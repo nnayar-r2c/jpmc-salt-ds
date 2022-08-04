@@ -100,6 +100,7 @@ export interface DataGridProps<TRowData = any, TColumnData = any> {
   // Selection
   rowSelectionMode?: RowSelectionMode;
   showCheckboxes?: boolean;
+  columnDividers?: boolean;
 }
 
 export const DataGrid = function <TRowData = any>(
@@ -123,6 +124,7 @@ export const DataGrid = function <TRowData = any>(
     rowDividerField,
     rowSelectionMode,
     showCheckboxes,
+    columnDividers,
   } = props;
 
   const [dataGridModel] = useState<DataGridModel<TRowData>>(
@@ -156,6 +158,7 @@ export const DataGrid = function <TRowData = any>(
   dataGridModel.setRowDividerField(rowDividerField);
   dataGridModel.setRowSelectionMode(rowSelectionMode);
   dataGridModel.setShowCheckboxes(showCheckboxes);
+  dataGridModel.setColumnDividers(columnDividers);
 
   return (
     <DataGridContext.Provider value={contextValue}>

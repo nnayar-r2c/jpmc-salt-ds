@@ -2,7 +2,7 @@
 }
 
 .uitkGridTextCellEditor {
-  border-collapse: collapse;
+  /*border-collapse: collapse;*/
   box-sizing: border-box;
   height: var(--uitkGrid-rowHeight);
   margin: 0;

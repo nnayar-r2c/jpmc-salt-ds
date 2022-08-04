@@ -16,9 +16,7 @@ export interface BaseCellProps<T = any>
   isSelectedRow?: boolean;
   isSelected?: boolean;
   isFocused?: boolean;
-  isAlternate?: boolean;
-  isDivided?: boolean;
-  isSecondaryBackground?: boolean;
+  isColumnDivided?: boolean;
   className?: string;
   style?: CSSProperties;
 }
@@ -35,9 +33,7 @@ export const BaseCell: FC<BaseCellProps> = function BaseCell(props) {
     isSelectedRow,
     isSelected,
     isFocused,
-    isAlternate,
-    isSecondaryBackground,
-    isDivided,
+    isColumnDivided,
     className,
     style,
     children,
@@ -60,18 +56,7 @@ export const BaseCell: FC<BaseCellProps> = function BaseCell(props) {
       className={cn(
         withBaseName(),
         {
-          [withBaseName("hover")]: isHoverOverRow,
-          [withBaseName("selectedRow")]: isSelectedRow,
-          [withBaseName("selectedCell")]: isSelected,
-          // TODO apply zebra and secondary to rows (or to the table)
-          [withBaseName("zebra")]:
-            isAlternate && !isSelected && !isSelectedRow && !isHoverOverRow, // TODO css?
-          [withBaseName("secondary")]:
-            isSecondaryBackground &&
-            !isSelected &&
-            !isSelectedRow &&
-            !isHoverOverRow,
-          [withBaseName("divided")]: isDivided,
+          // [withBaseName("selectedCell")]: isSelected,
           [withBaseName("editable")]: !isAllEditable && isEditable,
           [withBaseName("allEditable")]: isAllEditable && column.index !== 0,
         },
@@ -80,6 +65,9 @@ export const BaseCell: FC<BaseCellProps> = function BaseCell(props) {
       style={style}
     >
       {isFocused ? <Cursor /> : null}
+      {isColumnDivided ? (
+        <div className={withBaseName("columnDivider")} />
+      ) : null}
       <div className={withBaseName("valueContainer")}>{children}</div>
     </td>
   );

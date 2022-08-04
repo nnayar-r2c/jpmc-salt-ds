@@ -1,0 +1,9 @@
+.uitkGridRowHover {
+  background-color: var(--uitkGrid-rowHover-color);
+  opacity: var(--uitkGrid-rowHover-opacity);
+  height: var(--uitkGrid-rowHeight);
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: var(--uitkGrid-rowHover-zIndex);
+}

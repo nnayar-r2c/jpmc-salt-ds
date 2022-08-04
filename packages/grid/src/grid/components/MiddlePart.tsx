@@ -25,6 +25,13 @@ export function MiddlePart<T>(props: MiddlePartProps<T>) {
   const bodyVisibleColumnWidth = model.useBodyVisibleColumnWidth();
   const visibleColumns = model.useBodyVisibleColumns();
   const visibleRows = model.useRows();
+  const leftWidth = model.useLeftWidth();
+
+  const viewportStyle = useMemo(() => {
+    return {
+      clipPath: `inset(0 0 0 ${leftWidth}px)`,
+    };
+  }, [leftWidth]);
 
   const spaceStyle = useMemo(() => {
     return {
@@ -42,7 +49,7 @@ export function MiddlePart<T>(props: MiddlePartProps<T>) {
   }, [bodyVisibleColumnWidth, bodyVisibleAreaLeft, bodyVisibleAreaTop]);
 
   return (
-    <div ref={middleRef} className={withBaseName()}>
+    <div ref={middleRef} className={withBaseName()} style={viewportStyle}>
       <div className={withBaseName("space")} style={spaceStyle}>
         <table style={tableStyle} onWheel={onWheel}>
           <TableColGroup columns={visibleColumns} />

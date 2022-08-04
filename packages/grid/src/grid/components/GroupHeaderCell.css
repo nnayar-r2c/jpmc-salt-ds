@@ -2,7 +2,7 @@
 }
 
 .uitkGridGroupHeaderCell {
-  border-collapse: collapse;
+  /*border-collapse: collapse;*/
   text-align: left;
   padding: var(--uitkGrid-cell-padding);
   position: relative;

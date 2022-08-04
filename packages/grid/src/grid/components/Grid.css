@@ -1,29 +1,29 @@
 .uitk-density-touch .uitkGrid {
-  --uitkGrid-rowHeight: 60px;
+  --uitkGrid-rowHeight: 61px;
   --uitkGrid-padding: 16px;
   --uitkGrid-fontSize: 16px;
 }
 
 .uitk-density-low .uitkGrid {
-  --uitkGrid-rowHeight: 48px;
+  --uitkGrid-rowHeight: 49px;
   --uitkGrid-padding: 12px;
   --uitkGrid-fontSize: 14px;
 }
 
 .uitk-density-medium .uitkGrid {
-  --uitkGrid-rowHeight: 36px;
+  --uitkGrid-rowHeight: 37px;
   --uitkGrid-padding: 8px;
   --uitkGrid-fontSize: 12px;
 }
 
 .uitk-density-high .uitkGrid {
-  --uitkGrid-rowHeight: 24px;
+  --uitkGrid-rowHeight: 25px;
   --uitkGrid-padding: 8px;
   --uitkGrid-fontSize: 12px;
 }
 
 .uitk-density-ultrahigh .uitkGrid {
-  --uitkGrid-rowHeight: 20px;
+  --uitkGrid-rowHeight: 21px;
   --uitkGrid-padding: 4px;
   --uitkGrid-fontSize: 12px;
   /*Checkbox*/
@@ -190,17 +190,23 @@
 .uitkGrid {
   --uitkGrid-scrollBar-size: 15px;
   --uitkGrid-cell-padding: 0 var(--uitkGrid-padding) 0 var(--uitkGrid-padding);
+  --uitkGrid-borderSpacing: 1px;
+
+  --uitkGrid-rowHover-zIndex: 1;
+  --uitkGrid-cell-zIndex: 2;
 }
 
 .uitk-light .uitkGrid {
   --uitkGrid-backgroundColor-secondary: #f2f4f6;
   --uitkGrid-cell-borderColor: #d9dde3;
   --uitkGrid-cell-backgroundColor: var(--uitk-color-white);
-  --uitkGrid-zebraColor: #eaedef;
-  --uitkGrid-row-backgroundColor-hover: #a4d5f4;
+  --uitkGrid-zebraColor: rgba(0, 0, 0, .1);
+  --uitkGrid-row-backgroundColor-hover: rgba(125, 195, 240, .25);
+  /*--uitkGrid-rowHover-color: var(--uitk-color-blue-50);*/
+  /*--uitkGrid-rowHover-opacity: .25;*/
   /*--row-separator-color: #D9DDE3;*/
-  --uitkGrid-row-backgroundColor-selected: #64b1e4;
-  --uitkGrid-row-borderColor-selected: #2670a9;
+  --uitkGrid-row-backgroundColor-selected: rgba(125, 195, 240, .5);
+  --uitkGrid-row-borderColor-selected: rgba(125, 195, 240, 1);
   --uitkGrid-cell-backgroundColor-selected: #64b1e4;
   --uitkGrid-header-borderColor: var(--uitk-color-grey-90);
   --uitkGrid-header-backgroundColor: var(--uitk-color-white);
@@ -212,7 +218,10 @@
   --uitkGrid-columnDropTarget-color: var(--uitk-color-blue-500);
   --uitkGrid-cursor-borderColor: #00477b;
   --uitkGrid-borderColor: var(--uitk-color-grey-90);
-  --uitkGrid-rowDividerColor: var(--uitk-color-grey-90);
+
+  --uitkGrid-rowDivider-color: rgba(0, 0, 0, .1);
+  --uitkGrid-columnDivider-color: rgba(0, 0, 0, .1);
+  --uitkGrid-rowDivider-color-divided: rgba(0, 0, 0, .2);
 }
 
 .uitk-dark .uitkGrid {
@@ -235,7 +244,9 @@
   --uitkGrid-columnDropTarget-color: var(--uitk-color-blue-100);
   --uitkGrid-cursor-borderColor: #7dc3f2;
   --uitkGrid-borderColor: var(--uitk-color-grey-100);
-  --uitkGrid-rowDividerColor: var(--uitk-color-grey-100);
+  --uitkGrid-rowDivider-color: var(--uitk-color-grey-100);
+  --uitkGrid-rowDivider-color-divided: rgba(255, 255, 255, .2);
+
 }
 
 .uitkGrid {
@@ -243,6 +254,11 @@
   width: 1280px;
   position: relative;
   outline: none;
+  border-collapse: collapse;
+}
+
+.uitkGrid table {
+  border-collapse: collapse;
 }
 
 .uitkGrid-framed {

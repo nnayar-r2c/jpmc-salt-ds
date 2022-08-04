@@ -22,6 +22,7 @@ import { ColumnDropTarget } from "./ColumnDropTarget";
 import { MovingColumn } from "./MovingColumn";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
 import cx from "classnames";
+import { RowHover } from "./RowHover";
 
 const withBaseName = makePrefixer("uitkGrid");
 
@@ -101,6 +102,7 @@ export function GridBase<T>(props: GridBaseProps<T>) {
       <BottomRightPart onWheel={onWheel} />
       <ColumnDropTarget />
       <MovingColumn />
+      {/*<RowHover />*/}
     </div>
   );
 }

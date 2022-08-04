@@ -6,6 +6,6 @@
 }
 
 .uitkGridTopRightPart table {
-  border-collapse: collapse;
+  /*border-collapse: collapse;*/
   table-layout: fixed;
 }

@@ -10,6 +10,6 @@
 }
 
 .uitkGridBottomLeftPart table {
-  border-spacing: 0;
+  border-spacing: var(--uitkGrid-borderSpacing);
   table-layout: fixed;
 }

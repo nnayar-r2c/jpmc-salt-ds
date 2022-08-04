@@ -1,5 +1,6 @@
 import {
   BehaviorSubject,
+  combineLatest,
   distinctUntilChanged,
   filter,
   map,
@@ -130,21 +131,6 @@ export type RowSelectionMode = "single" | "multi" | "none";
 export type CellSelectionMode = "single" | "multi" | "none";
 export type GridBackgroundVariant = "primary" | "secondary" | "zebra";
 
-// 1. Any component rendered within a Grid should be able to access any part of
-//    the grid model. For example a checkbox column header cell needs to be able
-//    to select/unselect all rows in the grid. Passing everything as props to
-//    every piece of the grid is not ideal. Context can solve this problem.
-//    Using the context directly is not ideal either because (2, 3)
-// 2. A component should not be re-rendered on irrelevant changes in the model.
-// 3. A component should not have to filter irrelevant changes. No extra effort
-//    should be required to ignore things that the component doesn't use.
-//    An instance of GridModel is used as the context value. The context value
-//    itself doesn't change (the reference) so a component that uses the context
-//    doesn't get re-rendered on context changes. It can subscribe to specific
-//    streams within the context (GridModel) and re-render on updates on those
-//    streams only.
-// 4. The model is quite big and it is expected to grow in the future. It would
-//    be nice to make it as modular as possible.
 export interface IGridModel<TRowData> {
   // Parts
   readonly columnDragAndDrop: IColumnDragAndDrop<TRowData>;
@@ -174,7 +160,9 @@ export interface IGridModel<TRowData> {
   // Events
   readonly resize: (size: GridSize) => void;
   readonly scroll: (event: GridScrollEvent) => void;
+  readonly useHoverOverRowIndex: () => number | undefined;
   readonly setHoverOverRowIndex: (rowIndex?: number) => void;
+  readonly useHoverOverRowTop: () => number | undefined;
   readonly moveCursor: (position: CellPosition) => void;
   readonly setRowHeight: (rowHeight: number) => void;
   readonly resizeColumn: (event: ColumnResizeEvent) => void;
@@ -208,6 +196,9 @@ export interface IGridModel<TRowData> {
   readonly useRightColumnGroups: () => ColumnGroup<TRowData>[] | undefined;
   readonly useVisibleColumnGroups: () => ColumnGroup<TRowData>[] | undefined;
   readonly useIsAllEditable: () => boolean;
+
+  readonly useColumnDividers: () => boolean | undefined;
+  readonly setColumnDividers: (columnDividers: boolean | undefined) => void;
 }
 
 export type VisibleRowRangeChangeHandler = (
@@ -246,10 +237,16 @@ export class GridModel<TRowData = any> implements IGridModel<TRowData> {
   public readonly setIsFramed: (isFramed: boolean | undefined) => void;
   public readonly useBackgroundVariant: () => GridBackgroundVariant | undefined;
   public readonly setRowDividers: (rowDividers: number[] | undefined) => void;
+  public readonly useColumnDividers: () => boolean | undefined;
+  public readonly setColumnDividers: (
+    columnDividers: boolean | undefined
+  ) => void;
   // Events
   public readonly resize: (size: GridSize) => void;
   public readonly scroll: (event: GridScrollEvent) => void;
+  public readonly useHoverOverRowIndex: () => number | undefined;
   public readonly setHoverOverRowIndex: (rowIndex?: number) => void;
+  public readonly useHoverOverRowTop: () => number | undefined;
   public readonly moveCursor: (position: CellPosition) => void;
   public readonly setRowHeight: (rowHeight: number) => void;
   public readonly resizeColumn: (event: ColumnResizeEvent) => void;
@@ -320,6 +317,7 @@ export class GridModel<TRowData = any> implements IGridModel<TRowData> {
     const rowSelectionMode$ = new BehaviorSubject<RowSelectionMode>("single");
     const cellSelectionMode$ = new BehaviorSubject<CellSelectionMode>("none");
     const showCheckboxes$ = new BehaviorSubject<boolean | undefined>(undefined);
+    const columnDividers$ = new BehaviorSubject<boolean | undefined>(undefined);
 
     const columnGroupDefinitions$ = new BehaviorSubject<
       ColumnGroupDefinition<TRowData>[] | undefined
@@ -331,6 +329,7 @@ export class GridModel<TRowData = any> implements IGridModel<TRowData> {
     const hoverOverRowIndex$ = new BehaviorSubject<number | undefined>(
       undefined
     );
+    const hoverOverRowTop$ = new BehaviorSubject<number | undefined>(undefined);
     const cursorPosition$ = new BehaviorSubject<CellPosition | undefined>(
       undefined
     );
@@ -520,6 +519,8 @@ export class GridModel<TRowData = any> implements IGridModel<TRowData> {
     this.setShowCheckboxes = createHandler(showCheckboxes$);
     this.useShowToolbar = createHook(showToolbar$);
     this.setHoverOverRowIndex = createHandler(hoverOverRowIndex$);
+    this.useHoverOverRowIndex = createHook(hoverOverRowIndex$);
+    this.useHoverOverRowTop = createHook(hoverOverRowTop$);
     this.useCursorPosition = createHook(cursorPosition$);
     this.moveCursor = createHandler(moveCursorEvents$);
     this.setRowHeight = createHandler(rowHeight$);
@@ -557,6 +558,8 @@ export class GridModel<TRowData = any> implements IGridModel<TRowData> {
     this.useIsFramed = createHook(isFramed$);
     this.setIsFramed = createHandler(isFramed$);
     this.setRowDividers = createHandler(rowDividers$);
+    this.useColumnDividers = createHook(columnDividers$);
+    this.setColumnDividers = createHandler(columnDividers$);
 
     this.visibleRowRange$ = visibleRowRange$;
 
@@ -599,6 +602,22 @@ export class GridModel<TRowData = any> implements IGridModel<TRowData> {
     hoverOverRows(hoverOverRowIndex$, rows$);
     rowCursorPosition(cursorPosition$, rows$);
     columnMove(columnMoveEvents$, columnsAndGroups$);
+
+    combineLatest([hoverOverRowIndex$, rowHeight$, topHeight$])
+      .pipe(
+        map(([hoverOverRowIndex, rowHeight, topHeight]) => {
+          if (
+            hoverOverRowIndex === undefined ||
+            rowHeight === undefined ||
+            topHeight === undefined
+          ) {
+            return undefined;
+          }
+          return topHeight + (rowHeight + 1) * hoverOverRowIndex;
+        }),
+        distinctUntilChanged()
+      )
+      .subscribe(hoverOverRowTop$);
 
     moveCursorEvents$.subscribe((x) => {
       cursorPosition$.next(x);

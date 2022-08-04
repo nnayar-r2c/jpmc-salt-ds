@@ -61,6 +61,8 @@ export class DataGridSettingsModel {
     "none"
   );
   public readonly showCheckboxes = new BoolField("Show checkboxes");
+  public readonly pictureBackground = new BoolField("Picture background");
+  public readonly columnDividers = new BoolField("Column dividers");
 
   constructor() {}
 }
@@ -138,6 +140,12 @@ export const DataGridSettings = function DataGridSettings(
         </GridItem>
         <GridItem>
           <CheckboxField model={model.showCheckboxes} />
+        </GridItem>
+        <GridItem>
+          <CheckboxField model={model.pictureBackground} />
+        </GridItem>
+        <GridItem>
+          <CheckboxField model={model.columnDividers} />
         </GridItem>
       </GridLayout>
     </Card>

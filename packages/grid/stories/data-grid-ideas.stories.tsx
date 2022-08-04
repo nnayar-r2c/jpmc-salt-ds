@@ -23,6 +23,7 @@ import {
   DataGridSettingsModel,
 } from "./grid/data-grid-settings/DataGridSettings";
 import { randomAmount } from "./grid/utils";
+import image from "./grid/jpmorgan.webp";
 
 export default {
   title: "Grid/Data Grid Ideas",
@@ -230,28 +231,34 @@ const DataGridStoryTemplate: Story<DataGridStoryProps> = (props) => {
   const colGroupDefs = showColumnGroups ? columnGroupDefinitions : undefined;
   const rowSelectionMode = dataGridSettingsModel.rowSelectionMode.useValue();
   const showCheckboxes = dataGridSettingsModel.showCheckboxes.useValue();
+  const background = dataGridSettingsModel.pictureBackground.useValue();
+  const columnDividers = dataGridSettingsModel.columnDividers.useValue();
 
   return (
     <div className={"gridStory"}>
-      <GridToolbar model={toolbarModel} />
-      <DataGrid
-        className={"grid"}
-        rowKeyGetter={rowKeyGetter}
-        data={dummyInvestors}
-        columnDefinitions={columnDefinitions}
-        columnGroupDefinitions={colGroupDefs}
-        filterFn={filterFn}
-        sortFn={sortFn}
-        sortSettings={sortSettings}
-        rowGrouping={rowGrouping}
-        leafNodeGroupNameField={"name"}
-        backgroundVariant={backgroundVariant}
-        isFramed={isFramed}
-        rowDividerField={rowDividerField}
-        rowSelectionMode={rowSelectionMode}
-        showCheckboxes={showCheckboxes}
-      />
-      <DataGridSettings model={dataGridSettingsModel} />
+      {background ? <img className={"gridBackground"} src={image} /> : null}
+      <div className={"gridContainer"}>
+        <GridToolbar model={toolbarModel} />
+        <DataGrid
+          className={"grid"}
+          rowKeyGetter={rowKeyGetter}
+          data={dummyInvestors}
+          columnDefinitions={columnDefinitions}
+          columnGroupDefinitions={colGroupDefs}
+          filterFn={filterFn}
+          sortFn={sortFn}
+          sortSettings={sortSettings}
+          rowGrouping={rowGrouping}
+          leafNodeGroupNameField={"name"}
+          backgroundVariant={backgroundVariant}
+          isFramed={isFramed}
+          rowDividerField={rowDividerField}
+          rowSelectionMode={rowSelectionMode}
+          showCheckboxes={showCheckboxes}
+          columnDividers={columnDividers}
+        />
+        <DataGridSettings model={dataGridSettingsModel} />
+      </div>
     </div>
   );
 };

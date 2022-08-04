@@ -17,6 +17,7 @@ export function TableBody<T>(props: TableBodyProps<T>) {
   const backgroundVariant = model.useBackgroundVariant();
   const isRangeSelectionInProgress =
     model.cellSelection.useIsRangeSelectionInProgress();
+  const isColumnDivided = model.useColumnDividers();
 
   const onMouseEnter: MouseEventHandler<HTMLTableRowElement> = useCallback(
     (event) => {
@@ -127,6 +128,7 @@ export function TableBody<T>(props: TableBodyProps<T>) {
             onMouseLeave={onMouseLeave}
             columns={columns}
             backgroundVariant={backgroundVariant}
+            isColumnDivided={isColumnDivided}
           />
         );
       })}

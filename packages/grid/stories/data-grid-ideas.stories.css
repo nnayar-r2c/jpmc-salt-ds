@@ -1,4 +1,17 @@
+.gridBackground {
+  position: absolute;
+  height: 600px;
+  width: 800px;
+  opacity: .5;
+  filter: blur(6px);
+}
+
 .gridStory {
+  position: relative;
+}
+
+.gridContainer {
+  z-index: 2;
 }
 
 .grid {

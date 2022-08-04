@@ -6,6 +6,8 @@
   right: var(--uitkGrid-scrollBar-size);
   bottom: var(--uitkGrid-scrollBar-size);
   left: 0;
+
+  /*clip-path: inset(20px 20px 20px 200px);*/
 }
 
 .uitkGridMiddlePart-space {
@@ -13,7 +15,7 @@
 }
 
 .uitkGridMiddlePart table {
-  border-spacing: 0;
+  border-spacing: var(--uitkGrid-borderSpacing);
   table-layout: fixed;
   position: absolute;
   top: 0;

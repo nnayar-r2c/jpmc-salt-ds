@@ -1,2 +1,29 @@
 .uitkGridTableRow {
+  border-style: solid;
+  border-color: var(--uitkGrid-rowDivider-color);
+  border-width: 1px 0 0 0;
+
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.uitkGridTableRow-selected + .uitkGridTableRow {
+  border-color: var(--uitkGrid-row-borderColor-selected);
+}
+
+.uitkGridTableRow-divided {
+  border-color: var(--uitkGrid-rowDivider-color-divided);
+}
+
+.uitkGridTableRow-hover {
+  background-color: var(--uitkGrid-row-backgroundColor-hover);
+}
+
+.uitkGridTableRow-selected {
+  background-color: var(--uitkGrid-row-backgroundColor-selected);
+  border-color: var(--uitkGrid-row-borderColor-selected);
+}
+
+.uitkGridTableRow-zebra {
+  background-color: var(--uitkGrid-zebraColor);
 }

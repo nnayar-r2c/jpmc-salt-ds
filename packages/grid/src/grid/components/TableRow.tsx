@@ -3,6 +3,7 @@ import { memo, MouseEventHandler } from "react";
 import "./TableRow.css";
 import { BaseCell } from "./BaseCell";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
+import cn from "classnames";
 
 const withBaseName = makePrefixer("uitkGridTableRow");
 
@@ -12,6 +13,7 @@ export interface TableRowProps<T = any> {
   onMouseEnter: MouseEventHandler<HTMLTableRowElement>;
   onMouseLeave: MouseEventHandler<HTMLTableRowElement>;
   backgroundVariant?: GridBackgroundVariant;
+  isColumnDivided?: boolean;
 }
 
 function getCellValue<T, U>(
@@ -33,7 +35,7 @@ function getCellValue<T, U>(
 export const TableRow = memo<TableRowProps>(function TableRow<T>(
   props: TableRowProps<T>
 ) {
-  const { row, columns, backgroundVariant, onMouseEnter, onMouseLeave } = props;
+  const { row, columns, isColumnDivided, onMouseEnter, onMouseLeave } = props;
 
   const data = row.useData();
   const isSelectedRow = row.useIsSelected();
@@ -43,12 +45,16 @@ export const TableRow = memo<TableRowProps>(function TableRow<T>(
   const isEditMode = row.useIsEditMode();
   const index = row.useIndex();
   const selectedCells = row.useSelectedCells();
-  const isSecondaryBackground = backgroundVariant === "secondary";
   const isDivided = row.useIsDivided();
 
   return (
     <tr
-      className={withBaseName()}
+      className={cn(withBaseName(), {
+        [withBaseName("hover")]: isHoverOver,
+        [withBaseName("selected")]: isSelectedRow,
+        [withBaseName("zebra")]: isZebra && !isSelectedRow && !isHoverOver,
+        [withBaseName("divided")]: isDivided && !isSelectedRow && !isHoverOver,
+      })}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       data-row-index={index}
@@ -78,9 +84,7 @@ export const TableRow = memo<TableRowProps>(function TableRow<T>(
             isSelectedRow={isSelectedRow}
             isSelected={isSelected}
             isFocused={isFocused}
-            isAlternate={isZebra}
-            isSecondaryBackground={isSecondaryBackground}
-            isDivided={isDivided}
+            isColumnDivided={isColumnDivided}
           >
             {CellValue ? (
               <CellValue column={column} row={row} value={value} />

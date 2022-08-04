@@ -290,6 +290,7 @@ export class DataGridModel<TRowData = any, TColumnData = any> {
   private readonly rowKeyGetter: RowKeyGetterFn<TRowData>;
   private readonly data$: BehaviorSubject<TRowData[]>;
   private readonly showCheckboxes$: BehaviorSubject<boolean | undefined>;
+  private readonly columnDividers$: BehaviorSubject<boolean | undefined>;
 
   private readonly columnGroupDefinitions$: BehaviorSubject<
     ColGroupDef<TRowData>[] | undefined
@@ -375,6 +376,7 @@ export class DataGridModel<TRowData = any, TColumnData = any> {
   public readonly expandCollapseNode: (event: ExpandCollapseEvent) => void;
 
   public readonly setShowCheckboxes: (showCheckboxes?: boolean) => void;
+  public readonly setColumnDividers: (columnDividers?: boolean) => void;
 
   public constructor(options: DataGridModelOptions<TRowData>) {
     this.rowKeyGetter = options.rowKeyGetter;
@@ -396,6 +398,12 @@ export class DataGridModel<TRowData = any, TColumnData = any> {
 
     this.showCheckboxes$ = new BehaviorSubject<boolean | undefined>(undefined);
     this.setShowCheckboxes = createHandler(this.showCheckboxes$);
+
+    this.columnDividers$ = new BehaviorSubject<boolean | undefined>(undefined);
+    this.setColumnDividers = createHandler(this.columnDividers$);
+    this.columnDividers$.subscribe((columnDividers) => {
+      this.gridModel.setColumnDividers(columnDividers);
+    });
 
     this.leafRows$ = new BehaviorSubject<LeafRowNode<TRowData>[]>([]); // TODO init
     this.filteredLeafRows$ = new BehaviorSubject<LeafRowNode<TRowData>[]>([]);
