@@ -211,8 +211,9 @@
   --uitkGrid-header-borderColor: var(--uitk-color-grey-90);
   --uitkGrid-header-backgroundColor: var(--uitk-color-white);
   --uitkGrid-header-color: var(--uitk-color-grey-300);
-  --uitkGrid-headerColumnSeparator-color: #84878e;
-  --uitkGrid-headerRowSeparator-color: var(--uitk-color-grey-40);
+  --uitkGrid-headerColumnSeparator-color: rgba(0, 0, 0, .1);
+  --uitkGrid-headerRowSeparator-color: rgba(0, 0, 0, .3);
+  --uitkGrid-groupHeaderRowSeparator-color: rgba(0, 0, 0, .1);
   --uitkGrid-groupHeader-color: var(--uitk-color-grey-600);
   --uitkGrid-shadow-color: rgba(0, 0, 0, 0.2);
   --uitkGrid-columnDropTarget-color: var(--uitk-color-blue-500);

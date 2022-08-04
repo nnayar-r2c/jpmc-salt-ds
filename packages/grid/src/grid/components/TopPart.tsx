@@ -26,6 +26,13 @@ export function TopPart<T>(props: TopPartProps<T>) {
   const visibleColumns = model.useHeaderVisibleColumns();
   const visibleColumnGroups = model.useVisibleColumnGroups();
   const showToolbar = model.useShowToolbar();
+  const leftWidth = model.useLeftWidth();
+
+  const viewportStyle = useMemo(() => {
+    return {
+      clipPath: `inset(0 0 0 ${leftWidth}px)`,
+    };
+  }, [leftWidth]);
 
   const tableStyle = useMemo(() => {
     return {
@@ -43,7 +50,7 @@ export function TopPart<T>(props: TopPartProps<T>) {
   }, [topHeight, totalWidth]);
 
   return (
-    <div className={withBaseName()} ref={topRef}>
+    <div className={withBaseName()} ref={topRef} style={viewportStyle}>
       <div className={withBaseName("space")} style={spaceStyle}>
         <table style={tableStyle} onWheel={onWheel}>
           <TableColGroup columns={visibleColumns} />

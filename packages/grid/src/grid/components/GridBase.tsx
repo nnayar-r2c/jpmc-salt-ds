@@ -93,13 +93,13 @@ export function GridBase<T>(props: GridBaseProps<T>) {
       />
       <MiddlePart middleRef={middleRef} onWheel={onWheel} />
       <TopPart topRef={topRef} onWheel={onWheel} />
-      <BottomPart bottomRef={bottomRef} onWheel={onWheel} />
+      {/*<BottomPart bottomRef={bottomRef} onWheel={onWheel} />*/}
       <LeftPart leftRef={leftRef} onWheel={onWheel} />
       <RightPart rightRef={rightRef} onWheel={onWheel} />
       <TopLeftPart onWheel={onWheel} />
       <TopRightPart onWheel={onWheel} />
-      <BottomLeftPart onWheel={onWheel} />
-      <BottomRightPart onWheel={onWheel} />
+      {/*<BottomLeftPart onWheel={onWheel} />*/}
+      {/*<BottomRightPart onWheel={onWheel} />*/}
       <ColumnDropTarget />
       <MovingColumn />
       {/*<RowHover />*/}

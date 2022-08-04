@@ -6,7 +6,7 @@
   text-align: left;
   padding: var(--uitkGrid-cell-padding);
   position: relative;
-  background-color: var(--uitkGrid-header-backgroundColor);
+  /*background-color: var(--uitkGrid-header-backgroundColor);*/
   color: var(--uitkGrid-groupHeader-color);
   overflow: hidden;
   white-space: nowrap;
@@ -23,7 +23,7 @@
   right: 4px;
   bottom: 0;
   height: 1px;
-  background-color: var(--uitkGrid-headerRowSeparator-color);
+  background-color: var(--uitkGrid-groupHeaderRowSeparator-color);
 }
 
 .uitkGridGroupHeaderCell-firstGroupRowSeparator {
@@ -32,7 +32,7 @@
   right: 4px;
   bottom: 0;
   height: 1px;
-  background-color: var(--uitkGrid-headerRowSeparator-color);
+  background-color: var(--uitkGrid-groupHeaderRowSeparator-color);
 }
 
 .uitkGridGroupHeaderCell-lastGroupRowSeparator {
@@ -41,7 +41,7 @@
   right: 0;
   bottom: 0;
   height: 1px;
-  background-color: var(--uitkGrid-headerRowSeparator-color);
+  background-color: var(--uitkGrid-groupHeaderRowSeparator-color);
 }
 
 .uitkGridGroupHeaderCell-columnSeparator {

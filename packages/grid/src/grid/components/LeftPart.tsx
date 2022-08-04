@@ -26,6 +26,13 @@ export function LeftPart<T>(props: LeftPartProps<T>) {
   const leftColumns = model.useLeftColumns();
   const visibleRows = model.useRows();
   const bodyVisibleAreaTop = model.useBodyVisibleAreaTop();
+  const topHeight = model.useTopHeight();
+
+  const viewportStyle = useMemo(() => {
+    return {
+      clipPath: `inset(${topHeight}px -10px 0 0)`, // negative right clip is for the shadow
+    };
+  }, [topHeight]);
 
   const spaceStyle = useMemo(() => {
     return {
@@ -47,6 +54,7 @@ export function LeftPart<T>(props: LeftPartProps<T>) {
       className={cn(withBaseName(), {
         [withBaseName("raised")]: isRaised,
       })}
+      style={viewportStyle}
     >
       <div className={withBaseName("space")} style={spaceStyle}>
         <table style={tableStyle} onWheel={onWheel}>

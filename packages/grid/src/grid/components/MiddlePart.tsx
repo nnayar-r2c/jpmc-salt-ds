@@ -26,12 +26,13 @@ export function MiddlePart<T>(props: MiddlePartProps<T>) {
   const visibleColumns = model.useBodyVisibleColumns();
   const visibleRows = model.useRows();
   const leftWidth = model.useLeftWidth();
+  const topHeight = model.useTopHeight();
 
   const viewportStyle = useMemo(() => {
     return {
-      clipPath: `inset(0 0 0 ${leftWidth}px)`,
+      clipPath: `inset(${topHeight}px 0 0 ${leftWidth}px)`,
     };
-  }, [leftWidth]);
+  }, [leftWidth, topHeight]);
 
   const spaceStyle = useMemo(() => {
     return {
