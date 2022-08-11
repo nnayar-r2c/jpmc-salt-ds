@@ -6,17 +6,21 @@
   right: var(--uitkGrid-scrollBar-size);
   bottom: var(--uitkGrid-scrollBar-size);
   left: 0;
-
-  /*clip-path: inset(20px 20px 20px 200px);*/
+  clip-path: inset(var(--uitkGrid-topHeight) 0 0 var(--uitkGrid-leftWidth));
 }
 
 .uitkGridMiddlePart-space {
   position: relative;
+  height: var(--uitkGrid-totalHeight);
+  width: var(--uitkGrid-totalWidth);
 }
 
 .uitkGridMiddlePart table {
   border-spacing: var(--uitkGrid-borderSpacing);
   table-layout: fixed;
   position: absolute;
-  top: 0;
+
+  width: var(--uitkGrid-bodyVisibleColumnWidth);
+  top: var(--uitkGrid-bodyVisibleAreaTop);
+  left: var(--uitkGrid-bodyVisibleAreaLeft);
 }

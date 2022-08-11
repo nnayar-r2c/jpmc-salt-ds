@@ -1,4 +1,4 @@
-import { useMemo, WheelEventHandler } from "react";
+import { WheelEventHandler } from "react";
 import { useGridContext } from "../GridContext";
 import "./TopLeftPart.css";
 import { TableColGroup } from "./TableColGroup";
@@ -17,22 +17,13 @@ export function TopLeftPart<T>(props: TopLeftPartProps<T>) {
   const { onWheel } = props;
   const { model } = useGridContext();
 
-  const leftWidth = model.useLeftWidth();
-  const topHeight = model.useTopHeight();
   const showToolbar = model.useShowToolbar();
   const leftColumns = model.useLeftColumns();
   const leftGroups = model.useLeftColumnGroups();
 
-  const tableStyle = useMemo(() => {
-    return {
-      width: `${leftWidth}px`,
-      height: `${topHeight}px`,
-    };
-  }, [leftWidth, topHeight]);
-
   return (
     <div className={withBaseName()}>
-      <table style={tableStyle} onWheel={onWheel}>
+      <table onWheel={onWheel}>
         <TableColGroup columns={leftColumns} />
         <thead>
           {leftGroups && <GroupHeaderRow groups={leftGroups} />}

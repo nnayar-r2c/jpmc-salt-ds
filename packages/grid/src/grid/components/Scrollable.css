@@ -10,4 +10,6 @@
 
 .uitkGridScrollable-space {
   position: relative;
+  height: var(--uitkGrid-totalHeight);
+  width: var(--uitkGrid-totalWidth);
 }

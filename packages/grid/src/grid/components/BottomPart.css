@@ -14,11 +14,14 @@
 
 .uitkGridBottomPart-space {
   position: relative;
+  height: var(--uitkGrid-bottomHeight);
+  width: var(--uitkGrid-totalWidth);
 }
 
 .uitkGridBottomPart table {
-  /*border-collapse: separate;*/
   table-layout: fixed;
   position: absolute;
   bottom: 0;
+  width: var(--uitkGrid-bodyVisibleColumnWidth);
+  left: var(--uitkGrid-bodyVisibleAreaLeft);
 }

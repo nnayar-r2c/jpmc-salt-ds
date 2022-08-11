@@ -1,4 +1,4 @@
-import { useMemo, WheelEventHandler } from "react";
+import { WheelEventHandler } from "react";
 import { useGridContext } from "../GridContext";
 import { TableColGroup } from "./TableColGroup";
 import { HeaderRow } from "./HeaderRow";
@@ -17,27 +17,14 @@ export function TopRightPart<T>(props: TopRightPartProps<T>) {
   const { onWheel } = props;
   const { model } = useGridContext();
 
-  const rightWidth = model.useRightWidth();
-  const topHeight = model.useTopHeight();
   const showToolbar = model.useShowToolbar();
   const rightColumnGroups = model.useRightColumnGroups();
-
-  const tableStyle = useMemo(() => {
-    return {
-      width: `${rightWidth}px`,
-      height: `${topHeight}px`,
-    };
-  }, [rightWidth, topHeight]);
 
   const rightColumns = model.useRightColumns();
 
   return (
     <div className={withBaseName()}>
-      <table
-        className={withBaseName("table")}
-        style={tableStyle}
-        onWheel={onWheel}
-      >
+      <table className={withBaseName("table")} onWheel={onWheel}>
         <TableColGroup columns={rightColumns} />
         <thead>
           {rightColumnGroups ? (

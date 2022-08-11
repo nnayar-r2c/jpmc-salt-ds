@@ -223,6 +223,7 @@ const DataGridStoryTemplate: Story<DataGridStoryProps> = (props) => {
     }, [groupByColumns]);
 
   const backgroundVariant = dataGridSettingsModel.backgroundVariant.useValue();
+  const isZebra = dataGridSettingsModel.isZebra.useValue();
   const isFramed = dataGridSettingsModel.frame.useValue();
   const rowDividerField = dataGridSettingsModel.rowDividers.useValue()
     ? "location"
@@ -251,6 +252,7 @@ const DataGridStoryTemplate: Story<DataGridStoryProps> = (props) => {
           rowGrouping={rowGrouping}
           leafNodeGroupNameField={"name"}
           backgroundVariant={backgroundVariant}
+          isZebra={isZebra}
           isFramed={isFramed}
           rowDividerField={rowDividerField}
           rowSelectionMode={rowSelectionMode}

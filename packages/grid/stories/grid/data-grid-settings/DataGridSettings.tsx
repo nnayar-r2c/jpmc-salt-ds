@@ -1,4 +1,4 @@
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, distinctUntilChanged, map } from "rxjs";
 import {
   createHandler,
   createHook,
@@ -34,23 +34,30 @@ export class EnumField<T> {
 export class BoolField {
   public readonly label: string;
   public readonly value$: BehaviorSubject<boolean>;
+  public readonly disabled$: BehaviorSubject<boolean>;
   public readonly useValue: () => boolean;
   public readonly setValue: (value: boolean) => void;
+  public readonly useDisabled: () => boolean;
+  public readonly setDisabled: (disabled: boolean) => void;
 
   constructor(label: string, defaultValue?: boolean) {
     this.label = label;
     this.value$ = new BehaviorSubject<boolean>(defaultValue || false);
+    this.disabled$ = new BehaviorSubject<boolean>(false);
     this.useValue = createHook(this.value$);
     this.setValue = createHandler(this.value$);
+    this.useDisabled = createHook(this.disabled$);
+    this.setDisabled = createHandler(this.disabled$);
   }
 }
 
 export class DataGridSettingsModel {
   public readonly backgroundVariant = new EnumField<GridBackgroundVariant>(
     "Background Variant",
-    ["primary", "secondary", "zebra"],
+    ["transparent", "primary", "secondary"],
     "primary"
   );
+  public readonly isZebra = new BoolField("Zebra");
 
   public readonly frame = new BoolField("Frame");
   public readonly columnGrouping = new BoolField("Column Grouping");
@@ -64,7 +71,14 @@ export class DataGridSettingsModel {
   public readonly pictureBackground = new BoolField("Picture background");
   public readonly columnDividers = new BoolField("Column dividers");
 
-  constructor() {}
+  constructor() {
+    this.rowSelectionMode.value$
+      .pipe(
+        map((rsm) => rsm == "none"),
+        distinctUntilChanged()
+      )
+      .subscribe((disabled) => this.showCheckboxes.setDisabled(disabled));
+  }
 }
 
 export interface ToggleButtonFieldProps<T> {
@@ -103,12 +117,20 @@ export interface CheckboxFieldProps {
 export const CheckboxField = function CheckboxField(props: CheckboxFieldProps) {
   const { model } = props;
   const value = model.useValue();
+  const disabled = model.useDisabled();
 
   const onChange = (event: any, checked: boolean) => {
     model.setValue(checked);
   };
 
-  return <Checkbox label={model.label} checked={value} onChange={onChange} />;
+  return (
+    <Checkbox
+      disabled={disabled}
+      label={model.label}
+      checked={value}
+      onChange={onChange}
+    />
+  );
 };
 
 export interface DataGridSettingsProps {
@@ -123,11 +145,18 @@ export const DataGridSettings = function DataGridSettings(
   return (
     <Card className="dataGridSettings">
       <GridLayout columns={5}>
-        <GridItem colSpan={2}>
+        <GridItem colSpan={3}>
           <ToggleButtonField model={model.backgroundVariant} />
         </GridItem>
         <GridItem>
+          <CheckboxField model={model.isZebra} />
+        </GridItem>
+        <GridItem>
           <CheckboxField model={model.frame} />
+        </GridItem>
+
+        <GridItem colSpan={3}>
+          <ToggleButtonField model={model.rowSelectionMode} />
         </GridItem>
         <GridItem>
           <CheckboxField model={model.columnGrouping} />
@@ -135,9 +164,7 @@ export const DataGridSettings = function DataGridSettings(
         <GridItem>
           <CheckboxField model={model.rowDividers} />
         </GridItem>
-        <GridItem colSpan={2}>
-          <ToggleButtonField model={model.rowSelectionMode} />
-        </GridItem>
+
         <GridItem>
           <CheckboxField model={model.showCheckboxes} />
         </GridItem>

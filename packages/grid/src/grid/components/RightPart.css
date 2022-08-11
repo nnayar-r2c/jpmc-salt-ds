@@ -14,10 +14,15 @@
 
 .uitkGridRightPart-space {
   position: relative;
+  height: var(--uitkGrid-totalHeight);
+  width: var(--uitkGrid-rightWidth);
 }
 
 .uitkGridRightPart table {
   border-spacing: var(--uitkGrid-borderSpacing);
   table-layout: fixed;
   position: absolute;
+
+  top: var(--uitkGrid-bodyVisibleAreaTop);
+  width: var(--uitkGrid-rightWidth);
 }

@@ -1,5 +1,5 @@
 import { useGridContext } from "../GridContext";
-import { RefObject, useMemo, WheelEventHandler } from "react";
+import { RefObject, WheelEventHandler } from "react";
 import { TableColGroup } from "./TableColGroup";
 import { TableBody } from "./TableBody";
 import "./MiddlePart.css";
@@ -12,47 +12,16 @@ export interface MiddlePartProps<T> {
   onWheel: WheelEventHandler<HTMLTableElement>;
 }
 
-// Scrollable part of the columns that are not pinned. Can be scrolled along
-// both axis. Virtualized.
 export function MiddlePart<T>(props: MiddlePartProps<T>) {
   const { middleRef, onWheel } = props;
   const { model } = useGridContext();
-
-  const totalWidth = model.useTotalWidth();
-  const totalHeight = model.useTotalHeight();
-  const bodyVisibleAreaLeft = model.useBodyVisibleAreaLeft();
-  const bodyVisibleAreaTop = model.useBodyVisibleAreaTop();
-  const bodyVisibleColumnWidth = model.useBodyVisibleColumnWidth();
   const visibleColumns = model.useBodyVisibleColumns();
   const visibleRows = model.useRows();
-  const leftWidth = model.useLeftWidth();
-  const topHeight = model.useTopHeight();
-
-  const viewportStyle = useMemo(() => {
-    return {
-      clipPath: `inset(${topHeight}px 0 0 ${leftWidth}px)`,
-    };
-  }, [leftWidth, topHeight]);
-
-  const spaceStyle = useMemo(() => {
-    return {
-      width: `${totalWidth}px`,
-      height: `${totalHeight}px`,
-    };
-  }, [totalWidth, totalHeight]);
-
-  const tableStyle = useMemo(() => {
-    return {
-      width: `${bodyVisibleColumnWidth}px`,
-      top: `${bodyVisibleAreaTop}px`,
-      left: `${bodyVisibleAreaLeft}px`,
-    };
-  }, [bodyVisibleColumnWidth, bodyVisibleAreaLeft, bodyVisibleAreaTop]);
 
   return (
-    <div ref={middleRef} className={withBaseName()} style={viewportStyle}>
-      <div className={withBaseName("space")} style={spaceStyle}>
-        <table style={tableStyle} onWheel={onWheel}>
+    <div ref={middleRef} className={withBaseName()}>
+      <div className={withBaseName("space")}>
+        <table onWheel={onWheel}>
           <TableColGroup columns={visibleColumns} />
           <TableBody columns={visibleColumns} rows={visibleRows} />
         </table>

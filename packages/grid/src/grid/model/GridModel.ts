@@ -129,7 +129,7 @@ export interface GridSize {
 
 export type RowSelectionMode = "single" | "multi" | "none";
 export type CellSelectionMode = "single" | "multi" | "none";
-export type GridBackgroundVariant = "primary" | "secondary" | "zebra";
+export type GridBackgroundVariant = "transparent" | "primary" | "secondary";
 
 export interface IGridModel<TRowData> {
   // Parts
@@ -143,7 +143,9 @@ export interface IGridModel<TRowData> {
   readonly setBackgroundVariant: (
     backgroundVariant?: GridBackgroundVariant
   ) => void;
+  readonly setZebra: (isZebra?: boolean) => void;
   readonly useBackgroundVariant: () => GridBackgroundVariant | undefined;
+  readonly useZebra: () => boolean | undefined;
   // TODO checkboxes can be radio buttons in single-row mode. Rename this.
   readonly setShowCheckboxes: (showCheckboxes?: boolean) => void;
   readonly setColumnDefinitions: (
@@ -233,9 +235,11 @@ export class GridModel<TRowData = any> implements IGridModel<TRowData> {
   public readonly setBackgroundVariant: (
     backgroundVariant?: GridBackgroundVariant
   ) => void;
+  public readonly setZebra: (isZebra?: boolean) => void;
   public readonly useIsFramed: () => boolean | undefined;
   public readonly setIsFramed: (isFramed: boolean | undefined) => void;
   public readonly useBackgroundVariant: () => GridBackgroundVariant | undefined;
+  public readonly useZebra: () => boolean | undefined;
   public readonly setRowDividers: (rowDividers: number[] | undefined) => void;
   public readonly useColumnDividers: () => boolean | undefined;
   public readonly setColumnDividers: (
@@ -310,6 +314,7 @@ export class GridModel<TRowData = any> implements IGridModel<TRowData> {
     const backgroundVariant$ = new BehaviorSubject<
       GridBackgroundVariant | undefined
     >(undefined);
+    const isZebra$ = new BehaviorSubject<boolean | undefined>(undefined);
     const isFramed$ = new BehaviorSubject<boolean | undefined>(undefined);
     const rowDividers$ = new BehaviorSubject<number[] | undefined>(undefined);
 
@@ -484,6 +489,7 @@ export class GridModel<TRowData = any> implements IGridModel<TRowData> {
       cursorPosition$,
       this.editMode,
       backgroundVariant$,
+      isZebra$,
       rowDividers$
     );
 
@@ -555,6 +561,8 @@ export class GridModel<TRowData = any> implements IGridModel<TRowData> {
     this.setOnVisibleRowRangeChange = createHandler(onVisibleRowRangeChange$);
     this.setBackgroundVariant = createHandler(backgroundVariant$);
     this.useBackgroundVariant = createHook(backgroundVariant$);
+    this.useZebra = createHook(isZebra$);
+    this.setZebra = createHandler(isZebra$);
     this.useIsFramed = createHook(isFramed$);
     this.setIsFramed = createHandler(isFramed$);
     this.setRowDividers = createHandler(rowDividers$);

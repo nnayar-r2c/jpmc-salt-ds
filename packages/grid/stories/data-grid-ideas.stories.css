@@ -1,8 +1,8 @@
 .gridBackground {
   position: absolute;
-  height: 600px;
-  width: 800px;
-  opacity: .5;
+  height: 700px;
+  width: 900px;
+  opacity: .3;
   filter: blur(6px);
 }
 
@@ -12,6 +12,7 @@
 
 .gridContainer {
   z-index: 2;
+  padding: 40px;
 }
 
 .grid {

@@ -1,5 +1,5 @@
 import { useGridContext } from "../GridContext";
-import { RefObject, UIEventHandler, useEffect, useMemo } from "react";
+import { RefObject, UIEventHandler, useEffect } from "react";
 import "./Scrollable.css";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
 
@@ -19,16 +19,7 @@ export function Scrollable<T>(props: ScrollableProps<T>) {
     props;
 
   const { model } = useGridContext();
-  const totalWidth = model.useTotalWidth();
-  const totalHeight = model.useTotalHeight();
   const scrollPosition = model.useScrollPosition();
-
-  const style = useMemo(() => {
-    return {
-      height: `${totalHeight}px`,
-      width: `${totalWidth}px`,
-    };
-  }, [totalHeight, totalWidth]);
 
   const onScroll: UIEventHandler<HTMLDivElement> = (event) => {
     if (!scrollerRef.current) {
@@ -73,7 +64,7 @@ export function Scrollable<T>(props: ScrollableProps<T>) {
 
   return (
     <div ref={scrollerRef} className={withBaseName()} onScroll={onScroll}>
-      <div className={withBaseName("space")} style={style} />
+      <div className={withBaseName("space")} />
     </div>
   );
 }

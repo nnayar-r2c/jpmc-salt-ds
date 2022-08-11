@@ -23,6 +23,7 @@ export function createRows<T>(
   cursorPosition$: BehaviorSubject<CellPosition | undefined>,
   editMode: EditMode,
   backgroundVariant$: BehaviorSubject<GridBackgroundVariant | undefined>,
+  isZebra$: BehaviorSubject<boolean | undefined>,
   rowDividers$: BehaviorSubject<number[] | undefined>
 ) {
   const rows$ = new BehaviorSubject<Row<T>[]>([]);
@@ -71,15 +72,11 @@ export function createRows<T>(
     )
     .subscribe(rows$);
 
-  combineLatest([rows$, backgroundVariant$]).subscribe(
-    ([rows, backgroundVariant]) => {
-      rows.forEach((row) => {
-        row.isZebra$.next(
-          backgroundVariant === "zebra" && row.index$.getValue() % 2 === 0
-        );
-      });
-    }
-  );
+  combineLatest([rows$, isZebra$]).subscribe(([rows, isZebra]) => {
+    rows.forEach((row) => {
+      row.isZebra$.next(!!isZebra && row.index$.getValue() % 2 === 0);
+    });
+  });
 
   rowSelection$.selectedKeys$.subscribe((selectedKeys) => {
     const rows = rows$.getValue();

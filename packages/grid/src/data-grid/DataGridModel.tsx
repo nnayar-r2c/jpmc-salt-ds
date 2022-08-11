@@ -328,6 +328,7 @@ export class DataGridModel<TRowData = any, TColumnData = any> {
   private readonly backgroundVariant$: BehaviorSubject<
     GridBackgroundVariant | undefined
   >;
+  private readonly isZebra$: BehaviorSubject<boolean | undefined>;
   private readonly rowDividerField$: BehaviorSubject<
     keyof TRowData | undefined
   >;
@@ -364,6 +365,7 @@ export class DataGridModel<TRowData = any, TColumnData = any> {
   public readonly setBackgroundVariant: (
     backgroundVariant?: GridBackgroundVariant
   ) => void;
+  public readonly setZebra: (isZebra?: boolean) => void;
 
   public readonly setIsFramed: (isFramed: boolean | undefined) => void;
   public readonly setRowDividerField: (
@@ -705,6 +707,12 @@ export class DataGridModel<TRowData = any, TColumnData = any> {
     this.setBackgroundVariant = createHandler(this.backgroundVariant$);
     this.backgroundVariant$.subscribe((backgroundVariant) => {
       this.gridModel.setBackgroundVariant(backgroundVariant);
+    });
+
+    this.isZebra$ = new BehaviorSubject<boolean | undefined>(undefined);
+    this.setZebra = createHandler(this.isZebra$);
+    this.isZebra$.subscribe((isZebra) => {
+      this.gridModel.setZebra(isZebra);
     });
 
     this.setIsFramed = this.gridModel.setIsFramed;

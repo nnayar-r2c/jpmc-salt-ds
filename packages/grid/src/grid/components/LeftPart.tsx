@@ -2,7 +2,7 @@ import cn from "classnames";
 import { TableColGroup } from "./TableColGroup";
 import { TableBody } from "./TableBody";
 import { useGridContext } from "../GridContext";
-import { RefObject, useMemo, WheelEventHandler } from "react";
+import { RefObject, WheelEventHandler } from "react";
 import "./LeftPart.css";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
 
@@ -21,32 +21,8 @@ export function LeftPart<T>(props: LeftPartProps<T>) {
   const { model } = useGridContext();
 
   const isRaised = model.useIsLeftRaised();
-  const totalHeight = model.useTotalHeight();
-  const leftWidth = model.useLeftWidth();
   const leftColumns = model.useLeftColumns();
   const visibleRows = model.useRows();
-  const bodyVisibleAreaTop = model.useBodyVisibleAreaTop();
-  const topHeight = model.useTopHeight();
-
-  const viewportStyle = useMemo(() => {
-    return {
-      clipPath: `inset(${topHeight}px -10px 0 0)`, // negative right clip is for the shadow
-    };
-  }, [topHeight]);
-
-  const spaceStyle = useMemo(() => {
-    return {
-      height: `${totalHeight}px`,
-      width: `${leftWidth}px`,
-    };
-  }, [totalHeight, leftWidth]);
-
-  const tableStyle = useMemo(() => {
-    return {
-      top: `${bodyVisibleAreaTop}px`,
-      width: `${leftWidth}px`,
-    };
-  }, [bodyVisibleAreaTop, leftWidth]);
 
   return (
     <div
@@ -54,10 +30,9 @@ export function LeftPart<T>(props: LeftPartProps<T>) {
       className={cn(withBaseName(), {
         [withBaseName("raised")]: isRaised,
       })}
-      style={viewportStyle}
     >
-      <div className={withBaseName("space")} style={spaceStyle}>
-        <table style={tableStyle} onWheel={onWheel}>
+      <div className={withBaseName("space")}>
+        <table onWheel={onWheel}>
           <TableColGroup columns={leftColumns} />
           <TableBody columns={leftColumns} rows={visibleRows} />
         </table>

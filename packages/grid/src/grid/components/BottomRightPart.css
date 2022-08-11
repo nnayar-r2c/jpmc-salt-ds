@@ -12,4 +12,6 @@
 .uitkGridBottomRightPart table {
   border-spacing: var(--uitkGrid-borderSpacing);
   table-layout: fixed;
+
+  width: var(--uitkGrid-rightWidth);
 }

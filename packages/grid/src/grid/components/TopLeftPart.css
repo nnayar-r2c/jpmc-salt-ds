@@ -6,6 +6,7 @@
 }
 
 .uitkGridTopLeftPart table {
-  /*border-collapse: collapse;*/
   table-layout: fixed;
+  width: var(--uitkGrid-leftWidth);
+  height: var(--uitkGrid-topHeight);
 }

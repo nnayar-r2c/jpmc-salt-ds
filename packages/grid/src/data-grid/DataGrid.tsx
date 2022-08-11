@@ -72,6 +72,7 @@ export interface DataGridProps<TRowData = any, TColumnData = any> {
   className?: string;
   rowDividers?: DataGridRowDividerVariant;
   backgroundVariant?: GridBackgroundVariant;
+  isZebra?: boolean;
   isFramed?: boolean;
   rowDividerField?: keyof TRowData; // Rows with different values in this field will be divided by high emphasis row divider
 
@@ -120,6 +121,7 @@ export const DataGrid = function <TRowData = any>(
     sortFn,
     sortSettings,
     backgroundVariant,
+    isZebra,
     isFramed,
     rowDividerField,
     rowSelectionMode,
@@ -154,6 +156,7 @@ export const DataGrid = function <TRowData = any>(
   dataGridModel.setSortFn(sortFn);
   dataGridModel.setSortSettings(sortSettings);
   dataGridModel.setBackgroundVariant(backgroundVariant);
+  dataGridModel.setZebra(isZebra);
   dataGridModel.setIsFramed(isFramed);
   dataGridModel.setRowDividerField(rowDividerField);
   dataGridModel.setRowSelectionMode(rowSelectionMode);

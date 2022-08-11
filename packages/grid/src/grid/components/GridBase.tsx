@@ -3,6 +3,7 @@ import {
   KeyboardEventHandler,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   WheelEventHandler,
 } from "react";
@@ -10,19 +11,15 @@ import { CellMeasure } from "./CellMeasure";
 import { Scrollable } from "./Scrollable";
 import { MiddlePart } from "./MiddlePart";
 import { TopPart } from "./TopPart";
-import { BottomPart } from "./BottomPart";
 import { LeftPart } from "./LeftPart";
 import { RightPart } from "./RightPart";
 import { TopLeftPart } from "./TopLeftPart";
 import { TopRightPart } from "./TopRightPart";
-import { BottomLeftPart } from "./BottomLeftPart";
-import { BottomRightPart } from "./BottomRightPart";
 import { useGridContext } from "../GridContext";
 import { ColumnDropTarget } from "./ColumnDropTarget";
 import { MovingColumn } from "./MovingColumn";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
 import cx from "classnames";
-import { RowHover } from "./RowHover";
 
 const withBaseName = makePrefixer("uitkGrid");
 
@@ -42,6 +39,7 @@ export function GridBase<T>(props: GridBaseProps<T>) {
 
   const { model } = useGridContext();
   const isFramed = model.useIsFramed();
+  const backgroundVariant = model.useBackgroundVariant();
 
   const onKeyDown: KeyboardEventHandler<HTMLDivElement> = useCallback(
     (event) => {
@@ -68,15 +66,65 @@ export function GridBase<T>(props: GridBaseProps<T>) {
     scrollerDiv.scrollTop += event.deltaY;
   }, []);
 
+  const totalWidth = model.useTotalWidth();
+  const totalHeight = model.useTotalHeight();
+  const topHeight = model.useTopHeight();
+  const leftWidth = model.useLeftWidth();
+  const bodyVisibleAreaLeft = model.useBodyVisibleAreaLeft();
+  const bodyVisibleAreaTop = model.useBodyVisibleAreaTop();
+  const bodyVisibleColumnWidth = model.useBodyVisibleColumnWidth();
+  const bottomHeight = model.useBottomHeight();
+  const rightWidth = model.useRightWidth();
+  const headerVisibleColumnWidth = model.useHeaderVisibleColumnWidth();
+  const headerVisibleAreaLeft = model.useHeaderVisibleAreaLeft();
+
+  const style = useMemo(
+    () =>
+      ({
+        ["--uitkGrid-totalWidth"]: `${totalWidth}px`,
+        ["--uitkGrid-totalHeight"]: `${totalHeight}px`,
+        ["--uitkGrid-topHeight"]: `${topHeight}px`,
+        ["--uitkGrid-leftWidth"]: `${leftWidth}px`,
+        ["--uitkGrid-rightWidth"]: `${rightWidth}px`,
+
+        ["--uitkGrid-bodyVisibleColumnWidth"]: `${bodyVisibleColumnWidth}px`,
+        ["--uitkGrid-bodyVisibleAreaTop"]: `${bodyVisibleAreaTop}px`,
+        ["--uitkGrid-bodyVisibleAreaLeft"]: `${bodyVisibleAreaLeft}px`,
+        ["--uitkGrid-bottomHeight"]: `${bottomHeight}px`,
+
+        ["--uitkGrid-headerVisibleColumnWidth"]: `${headerVisibleColumnWidth}px`,
+        ["--uitkGrid-headerVisibleAreaLeft"]: `${headerVisibleAreaLeft}px`,
+      } as any),
+    [
+      totalHeight,
+      totalWidth,
+      topHeight,
+      leftWidth,
+      rightWidth,
+
+      bottomHeight,
+      bodyVisibleColumnWidth,
+      bodyVisibleAreaLeft,
+      bodyVisibleAreaTop,
+
+      headerVisibleColumnWidth,
+      headerVisibleAreaLeft,
+    ]
+  );
+
   return (
     <div
       className={cx(
         withBaseName(),
         {
           [withBaseName("framed")]: isFramed,
+          [withBaseName("primaryBackground")]: backgroundVariant === "primary",
+          [withBaseName("secondaryBackground")]:
+            backgroundVariant === "secondary",
         },
         className
       )}
+      style={style}
       ref={rootRef}
       tabIndex={0}
       onKeyDown={onKeyDown}
