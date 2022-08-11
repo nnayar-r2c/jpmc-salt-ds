@@ -2,30 +2,35 @@
   --uitkGrid-rowHeight: 61px;
   --uitkGrid-padding: 16px;
   --uitkGrid-fontSize: 16px;
+  --uitkGrid-dividerGap: 20px;
 }
 
 .uitk-density-low .uitkGrid {
   --uitkGrid-rowHeight: 49px;
   --uitkGrid-padding: 12px;
   --uitkGrid-fontSize: 14px;
+  --uitkGrid-dividerGap: 16px;
 }
 
 .uitk-density-medium .uitkGrid {
   --uitkGrid-rowHeight: 37px;
   --uitkGrid-padding: 8px;
   --uitkGrid-fontSize: 12px;
+  --uitkGrid-dividerGap: 12px;
 }
 
 .uitk-density-high .uitkGrid {
   --uitkGrid-rowHeight: 25px;
   --uitkGrid-padding: 8px;
   --uitkGrid-fontSize: 12px;
+  --uitkGrid-dividerGap: 8px;
 }
 
 .uitk-density-ultrahigh .uitkGrid {
   --uitkGrid-rowHeight: 21px;
   --uitkGrid-padding: 4px;
   --uitkGrid-fontSize: 12px;
+  --uitkGrid-dividerGap: 6px;
   /*Checkbox*/
   --checkbox-font-size: 11px;
   /*CheckboxIcon*/
@@ -199,20 +204,17 @@
 .uitk-light .uitkGrid {
   --uitkGrid-backgroundColor-primary: var(--uitk-color-white);
   --uitkGrid-backgroundColor-secondary: #f2f4f6;
-  /*--uitkGrid-cell-borderColor: #d9dde3;*/
-  /*--uitkGrid-cell-backgroundColor: var(--uitk-color-white);*/
   --uitkGrid-zebraColor: rgba(0, 0, 0, .1);
 
   --uitkGrid-row-backgroundColor-hover: rgba(125, 195, 240, .25);
-  /*--uitkGrid-rowHover-color: var(--uitk-color-blue-50);*/
-  /*--uitkGrid-rowHover-opacity: .25;*/
-  /*--row-separator-color: #D9DDE3;*/
   --uitkGrid-row-backgroundColor-selected: rgba(125, 195, 240, .5);
+
   --uitkGrid-row-borderColor-selected: rgba(125, 195, 240, 1);
   --uitkGrid-cell-backgroundColor-selected: #64b1e4;
   --uitkGrid-header-borderColor: var(--uitk-color-grey-90);
-  /*--uitkGrid-header-backgroundColor: var(--uitk-color-white);*/
+
   --uitkGrid-header-color: var(--uitk-color-grey-300);
+
   --uitkGrid-headerColumnSeparator-color: rgba(0, 0, 0, .1);
   --uitkGrid-headerRowSeparator-color: rgba(0, 0, 0, .3);
   --uitkGrid-groupHeaderRowSeparator-color: rgba(0, 0, 0, .1);
@@ -231,9 +233,7 @@
 .uitk-dark .uitkGrid {
   --uitkGrid-backgroundColor-primary: var(--uitk-color-grey-800);
   --uitkGrid-backgroundColor-secondary: #2f3136;
-  /*--uitkGrid-cell-borderColor: #3b3f46;*/
-  /*--uitkGrid-cell-backgroundColor: var(--uitk-color-grey-800);*/
-  --uitkGrid-zebraColor: rgba(255, 255, 255, .1); /* #3B3F46; */
+  --uitkGrid-zebraColor: rgba(255, 255, 255, .1);
 
   --uitkGrid-row-backgroundColor-hover: rgba(51, 141, 205, 0.25);
   --uitkGrid-row-backgroundColor-selected: rgba(51, 141, 205, 0.5);
@@ -241,7 +241,7 @@
   --uitkGrid-row-borderColor-selected: #4b9fd8;
   --uitkGrid-cell-backgroundColor-selected: #64b1e4;
   --uitkGrid-header-borderColor: var(--uitk-color-grey-100);
-  /*--uitkGrid-header-backgroundColor: var(--uitk-color-grey-800);*/
+
   --uitkGrid-header-color: var(--uitk-color-grey-50);
 
   --uitkGrid-headerColumnSeparator-color: rgba(255, 255, 255, .1);

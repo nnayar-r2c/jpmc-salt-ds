@@ -19,7 +19,6 @@ export function TopRightPart<T>(props: TopRightPartProps<T>) {
 
   const showToolbar = model.useShowToolbar();
   const rightColumnGroups = model.useRightColumnGroups();
-
   const rightColumns = model.useRightColumns();
 
   return (
