@@ -50,9 +50,9 @@ export const TableRow = memo<TableRowProps>(function TableRow<T>(
   return (
     <tr
       className={cn(withBaseName(), {
+        [withBaseName("zebra")]: isZebra,
         [withBaseName("hover")]: isHoverOver,
         [withBaseName("selected")]: isSelectedRow,
-        [withBaseName("zebra")]: isZebra && !isSelectedRow && !isHoverOver,
         [withBaseName("divided")]: isDivided && !isSelectedRow && !isHoverOver,
       })}
       onMouseEnter={onMouseEnter}

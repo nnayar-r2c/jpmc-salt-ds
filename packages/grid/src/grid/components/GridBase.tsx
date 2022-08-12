@@ -39,6 +39,7 @@ export function GridBase<T>(props: GridBaseProps<T>) {
 
   const { model } = useGridContext();
   const isFramed = model.useIsFramed();
+  const isZebra = model.useZebra();
   const backgroundVariant = model.useBackgroundVariant();
 
   const onKeyDown: KeyboardEventHandler<HTMLDivElement> = useCallback(
@@ -55,8 +56,6 @@ export function GridBase<T>(props: GridBaseProps<T>) {
     }
   }, [rootRef.current]);
 
-  // All parts should scroll together. This handler is passed to every part of
-  // the table responsive to scrolling.
   const onWheel: WheelEventHandler<HTMLTableElement> = useCallback((event) => {
     const scrollerDiv = scrollableRef.current;
     if (!scrollerDiv) {
@@ -121,6 +120,7 @@ export function GridBase<T>(props: GridBaseProps<T>) {
           [withBaseName("primaryBackground")]: backgroundVariant === "primary",
           [withBaseName("secondaryBackground")]:
             backgroundVariant === "secondary",
+          [withBaseName("zebra")]: isZebra,
         },
         className
       )}

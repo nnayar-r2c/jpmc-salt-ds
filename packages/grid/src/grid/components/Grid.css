@@ -233,7 +233,7 @@
 .uitk-dark .uitkGrid {
   --uitkGrid-backgroundColor-primary: var(--uitk-color-grey-800);
   --uitkGrid-backgroundColor-secondary: #2f3136;
-  --uitkGrid-zebraColor: rgba(255, 255, 255, .1);
+  --uitkGrid-zebraColor: rgba(255, 255, 255, .05);
 
   --uitkGrid-row-backgroundColor-hover: rgba(51, 141, 205, 0.25);
   --uitkGrid-row-backgroundColor-selected: rgba(51, 141, 205, 0.5);
@@ -257,7 +257,6 @@
   --uitkGrid-rowDivider-color: rgba(255, 255, 255, .1);
   --uitkGrid-columnDivider-color: rgba(255, 255, 255, .1);
   --uitkGrid-rowDivider-color-divided: rgba(255, 255, 255, .2);
-
 }
 
 .uitkGrid {
@@ -282,4 +281,8 @@
 
 .uitkGrid-secondaryBackground {
   background-color: var(--uitkGrid-backgroundColor-secondary);
+}
+
+.uitkGrid.uitkGrid-zebra {
+  --uitkGrid-rowDivider-color: transparent;
 }

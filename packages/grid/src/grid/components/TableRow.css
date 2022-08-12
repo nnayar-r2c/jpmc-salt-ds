@@ -12,15 +12,47 @@
   border-color: var(--uitkGrid-rowDivider-color-divided);
 }
 
+.uitkGridTableRow-zebra {
+  background: var(--uitkGrid-zebraColor);
+}
+
 .uitkGridTableRow-hover {
-  background-color: var(--uitkGrid-row-backgroundColor-hover);
+  background: var(--uitkGrid-row-backgroundColor-hover);
 }
 
 .uitkGridTableRow-selected {
-  background-color: var(--uitkGrid-row-backgroundColor-selected);
+  background: var(--uitkGrid-row-backgroundColor-selected);
   border-color: var(--uitkGrid-row-borderColor-selected);
 }
 
-.uitkGridTableRow-zebra {
-  background-color: var(--uitkGrid-zebraColor);
+.uitkGridTableRow-zebra.uitkGridTableRow-selected {
+  background: linear-gradient(
+    var(--uitkGrid-row-backgroundColor-selected),
+    var(--uitkGrid-row-backgroundColor-selected)),
+  linear-gradient(
+    var(--uitkGrid-zebraColor),
+    var(--uitkGrid-zebraColor)
+  );
+}
+
+.uitkGridTableRow-zebra.uitkGridTableRow-hover {
+  background: linear-gradient(
+    var(--uitkGrid-row-backgroundColor-hover), var(--uitkGrid-row-backgroundColor-hover)),
+  linear-gradient(var(--uitkGrid-zebraColor), var(--uitkGrid-zebraColor));
+}
+
+.uitkGridTableRow-zebra.uitkGridTableRow-selected.uitkGridTableRow-hover {
+  background: linear-gradient(
+    var(--uitkGrid-row-backgroundColor-hover), var(--uitkGrid-row-backgroundColor-hover)),
+  linear-gradient(
+    var(--uitkGrid-row-backgroundColor-selected), var(--uitkGrid-row-backgroundColor-selected)),
+  linear-gradient(
+    var(--uitkGrid-zebraColor), var(--uitkGrid-zebraColor));
+}
+
+.uitkGridTableRow-selected.uitkGridTableRow-hover {
+  background: linear-gradient(
+    var(--uitkGrid-row-backgroundColor-hover), var(--uitkGrid-row-backgroundColor-hover)),
+  linear-gradient(
+    var(--uitkGrid-row-backgroundColor-selected), var(--uitkGrid-row-backgroundColor-selected));
 }

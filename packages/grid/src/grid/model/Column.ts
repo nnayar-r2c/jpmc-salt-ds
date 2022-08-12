@@ -34,7 +34,7 @@ export class Column<TRowData = any, TCellValue = any, TColumnData = any> {
     this.width$ = new BehaviorSubject<number>(
       definition.width != null ? definition.width : defaultColumnWidth
     );
-    this.pinned$ = new BehaviorSubject<ColumnPinType>(null);
+    this.pinned$ = new BehaviorSubject<ColumnPinType | null>(null);
     this.separator$ = new BehaviorSubject<ColumnSeparatorType>("regular");
     this.title$ = new BehaviorSubject<string>(definition.title || "");
     this.isEditable$ = new BehaviorSubject(!!definition.isEditable);

@@ -12,7 +12,7 @@ export function createClientMiddleHeight<T>(
   combineLatest([clientHeight$, topHeight$, bottomHeight$])
     .pipe(
       map(([clientHeight, topHeight, bottomHeight]) => {
-        return clientHeight - topHeight - bottomHeight - scrollBarSize;
+        return clientHeight - topHeight - bottomHeight; /* - scrollBarSize;*/
       })
     )
     .subscribe(clientMiddleHeight$);

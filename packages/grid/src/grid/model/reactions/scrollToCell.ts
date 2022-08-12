@@ -3,6 +3,7 @@ import { BehaviorSubject, Subject } from "rxjs";
 import { Rng } from "../Rng";
 import { Column } from "../Column";
 import { GridScrollPosition } from "../GridScrollPosition";
+import { scrollBarSize } from "../utils";
 
 export function scrollToCell(
   scrollToCell$: Subject<CellPosition>,
@@ -29,7 +30,10 @@ export function scrollToCell(
       scrollPosition = scrollPosition.setScrollTop(rowHeight * rowIndex);
     } else if (rowIndex >= visibleRowRange.end - 1) {
       scrollPosition = scrollPosition.setScrollTop(
-        Math.max(0, rowHeight * rowIndex - clientMiddleHeight + rowHeight)
+        Math.max(
+          0,
+          rowHeight * rowIndex - clientMiddleHeight + rowHeight + scrollBarSize
+        )
       );
     }
 

@@ -13,7 +13,7 @@ export function createClientMiddleWidth<T>(
     .pipe(
       map(
         ([clientWidth, leftWidth, rightWidth]) =>
-          clientWidth - leftWidth - rightWidth - scrollBarSize
+          clientWidth - leftWidth - rightWidth /* - scrollBarSize*/
       )
     )
     .subscribe(clientMiddleWidth$);
