@@ -1,6 +1,6 @@
 import "./HeaderCell.css";
 import { Column, ColumnSeparatorType } from "../model";
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useEffect, useLayoutEffect, useRef } from "react";
 import { useColumnResize } from "../features/useColumnResize";
 import { useColumnMove } from "../features/useColumnMove";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
@@ -64,7 +64,7 @@ export function AutoSizingHeaderCell<T>(props: HeaderCellProps<T>) {
   const columnWidth = column.useWidth();
   const rowHeight = model.useRowHeight();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const width = valueContainerRef.current
       ? valueContainerRef.current.offsetWidth
       : undefined;
