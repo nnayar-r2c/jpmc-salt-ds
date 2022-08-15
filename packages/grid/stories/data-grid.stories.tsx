@@ -1,159 +1,290 @@
 import { Story } from "@storybook/react";
 import {
   ColDef,
+  ColGroupDef,
   DataGrid,
-  DataGridRowGroupCellComponentProps,
+  DataGridRowGroupLevelSettings,
   DataGridRowGroupSettings,
+  Filter,
+  FilterColumn,
+  FilterModel,
 } from "../src";
-import { Blotter, BlotterRecord, makeFakeBlotterRecord } from "./grid/blotter";
-import { FC } from "react";
-import { UserBadgeIcon } from "../../icons";
 import "./data-grid.stories.css";
-
-const DeskOwnerGroupValue: FC<
-  DataGridRowGroupCellComponentProps<BlotterRecord>
-> = (props) => {
-  const name = props.rowNode.name;
-  return (
-    <div className="desk-owner-cell">
-      <UserBadgeIcon />
-      <span style={{ marginLeft: "8px" }}>{name}</span>
-    </div>
-  );
-};
-
-const rowGroupingOptions = new Map<
-  string,
-  DataGridRowGroupSettings<BlotterRecord> | undefined
->([
-  ["No Grouping", undefined],
-  [
-    "Client",
-    {
-      title: "Client",
-      groupLevels: [
-        {
-          field: "client",
-        },
-      ],
-    },
-  ],
-  [
-    "Client->Side",
-    {
-      title: "Client-Side",
-      groupLevels: [
-        {
-          field: "client",
-        },
-        {
-          field: "side",
-        },
-      ],
-    },
-  ],
-  [
-    "Desk Owner -> Client -> Side",
-    {
-      title: "Desk Owner -> Client -> Side",
-      width: 300,
-      groupLevels: [
-        {
-          field: "deskOwner",
-          groupCellComponent: DeskOwnerGroupValue,
-        },
-        {
-          field: "client",
-        },
-        {
-          field: "side",
-        },
-      ],
-    },
-  ],
-]);
+import { useMemo, useState } from "react";
+import { GridToolbar, GridToolbarModel } from "../src/data-grid/toolbar";
+import {
+  ListCellValue,
+  NumericColumnData,
+  NumericColumnHeader,
+} from "../src/data-grid/column-types";
+import { PillCellValue, NumericCellValue } from "../src/data-grid/column-types";
+import {
+  DataGridSettings,
+  DataGridSettingsModel,
+} from "./grid/data-grid-settings/DataGridSettings";
+import { randomAmount } from "./grid/utils";
+import image from "./grid/jpmorgan.webp";
 
 export default {
   title: "Grid/Data Grid",
   component: DataGrid,
   argTypes: {
-    showTreeLines: { control: "boolean" },
-    rowGrouping: {
-      control: "select",
-      options: [...rowGroupingOptions.keys()],
-    },
+    // showTreeLines: { control: "boolean" },
+    // rowGrouping: {
+    //   control: "select",
+    //   options: [...rowGroupingOptions.keys()],
+    // },
   },
 };
 
-const blotter = new Blotter();
-
-for (let i = 0; i < 100; ++i) {
-  const record = makeFakeBlotterRecord();
-  record.identifier = `${i}-${record.identifier}`;
-  blotter.addRecord(record);
+interface Investor {
+  name: string;
+  addedInvestors: string[];
+  location: string;
+  strategy: string[];
+  cohort: string[];
+  notes: string;
+  amount: number;
 }
 
-const blotterColumnDefinitions: ColDef<BlotterRecord>[] = [
+function createDummyInvestors(): Investor[] {
+  const a = [
+    "Apple",
+    "Orange",
+    "Dragonfruit",
+    "Coffee",
+    "Fig",
+    "Grape",
+    "Hazelnut",
+  ];
+  const b = ["Investment", "Venture Capital", "Private Wealth"];
+  const c = ["", "Inc."];
+  const loc = [
+    "New York, NY",
+    "Jersey City, NJ",
+    "Boston, MA",
+    "San Francisco, CA",
+  ];
+  const str = [
+    ["FO"],
+    ["PE"],
+    ["VC"],
+    ["FO", "PE"],
+    ["FO", "PE", "VC"],
+    ["VC", "PE"],
+  ];
+  const coh = [
+    ["Potential Leads"],
+    ["Top VCs"],
+    ["Potential Leads", "Top VCs"],
+  ];
+
+  const investors: Investor[] = [];
+  let i = 0;
+  for (let x of a) {
+    for (let y of b) {
+      for (let z of c) {
+        investors.push({
+          name: [x, y, z].join(" "),
+          addedInvestors: [],
+          location: loc[i % loc.length],
+          cohort: coh[i % coh.length],
+          strategy: str[i % str.length],
+          notes: "",
+          amount: randomAmount(100, 300, 4),
+        });
+        ++i;
+      }
+    }
+  }
+
+  return investors;
+}
+
+const columnDefinitions: ColDef<Investor>[] = [
   {
-    key: "identifier",
+    key: "name",
     type: "text",
-    field: "identifier",
-    title: "Identifier",
+    field: "name",
+    title: "Name",
+    pinned: "left",
+  },
+  // TODO createNumericColDef(key, type, field, title, precision)?
+  {
+    key: "amount",
+    type: "number",
+    field: "amount",
+    title: "Amount",
+    cellComponent: NumericCellValue,
+    headerComponent: NumericColumnHeader,
+    headerClassName: "uitkDataGridNumericColumnHeader",
+    data: {
+      precision: 4,
+    } as NumericColumnData,
   },
   {
-    key: "client",
+    key: "addedInvestors",
+    type: "multiList",
+    field: "addedInvestors",
+    title: "Added Investors",
+  },
+  {
+    key: "location",
     type: "text",
-    field: "client",
+    field: "location",
+    title: "Location",
   },
   {
-    key: "side",
+    key: "strategy",
+    type: "multiList",
+    field: "strategy",
+    title: "Strategy",
+    cellComponent: ListCellValue,
+  },
+  {
+    key: "cohort",
+    type: "multiList",
+    field: "cohort",
+    title: "Cohort",
+    cellComponent: PillCellValue,
+  },
+  {
+    key: "notes",
     type: "text",
-    field: "side",
-  },
-  {
-    key: "deskOwner",
-    type: "text",
-    field: "deskOwner",
-  },
-  {
-    key: "quantity",
-    type: "numeric",
-    field: "quantity",
-  },
-  {
-    key: "averagePx",
-    type: "numeric",
-    field: "averagePx",
-  },
-  {
-    key: "price",
-    type: "price",
-    field: "price",
+    field: "notes",
+    title: "Notes",
   },
 ];
 
-const blotterRowKeyGetter = (rowData: BlotterRecord) => rowData.key;
+const columnGroupDefinitions: ColGroupDef<Investor>[] = [
+  {
+    key: "groupOne",
+    title: "Group One",
+    pinned: "left",
+    columnKeys: ["name"],
+  },
+  {
+    key: "groupTwo",
+    title: "Group Two",
+    columnKeys: ["amount", "addedInvestors", "location"],
+  },
+  {
+    key: "groupThree",
+    title: "Group Three",
+    columnKeys: ["strategy", "cohort", "notes"],
+  },
+];
 
-interface DataGridNestStoryProps {
+const filterColumns: FilterColumn<Investor>[] = columnDefinitions.map((c) => {
+  return {
+    name: c.title || c.field,
+    field: c.field as keyof Investor,
+  };
+});
+
+const dummyInvestors = createDummyInvestors();
+
+const rowKeyGetter = (rowData: Investor) => rowData.name;
+
+interface DataGridStoryProps {
   showTreeLines: boolean;
   rowGrouping: string;
 }
 
-const DataGridStoryTemplate: Story<DataGridNestStoryProps> = (props) => {
-  const { showTreeLines, rowGrouping: rowGroupingOption } = props;
-  const rowGrouping = rowGroupingOptions.get(rowGroupingOption);
-  return (
-    <DataGrid
-      rowKeyGetter={blotterRowKeyGetter}
-      data={blotter.visibleRecords}
-      columnDefinitions={blotterColumnDefinitions}
-      rowGrouping={rowGrouping}
-      leafNodeGroupNameField={"identifier"}
-      showTreeLines={showTreeLines}
-    />
+const DataGridStoryTemplate: Story<DataGridStoryProps> = (props) => {
+  const [toolbarModel] = useState<GridToolbarModel<Investor>>(
+    () => new GridToolbarModel(filterColumns)
   );
+  const [dataGridSettingsModel] = useState<DataGridSettingsModel>(
+    () => new DataGridSettingsModel()
+  );
+
+  const filterFn = toolbarModel.filter.useFilterFn();
+  const sortFn = toolbarModel.sort.useSortFn();
+  const sortSettings = toolbarModel.sort.useSortSettings();
+  const groupByColumns = toolbarModel.rowGrouping.useRowGroupingSettings();
+
+  const rowGrouping: DataGridRowGroupSettings<Investor> | undefined =
+    useMemo(() => {
+      if (groupByColumns == undefined || groupByColumns.length === 0) {
+        return undefined;
+      }
+      return {
+        title: "Group",
+        width: 100,
+        showTreeLines: true,
+        groupLevels: groupByColumns.map((x) => {
+          return {
+            field: x.field,
+          } as DataGridRowGroupLevelSettings<Investor>;
+        }),
+        pinned: "left",
+      };
+    }, [groupByColumns]);
+
+  const backgroundVariant = dataGridSettingsModel.backgroundVariant.useValue();
+  const isZebra = dataGridSettingsModel.isZebra.useValue();
+  const isFramed = dataGridSettingsModel.frame.useValue();
+  const rowDividerField = dataGridSettingsModel.rowDividers.useValue()
+    ? "location"
+    : undefined;
+  const showColumnGroups = dataGridSettingsModel.columnGrouping.useValue();
+  const colGroupDefs = showColumnGroups ? columnGroupDefinitions : undefined;
+  const rowSelectionMode = dataGridSettingsModel.rowSelectionMode.useValue();
+  const showCheckboxes = dataGridSettingsModel.showCheckboxes.useValue();
+  const background = dataGridSettingsModel.pictureBackground.useValue();
+  const columnDividers = dataGridSettingsModel.columnDividers.useValue();
+
+  return (
+    <div className={"gridStory"}>
+      {background ? <img className={"gridBackground"} src={image} /> : null}
+      <div className={"gridContainer"}>
+        <GridToolbar model={toolbarModel} />
+        <DataGrid
+          className={"grid"}
+          rowKeyGetter={rowKeyGetter}
+          data={dummyInvestors}
+          columnDefinitions={columnDefinitions}
+          columnGroupDefinitions={colGroupDefs}
+          filterFn={filterFn}
+          sortFn={sortFn}
+          sortSettings={sortSettings}
+          rowGrouping={rowGrouping}
+          leafNodeGroupNameField={"name"}
+          backgroundVariant={backgroundVariant}
+          isZebra={isZebra}
+          isFramed={isFramed}
+          rowDividerField={rowDividerField}
+          rowSelectionMode={rowSelectionMode}
+          showCheckboxes={showCheckboxes}
+          columnDividers={columnDividers}
+        />
+        <DataGridSettings model={dataGridSettingsModel} />
+      </div>
+    </div>
+  );
+};
+
+const FilterStoryTemplate: Story<{}> = () => {
+  const [model] = useState(() => new FilterModel<Investor>(filterColumns));
+  return <Filter model={model} />;
+};
+
+const ToolbarStoryTemplate: Story<{}> = () => {
+  const [toolbarModel] = useState<GridToolbarModel<Investor>>(
+    () => new GridToolbarModel(filterColumns)
+  );
+  return <GridToolbar model={toolbarModel} />;
 };
 
 export const DataGridExample = DataGridStoryTemplate.bind({});
 
 DataGridExample.args = {};
+
+export const FilterExample = FilterStoryTemplate.bind({});
+
+FilterExample.args = {};
+
+export const ToolbarExample = ToolbarStoryTemplate.bind({});
+
+ToolbarExample.args = {};

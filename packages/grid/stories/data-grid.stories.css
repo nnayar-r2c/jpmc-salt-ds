@@ -1,5 +1,21 @@
-.desk-owner-cell {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+.gridBackground {
+  position: absolute;
+  height: 700px;
+  width: 900px;
+  opacity: .3;
+  filter: blur(6px);
+}
+
+.gridStory {
+  position: relative;
+}
+
+.gridContainer {
+  z-index: 2;
+  padding: 40px;
+}
+
+.grid {
+  height: 600px;
+  width: 800px;
 }

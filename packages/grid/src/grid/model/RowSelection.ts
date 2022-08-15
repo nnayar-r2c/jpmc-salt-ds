@@ -8,6 +8,7 @@ import {
 import { useObservable } from "./useObservable";
 import { RowKeyGetter } from "../Grid";
 import { RowSelectionMode } from "./GridModel";
+import { createHook } from "./utils";
 
 export interface SelectAllEvent {
   isAllSelected: boolean;
@@ -50,9 +51,10 @@ export class RowSelection<T> implements IRowSelection<T> {
   }
 
   public readonly isAllSelected$ = new BehaviorSubject<boolean>(false);
-  public useIsAllSelected() {
-    return useObservable(this.isAllSelected$);
-  }
+  public useIsAllSelected = createHook(this.isAllSelected$);
+
+  public readonly isSomeSelected$ = new BehaviorSubject<boolean>(false);
+  public useIsSomeSelected = createHook(this.isSomeSelected$);
 
   public constructor(
     data$: BehaviorSubject<T[]>,
@@ -84,6 +86,14 @@ export class RowSelection<T> implements IRowSelection<T> {
         distinctUntilChanged()
       )
       .subscribe(this.isAllSelected$);
+
+    combineLatest([this.selectedKeys$, data$])
+      .pipe(
+        map(([selectedKeys, data]) => {
+          return data.length !== selectedKeys.size && selectedKeys.size !== 0;
+        })
+      )
+      .subscribe(this.isSomeSelected$);
 
     this.selectAllEvents$.subscribe((event) => {
       const newKeys = event.isAllSelected

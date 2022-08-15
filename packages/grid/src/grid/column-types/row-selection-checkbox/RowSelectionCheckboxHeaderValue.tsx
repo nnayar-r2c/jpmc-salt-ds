@@ -14,6 +14,7 @@ export const RowSelectionCheckboxHeaderValue = memo(
   function RowSelectionCheckboxHeaderValue<T>(props: HeaderValueProps<T>) {
     const { model } = useGridContext();
     const isAllSelected = model.rowSelection.useIsAllSelected();
+    const isSomeSelected = model.rowSelection.useIsSomeSelected();
 
     const onMouseDown: MouseEventHandler = useCallback(
       (event) => {
@@ -27,11 +28,11 @@ export const RowSelectionCheckboxHeaderValue = memo(
 
     return (
       <div className={withBaseName()} onMouseDown={onMouseDown}>
-        {isAllSelected ? (
-          <CheckboxCheckedIcon className={withBaseName("checkedIcon")} />
-        ) : (
-          <CheckboxIcon className={withBaseName("uncheckedIcon")} />
-        )}
+        <CheckboxIcon
+          checked={isAllSelected}
+          indeterminate={isSomeSelected}
+          className={withBaseName("icon")}
+        />
       </div>
     );
   }

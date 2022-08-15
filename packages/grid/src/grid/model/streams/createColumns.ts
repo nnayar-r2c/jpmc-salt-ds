@@ -2,7 +2,6 @@ import { BehaviorSubject, map } from "rxjs";
 import { Column } from "../Column";
 import { ColumnsAndGroups } from "../GridModel";
 
-// All columns
 export function createColumns<T>(
   columnsAndGroups$: BehaviorSubject<ColumnsAndGroups<T>>
 ) {

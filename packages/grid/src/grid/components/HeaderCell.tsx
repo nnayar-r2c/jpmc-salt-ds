@@ -61,19 +61,20 @@ export function AutoSizingHeaderCell<T>(props: HeaderCellProps<T>) {
 
   const { model } = useGridContext();
   const separator = column.useSeparator();
+  const columnWidth = column.useWidth();
   const rowHeight = model.useRowHeight();
 
   useEffect(() => {
     const width = valueContainerRef.current
       ? valueContainerRef.current.offsetWidth
       : undefined;
-    if (width != undefined) {
+    if (width != undefined && width !== columnWidth) {
       model.resizeColumn({
         columnIndex: column.index,
         width,
       });
     }
-  }, [valueContainerRef.current, rowHeight]);
+  }, [rowHeight, valueContainerRef.current, rowHeight, columnWidth]);
 
   return (
     <th
