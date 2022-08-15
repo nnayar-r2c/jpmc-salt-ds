@@ -203,15 +203,15 @@
 
 .uitk-light .uitkGrid {
   --uitkGrid-backgroundColor-primary: var(--uitk-color-white);
-  --uitkGrid-backgroundColor-secondary: #f2f4f6;
-  --uitkGrid-zebraColor: rgba(0, 0, 0, .1);
+  --uitkGrid-backgroundColor-secondary: var(--uitk-color-grey-20);
+  --uitkGrid-zebraColor: var(--uitk-color-grey-20);
 
-  --uitkGrid-row-backgroundColor-hover: rgba(125, 195, 240, .25);
-  --uitkGrid-row-backgroundColor-selected: rgba(125, 195, 240, .5);
+  --uitkGrid-row-backgroundColor-hover: var(--uitk-color-blue-10);
+  --uitkGrid-row-backgroundColor-selected: var(--uitk-color-blue-30);
 
-  --uitkGrid-row-borderColor-selected: rgba(125, 195, 240, 1);
+  --uitkGrid-row-borderColor-selected: var(--uitk-color-blue-50);
   --uitkGrid-cell-backgroundColor-selected: #64b1e4;
-  --uitkGrid-header-borderColor: var(--uitk-color-grey-90);
+  /*--uitkGrid-header-borderColor: var(--uitk-color-grey-90);*/
 
   --uitkGrid-header-color: var(--uitk-color-grey-300);
 
@@ -235,12 +235,12 @@
   --uitkGrid-backgroundColor-secondary: #2f3136;
   --uitkGrid-zebraColor: rgba(255, 255, 255, .05);
 
-  --uitkGrid-row-backgroundColor-hover: rgba(51, 141, 205, 0.25);
-  --uitkGrid-row-backgroundColor-selected: rgba(51, 141, 205, 0.5);
+  --uitkGrid-row-backgroundColor-hover: rgb(12, 53, 102);
+  --uitkGrid-row-backgroundColor-selected: rgb(0, 40, 88);
 
   --uitkGrid-row-borderColor-selected: #4b9fd8;
   --uitkGrid-cell-backgroundColor-selected: #64b1e4;
-  --uitkGrid-header-borderColor: var(--uitk-color-grey-100);
+  /*--uitkGrid-header-borderColor: var(--uitk-color-grey-100);*/
 
   --uitkGrid-header-color: var(--uitk-color-grey-50);
 

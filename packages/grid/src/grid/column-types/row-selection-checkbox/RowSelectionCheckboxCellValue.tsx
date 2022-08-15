@@ -1,11 +1,7 @@
 import { memo, MouseEventHandler, useCallback } from "react";
 import { CellValueProps } from "../../model";
 import "./RowSelectionCheckboxColumn.css";
-import {
-  CheckboxCheckedIcon,
-  CheckboxIcon,
-  makePrefixer,
-} from "@jpmorganchase/uitk-core";
+import { CheckboxIcon, makePrefixer } from "@jpmorganchase/uitk-core";
 import { getRowKey } from "../../features/getAttribute";
 import { useGridContext } from "../../GridContext";
 
@@ -26,11 +22,7 @@ export const RowSelectionCheckboxCellValue = memo(
 
     return (
       <div className={withBaseName()} onMouseDown={onMouseDown}>
-        {isSelected ? (
-          <CheckboxCheckedIcon className={withBaseName("checkedIcon")} />
-        ) : (
-          <CheckboxIcon className={withBaseName("uncheckedIcon")} />
-        )}
+        <CheckboxIcon checked={isSelected} className={withBaseName("icon")} />
       </div>
     );
   }
