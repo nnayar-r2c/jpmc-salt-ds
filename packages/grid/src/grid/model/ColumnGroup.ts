@@ -31,7 +31,9 @@ export class ColumnGroup<T = any> {
     this.key = definition.key;
     this.index = 0;
     this.definition = definition;
-    this.pinned = new BehaviorSubject<ColumnPinType>(definition.pinned || null);
+    this.pinned = new BehaviorSubject<ColumnPinType | null>(
+      definition.pinned || null
+    );
     this.columns = new BehaviorSubject<Column<T>[]>([]);
     this.colSpan = new BehaviorSubject<number>(0);
     this.title = new BehaviorSubject<string>(definition.title);
