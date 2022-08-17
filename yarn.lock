@@ -2970,6 +2970,7 @@ __metadata:
     eslint-plugin-storybook: ^0.5.12
     glob: ^7.1.6
     modular-scripts: "patch:modular-scripts@npm:3.1.2#.yarn/patches/modular-scripts-npm-3.1.0-5a349ac39e.patch"
+    modular-template-app: ^1.1.0
     no-scroll: ^2.1.1
     prettier: ^2.6.2
     prop-types: ^15.7.2
@@ -13914,6 +13915,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"grid-usability-test-app@workspace:playground/grid-usability-test-app":
+  version: 0.0.0-use.local
+  resolution: "grid-usability-test-app@workspace:playground/grid-usability-test-app"
+  languageName: unknown
+  linkType: soft
+
 "growly@npm:^1.3.0":
   version: 1.3.0
   resolution: "growly@npm:1.3.0"
@@ -18154,6 +18161,13 @@ __metadata:
   bin:
     modular: dist-cjs/cli.js
   checksum: 3f03b592de23abd118a8822035817c8cdd251a146887bb562a7e9b57182a864462040470cf92b657e5629615155e1082dd32520d7046ae9bb016155bd1b7c702
+  languageName: node
+  linkType: hard
+
+"modular-template-app@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "modular-template-app@npm:1.1.0"
+  checksum: 0d20f6a8a56d57844adc865b43827e4e6d02fdc71d21e042d4a054e26d747492f5a251e9c66d89ccb6194e8c4b67aa6be8b8bc6356edc6785c93e21cd9fdcb41
   languageName: node
   linkType: hard
 

@@ -1,0 +1,16 @@
+.gtaPageHeader {
+}
+
+.gtaPageHeader-text {
+  height: 61px;
+  font-weight: 800;
+  font-size: 56px;
+  line-height: 61px;
+}
+
+.gtaPageHeader-separator {
+  margin-top: 36px;
+  height: 4px;
+  width: 48px;
+  background-color: var(--uitk-color-orange-400);
+}
