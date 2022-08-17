@@ -1,0 +1,26 @@
+.uitkGridMiddlePart {
+  overflow-y: hidden;
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  right: var(--uitkGrid-scrollBar-size);
+  bottom: var(--uitkGrid-scrollBar-size);
+  left: 0;
+  clip-path: inset(var(--uitkGrid-topHeight) 0 0 var(--uitkGrid-leftWidth));
+}
+
+.uitkGridMiddlePart-space {
+  position: relative;
+  height: var(--uitkGrid-totalHeight);
+  width: var(--uitkGrid-totalWidth);
+}
+
+.uitkGridMiddlePart table {
+  border-spacing: var(--uitkGrid-borderSpacing);
+  table-layout: fixed;
+  position: absolute;
+
+  width: var(--uitkGrid-bodyVisibleColumnWidth);
+  top: var(--uitkGrid-bodyVisibleAreaTop);
+  left: var(--uitkGrid-bodyVisibleAreaLeft);
+}

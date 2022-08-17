@@ -1,0 +1,12 @@
+.uitkGridTopLeftPart {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+.uitkGridTopLeftPart table {
+  table-layout: fixed;
+  width: var(--uitkGrid-leftWidth);
+  height: var(--uitkGrid-topHeight);
+}
