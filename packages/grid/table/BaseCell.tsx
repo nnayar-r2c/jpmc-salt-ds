@@ -9,7 +9,7 @@ import {
 } from "./TableColumn";
 import { TableColumnModel } from "./Table";
 
-const withBaseName = makePrefixer("uitkGridBaseCell");
+const withBaseName = makePrefixer("uitkTableBaseCell");
 
 export function getCellId(rowKey: string, column: TableColumnModel) {
   return `R${rowKey}C${column.data.id}`;

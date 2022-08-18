@@ -1,6 +1,4 @@
 import {
-  Children,
-  isValidElement,
   KeyboardEventHandler,
   ReactNode,
   useCallback,
@@ -13,7 +11,6 @@ import {
 import { makePrefixer } from "@jpmorganchase/uitk-core";
 import { TableColumnProps } from "./TableColumn";
 import { TableContext } from "./TableContext";
-import { Rng } from "./Rng";
 import cx from "classnames";
 import { CellMeasure } from "./CellMeasure";
 import { Scrollable } from "./Scrollable";
@@ -28,12 +25,14 @@ import { SelectionContext } from "./SelectionContext";
 import {
   useBodyVisibleAreaTop,
   useBodyVisibleColumnRange,
-  useBodyVisibleColumns,
+  useColumnRange,
   useClientMidHeight,
   useClientMidWidth,
+  useColumnGroups,
   useLeftScrolledOutWidth,
   useProd,
   useRowIdxByKey,
+  useRowModels,
   useSelectRows,
   useSum,
   useSumRangeWidth,
@@ -41,8 +40,9 @@ import {
   useVisibleRowRange,
 } from "./tableHooks";
 import { ColumnGroupProps } from "./ColumnGroup";
+import { Rng } from "./Rng";
 
-const withBaseName = makePrefixer("uitkGrid");
+const withBaseName = makePrefixer("uitkTable");
 
 export type ColumnSeparatorType = "regular" | "none" | "groupEdge";
 export type ColumnGroupRowSeparatorType = "first" | "regular" | "last";
@@ -82,19 +82,79 @@ export interface TableColumnGroupModel {
   colSpan: number;
 }
 
-const useRowModels = (
-  getKey: (rowData: any) => string,
-  rowData: any[],
-  visibleRowRange: Rng
-) =>
-  useMemo(() => {
-    const rows: TableRowModel[] = [];
-    visibleRowRange.forEach((index) => {
-      const key = getKey(rowData[index]);
-      rows.push({ data: rowData[index], key, index });
-    });
-    return rows;
-  }, [getKey, rowData, visibleRowRange]);
+const useVisibleColumnGroupRange = (
+  bodyVisColRng: Rng,
+  midCols: TableColumnModel[],
+  midGrpByColId: Map<string, TableColumnGroupModel>,
+  leftGrpCount: number
+): Rng => {
+  const prevRef = useRef<Rng>(Rng.empty);
+  const range = useMemo(() => {
+    if (bodyVisColRng.length === 0) {
+      return Rng.empty;
+    }
+    const firstVisibleCol = midCols[bodyVisColRng.start];
+    const lastVisibleCol = midCols[bodyVisColRng.end - 1];
+    const firstVisibleGroup = midGrpByColId.get(firstVisibleCol.data.id);
+    const lastVisibleGroup = midGrpByColId.get(lastVisibleCol.data.id);
+    if (!firstVisibleGroup || !lastVisibleGroup) {
+      return Rng.empty;
+    }
+    return new Rng(
+      firstVisibleGroup.index - leftGrpCount,
+      lastVisibleGroup.index + 1 - leftGrpCount
+    );
+  }, [bodyVisColRng, midCols, midGrpByColId, leftGrpCount]);
+  if (!Rng.equals(prevRef.current, range)) {
+    prevRef.current = range;
+  }
+  return prevRef.current;
+};
+
+function last<T>(source: T[]): T {
+  return source[source.length - 1];
+}
+
+const useHeadVisibleColumnRange = (
+  visColGrps: TableColumnGroupModel[],
+  midColsById: Map<string, TableColumnModel>,
+  leftColCount: number
+) => {
+  const prevRef = useRef<Rng>(Rng.empty);
+  const range = useMemo(() => {
+    if (visColGrps.length === 0) {
+      return Rng.empty;
+    }
+    const firstVisibleGroup = visColGrps[0];
+    const lastVisibleGroup = last(visColGrps);
+    const firstColId = firstVisibleGroup.childrenIds[0];
+    const lastColId = last(lastVisibleGroup.childrenIds);
+    const firstColIdx = midColsById.get(firstColId)?.index;
+    const lastColIdx = midColsById.get(lastColId)?.index;
+    if (firstColIdx === undefined || lastColIdx === undefined) {
+      return Rng.empty;
+    }
+    return new Rng(firstColIdx - leftColCount, lastColIdx + 1 - leftColCount);
+  }, [visColGrps, midColsById, leftColCount]);
+  if (!Rng.equals(range, prevRef.current)) {
+    prevRef.current = range;
+  }
+  return prevRef.current;
+};
+
+const useCols = (
+  leftColPs: TableColumnProps[],
+  startIdx: number
+): TableColumnModel[] =>
+  useMemo(
+    () =>
+      leftColPs.map((data, i) => ({
+        data,
+        index: i + startIdx,
+        separator: "regular",
+      })),
+    [leftColPs]
+  );
 
 export const Table = (props: TableProps) => {
   const { rowData, isZebra, className, rowKeyGetter } = props;
@@ -127,38 +187,27 @@ export const Table = (props: TableProps) => {
     undefined
   );
   const [rowHeight, setRowHeight] = useState<number>(0);
+
   const rowIdxByKey = useRowIdxByKey(rowKeyGetter, rowData);
 
-  const leftCols: TableColumnModel[] = useMemo(
-    () =>
-      leftColPs.map((data, index) => ({
-        data,
-        index,
-        separator: "regular",
-      })),
-    [leftColPs]
-  );
-  const leftColCount = leftCols.length;
+  const leftCols: TableColumnModel[] = useCols(leftColPs, 0);
 
-  const midCols: TableColumnModel[] = useMemo(
-    () =>
-      midColPs.map((data, i) => ({
-        data,
-        index: i + leftColCount,
-        separator: "regular",
-      })),
-    [leftColCount, midColPs]
+  const midCols: TableColumnModel[] = useCols(midColPs, leftCols.length);
+  const rightCols: TableColumnModel[] = useCols(
+    rightColPs,
+    leftCols.length + midCols.length
   );
-  const midColCount = midCols.length;
 
-  const rightCols: TableColumnModel[] = useMemo(
-    () =>
-      rightColPs.map((data, i) => ({
-        data,
-        index: i + leftColCount + midColCount,
-        separator: "regular",
-      })),
-    [leftColCount, midColCount, rightColPs]
+  const midColsById = useMemo(
+    () => new Map<string, TableColumnModel>(midCols.map((c) => [c.data.id, c])),
+    [midCols]
+  );
+
+  const leftGrps = useColumnGroups(leftGrpPs, 0);
+  const midGrps = useColumnGroups(midGrpPs, leftGrps.length);
+  const rightGrps = useColumnGroups(
+    rightGrpPs,
+    leftGrps.length + midGrps.length
   );
 
   const leftWh = useSumWidth(leftCols);
@@ -166,7 +215,10 @@ export const Table = (props: TableProps) => {
   const rightWh = useSumWidth(rightCols);
   const totalWh = useSum([leftWh, midWidth, rightWh]);
 
-  const headRowCount = 1; // TODO api for column groups
+  const hasColumnGroups =
+    leftGrps.length > 0 || midGrps.length > 0 || rightGrps.length > 0;
+
+  const headRowCount = hasColumnGroups ? 2 : 1; // TODO multiple group levels
   const rowCount = rowData.length;
   const botRowCount = 0; // TODO
   const topHt = useProd([rowHeight, headRowCount]);
@@ -180,8 +232,39 @@ export const Table = (props: TableProps) => {
     scrollLeft,
     clientMidWidth
   );
-  const leftScrolledOutWidth = useLeftScrolledOutWidth(midCols, bodyVisColRng);
-  const bodyVisAreaLft = useSum([leftWh, leftScrolledOutWidth]);
+
+  const midGrpByColId = useMemo(() => {
+    const m = new Map<string, TableColumnGroupModel>();
+    for (let g of midGrps) {
+      for (let c of g.childrenIds) {
+        m.set(c, g);
+      }
+    }
+    return m;
+  }, [midGrps]);
+
+  const visColGrpRng = useVisibleColumnGroupRange(
+    bodyVisColRng,
+    midCols,
+    midGrpByColId,
+    leftGrps.length
+  );
+
+  const visColGrps = useMemo(() => {
+    return midGrps.slice(visColGrpRng.start, visColGrpRng.end);
+  }, [visColGrpRng, midGrps]);
+
+  const headVisColRng = useHeadVisibleColumnRange(
+    visColGrps,
+    midColsById,
+    leftCols.length
+  );
+
+  const bodyScrOutColWh = useLeftScrolledOutWidth(midCols, bodyVisColRng);
+  const headScrOutColWh = useLeftScrolledOutWidth(midCols, headVisColRng);
+
+  const bodyVisAreaLeft = useSum([leftWh, bodyScrOutColWh]);
+  const headVisAreaLeft = useSum([leftWh, headScrOutColWh]);
   const clientMidHt = useClientMidHeight(clientHeight, topHt, botHt);
   const visRowRng = useVisibleRowRange(
     scrollTop,
@@ -190,27 +273,27 @@ export const Table = (props: TableProps) => {
     rowCount
   );
   const bodyVisAreaTop = useBodyVisibleAreaTop(rowHeight, visRowRng, topHt);
-  // TODO check if this is necessary
-  const bodyVisibleColumns = useBodyVisibleColumns(midCols, bodyVisColRng);
+
+  const bodyVisibleColumns = useColumnRange(midCols, bodyVisColRng);
+  const headVisibleColumns = useColumnRange(midCols, headVisColRng);
   const bodyVisColWh = useSumRangeWidth(midCols, bodyVisColRng);
-  const headVisibleColumns = bodyVisibleColumns;
+
   const headVisColWh = bodyVisColWh; // TODO implement groups
-  const headVisAreaLft = bodyVisAreaLft; // TODO
 
   const style = useMemo(
     () =>
       ({
-        ["--uitkGrid-totalWidth"]: `${totalWh}px`,
-        ["--uitkGrid-totalHeight"]: `${totalHt}px`,
-        ["--uitkGrid-topHeight"]: `${topHt}px`,
-        ["--uitkGrid-leftWidth"]: `${leftWh}px`,
-        ["--uitkGrid-rightWidth"]: `${rightWh}px`,
-        ["--uitkGrid-bodyVisibleColumnWidth"]: `${bodyVisColWh}px`,
-        ["--uitkGrid-bodyVisibleAreaTop"]: `${bodyVisAreaTop}px`,
-        ["--uitkGrid-bodyVisibleAreaLeft"]: `${bodyVisAreaLft}px`,
-        ["--uitkGrid-bottomHeight"]: `${botHt}px`,
-        ["--uitkGrid-headerVisibleColumnWidth"]: `${headVisColWh}px`,
-        ["--uitkGrid-headerVisibleAreaLeft"]: `${headVisAreaLft}px`,
+        ["--uitkTable-totalWidth"]: `${totalWh}px`,
+        ["--uitkTable-totalHeight"]: `${totalHt}px`,
+        ["--uitkTable-topHeight"]: `${topHt}px`,
+        ["--uitkTable-leftWidth"]: `${leftWh}px`,
+        ["--uitkTable-rightWidth"]: `${rightWh}px`,
+        ["--uitkTable-bodyVisibleColumnWidth"]: `${bodyVisColWh}px`,
+        ["--uitkTable-bodyVisibleAreaTop"]: `${bodyVisAreaTop}px`,
+        ["--uitkTable-bodyVisibleAreaLeft"]: `${bodyVisAreaLeft}px`,
+        ["--uitkTable-bottomHeight"]: `${botHt}px`,
+        ["--uitkTable-headerVisibleColumnWidth"]: `${headVisColWh}px`,
+        ["--uitkTable-headerVisibleAreaLeft"]: `${headVisAreaLeft}px`,
       } as any),
     [
       totalHt,
@@ -220,10 +303,10 @@ export const Table = (props: TableProps) => {
       rightWh,
       botHt,
       bodyVisColWh,
-      bodyVisAreaLft,
+      bodyVisAreaLeft,
       bodyVisAreaTop,
       headVisColWh,
-      headVisAreaLft,
+      headVisAreaLeft,
     ]
   );
 
@@ -280,16 +363,7 @@ export const Table = (props: TableProps) => {
   }, []);
 
   const onColumnGroupAdded = useCallback((colGroupProps: ColumnGroupProps) => {
-    let childrenIds = Children.toArray(colGroupProps.children)
-      .map((child) => {
-        if (!isValidElement(child)) {
-          return undefined;
-        }
-        return child.props.id;
-      })
-      .filter((x) => x !== undefined);
     const { pinned = null } = colGroupProps;
-
     const adder = (old: ColumnGroupProps[]) => [...old, colGroupProps];
     if (pinned === "left") {
       setLeftGrpPs(adder);
@@ -298,12 +372,6 @@ export const Table = (props: TableProps) => {
     } else {
       setMidGrpPs(adder);
     }
-
-    console.log(
-      `Group added: "${colGroupProps.name}": [${childrenIds
-        .map((x) => `"${x}"`)
-        .join(", ")}].`
-    );
   }, []);
 
   const onColumnGroupRemoved = useCallback(
@@ -400,6 +468,7 @@ export const Table = (props: TableProps) => {
           />
           <TopPart
             columns={headVisibleColumns}
+            columnGroups={visColGrps}
             topRef={topRef}
             onWheel={onWheel}
           />
@@ -421,8 +490,18 @@ export const Table = (props: TableProps) => {
             hoverOverRowKey={hoverRowKey}
             setHoverOverRowKey={setHoverRowKey}
           />
-          <TopLeftPart onWheel={onWheel} columns={leftCols} />
-          <TopRightPart onWheel={onWheel} columns={rightCols} />
+          <TopLeftPart
+            onWheel={onWheel}
+            columns={leftCols}
+            columnGroups={leftGrps}
+            isRaised={isLeftRaised}
+          />
+          <TopRightPart
+            onWheel={onWheel}
+            columns={rightCols}
+            columnGroups={rightGrps}
+            isRaised={isRightRaised}
+          />
         </div>
       </SelectionContext.Provider>
     </TableContext.Provider>

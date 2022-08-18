@@ -6,7 +6,7 @@ import "./RightPart.css";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
 import { TableColumnModel, TableRowModel } from "./Table";
 
-const withBaseName = makePrefixer("uitkGridRightPart");
+const withBaseName = makePrefixer("uitkTableRightPart");
 
 export interface RightPartProps<T> {
   rightRef: RefObject<HTMLDivElement>;

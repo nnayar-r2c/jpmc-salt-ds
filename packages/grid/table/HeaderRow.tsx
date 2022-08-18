@@ -4,7 +4,7 @@ import { TableColumnModel } from "./Table";
 import { HeaderCell } from "./HeaderCell";
 import { HeaderCellValue } from "./HeaderCellValue";
 
-const withBaseName = makePrefixer("uitkGridHeaderRow");
+const withBaseName = makePrefixer("uitkTableHeaderRow");
 
 export interface HeaderRowProps<T> {
   columns: TableColumnModel[];

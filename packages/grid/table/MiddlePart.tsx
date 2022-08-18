@@ -5,7 +5,7 @@ import "./MiddlePart.css";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
 import { TableColumnModel, TableRowModel } from "./Table";
 
-const withBaseName = makePrefixer("uitkGridMiddlePart");
+const withBaseName = makePrefixer("uitkTableMiddlePart");
 
 export interface MiddlePartProps<T> {
   middleRef: RefObject<HTMLDivElement>;

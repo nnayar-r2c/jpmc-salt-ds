@@ -3,7 +3,7 @@ import "./GroupHeaderCell.css";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
 import { TableColumnGroupModel } from "./Table";
 
-const withBaseName = makePrefixer("uitkGridGroupHeaderCell");
+const withBaseName = makePrefixer("uitkTableGroupHeaderCell");
 
 export interface GroupHeaderCellProps {
   group: TableColumnGroupModel;

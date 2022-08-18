@@ -1,29 +1,29 @@
-.uitkGridRightPart {
+.uitkTableRightPart {
   position: absolute;
   top: 0;
-  right: var(--uitkGrid-scrollBar-size);
-  bottom: var(--uitkGrid-scrollBar-size);
+  right: var(--uitkTable-scrollBar-size);
+  bottom: var(--uitkTable-scrollBar-size);
   overflow-x: hidden;
   overflow-y: hidden;
   z-index: 2;
-  clip-path: inset(var(--uitkGrid-topHeight) 0 0 -10px);
+  clip-path: inset(var(--uitkTable-topHeight) 0 0 -10px);
 }
 
-.uitkGridRightPart-raised {
-  box-shadow: -6px 0 4px -4px var(--uitkGrid-shadow-color);
+.uitkTableRightPart-raised {
+  box-shadow: -6px 0 4px -4px var(--uitkTable-shadow-color);
 }
 
-.uitkGridRightPart-space {
+.uitkTableRightPart-space {
   position: relative;
-  height: var(--uitkGrid-totalHeight);
-  width: var(--uitkGrid-rightWidth);
+  height: var(--uitkTable-totalHeight);
+  width: var(--uitkTable-rightWidth);
 }
 
-.uitkGridRightPart table {
-  border-spacing: var(--uitkGrid-borderSpacing);
+.uitkTableRightPart table {
+  border-spacing: var(--uitkTable-borderSpacing);
   table-layout: fixed;
   position: absolute;
 
-  top: var(--uitkGrid-bodyVisibleAreaTop);
-  width: var(--uitkGrid-rightWidth);
+  top: var(--uitkTable-bodyVisibleAreaTop);
+  width: var(--uitkTable-rightWidth);
 }

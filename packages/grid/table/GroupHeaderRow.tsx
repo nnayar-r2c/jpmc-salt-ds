@@ -3,7 +3,7 @@ import { GroupHeaderCell } from "./GroupHeaderCell";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
 import { TableColumnGroupModel } from "./Table";
 
-const withBaseName = makePrefixer("uitkGridGroupHeaderRow");
+const withBaseName = makePrefixer("uitkTableGroupHeaderRow");
 
 export interface GroupHeaderRowProps<T> {
   groups: TableColumnGroupModel[];
@@ -12,6 +12,9 @@ export interface GroupHeaderRowProps<T> {
 export function GroupHeaderRow<T>(props: GroupHeaderRowProps<T>) {
   const { groups } = props;
 
+  if (groups.length === 0) {
+    return null;
+  }
   return (
     <tr className={withBaseName()}>
       {groups.map((group) => {

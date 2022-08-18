@@ -120,13 +120,12 @@ const TableStoryTemplate: Story<{}> = (props) => {
           getValue={(x) => x.amount.toFixed(4)}
         />
       </ColumnGroup>
-      <ColumnGroup id={"groupFour"} name={"Group Four"}>
+      <ColumnGroup id={"groupFour"} name={"Group Four"} pinned={"right"}>
         <TableColumn
           name={"Strategy"}
           id={"strategy"}
           width={200}
           getValue={(x) => x.strategy}
-          pinned={"right"}
         />
       </ColumnGroup>
     </Table>

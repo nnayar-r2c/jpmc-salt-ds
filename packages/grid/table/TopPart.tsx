@@ -2,19 +2,21 @@ import { RefObject, WheelEventHandler } from "react";
 import { TableColGroup } from "./TableColGroup";
 import "./TopPart.css";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
-import { TableColumnModel } from "./Table";
+import { TableColumnGroupModel, TableColumnModel } from "./Table";
 import { HeaderRow } from "./HeaderRow";
+import { GroupHeaderRow } from "./GroupHeaderRow";
 
-const withBaseName = makePrefixer("uitkGridTopPart");
+const withBaseName = makePrefixer("uitkTableTopPart");
 
 export interface TopPartProps<T> {
   topRef: RefObject<HTMLDivElement>;
   onWheel: WheelEventHandler<HTMLDivElement>;
   columns: TableColumnModel[];
+  columnGroups: TableColumnGroupModel[];
 }
 
 export function TopPart<T>(props: TopPartProps<T>) {
-  const { topRef, onWheel, columns } = props;
+  const { topRef, onWheel, columns, columnGroups } = props;
 
   return (
     <div className={withBaseName()} ref={topRef}>
@@ -22,9 +24,7 @@ export function TopPart<T>(props: TopPartProps<T>) {
         <table onWheel={onWheel}>
           <TableColGroup columns={columns} />
           <thead>
-            {/*{visibleColumnGroups && (*/}
-            {/*  <GroupHeaderRow groups={visibleColumnGroups} />*/}
-            {/*)}*/}
+            <GroupHeaderRow groups={columnGroups} />
             <HeaderRow columns={columns} />
           </thead>
         </table>

@@ -1,4 +1,4 @@
-.uitkGridScrollable {
+.uitkTableScrollable {
   overflow-y: scroll;
   overflow-x: scroll;
   position: absolute;
@@ -8,8 +8,8 @@
   left: 0;
 }
 
-.uitkGridScrollable-space {
+.uitkTableScrollable-space {
   position: relative;
-  height: var(--uitkGrid-totalHeight);
-  width: var(--uitkGrid-totalWidth);
+  height: var(--uitkTable-totalHeight);
+  width: var(--uitkTable-totalWidth);
 }

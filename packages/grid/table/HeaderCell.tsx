@@ -4,7 +4,7 @@ import { makePrefixer } from "@jpmorganchase/uitk-core";
 import cn from "classnames";
 import { ColumnSeparatorType, TableColumnModel } from "./Table";
 
-const withBaseName = makePrefixer("uitkGridHeaderCell");
+const withBaseName = makePrefixer("uitkTableHeaderCell");
 
 export interface HeaderCellProps {
   column: TableColumnModel;

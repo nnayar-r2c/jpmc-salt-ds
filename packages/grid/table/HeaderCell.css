@@ -1,18 +1,18 @@
-.uitkGridHeaderCell {
+.uitkTableHeaderCell {
   text-align: left;
-  font-size: var(--uitkGrid-fontSize);
+  font-size: var(--uitkTable-fontSize);
   font-weight: normal;
-  height: var(--uitkGrid-rowHeight);
-  line-height: var(--uitkGrid-rowHeight);
+  height: var(--uitkTable-rowHeight);
+  line-height: var(--uitkTable-rowHeight);
   position: relative;
   box-sizing: border-box;
-  color: var(--uitkGrid-header-color);
+  color: var(--uitkTable-header-color);
   white-space: nowrap;
 }
 
-.uitkGridHeaderCell-valueContainer {
-  line-height: var(--uitkGrid-rowHeight);
-  padding: var(--uitkGrid-cell-padding);
+.uitkTableHeaderCell-valueContainer {
+  line-height: var(--uitkTable-rowHeight);
+  padding: var(--uitkTable-cell-padding);
   position: absolute;
   top: 0;
   right: 0;
@@ -21,8 +21,8 @@
   overflow: hidden;
 }
 
-.uitkGridHeaderCell-autosizeContainer {
-  line-height: var(--uitkGrid-rowHeight);
+.uitkTableHeaderCell-autosizeContainer {
+  line-height: var(--uitkTable-rowHeight);
   padding: 0;
   position: absolute;
   top: 0;
@@ -32,35 +32,35 @@
   overflow: hidden;
 }
 
-.uitkGridHeaderCell-measuredContent {
+.uitkTableHeaderCell-measuredContent {
   display: inline-block;
-  padding: var(--uitkGrid-cell-padding);
+  padding: var(--uitkTable-cell-padding);
 }
 
-.uitkGridHeaderCell-text {
+.uitkTableHeaderCell-text {
 }
 
-.uitkGridHeaderCell-regularSeparator {
-  background-color: var(--uitkGrid-headerColumnSeparator-color);
+.uitkTableHeaderCell-regularSeparator {
+  background-color: var(--uitkTable-headerColumnSeparator-color);
   width: 1px;
   height: auto;
   position: absolute;
   right: 0;
-  top: var(--uitkGrid-dividerGap);
-  bottom: var(--uitkGrid-dividerGap);
+  top: var(--uitkTable-dividerGap);
+  bottom: var(--uitkTable-dividerGap);
 }
 
-.uitkGridHeaderCell-edgeSeparator {
-  background-color: var(--uitkGrid-headerColumnSeparator-color);
+.uitkTableHeaderCell-edgeSeparator {
+  background-color: var(--uitkTable-headerColumnSeparator-color);
   width: 1px;
   height: auto;
   position: absolute;
   right: 0;
   top: 0;
-  bottom: var(--uitkGrid-dividerGap);
+  bottom: var(--uitkTable-dividerGap);
 }
 
-.uitkGridHeaderCell-resizeHandle {
+.uitkTableHeaderCell-resizeHandle {
   position: absolute;
   right: -8px;
   top: 0;
@@ -71,7 +71,7 @@
   z-index: 2;
 }
 
-.uitkGridHeaderCell-moveHandle {
+.uitkTableHeaderCell-moveHandle {
   position: absolute;
   right: 32px;
   top: 0;

@@ -1,28 +1,28 @@
-.uitkGridLeftPart {
+.uitkTableLeftPart {
   position: absolute;
   top: 0;
   left: 0;
-  bottom: var(--uitkGrid-scrollBar-size);
+  bottom: var(--uitkTable-scrollBar-size);
   overflow-x: hidden;
   overflow-y: hidden;
   z-index: 2;
-  clip-path: inset(var(--uitkGrid-topHeight) -10px 0 0);
+  clip-path: inset(var(--uitkTable-topHeight) -10px 0 0);
 }
 
-.uitkGridLeftPart-raised {
-  box-shadow: 6px 0 4px -4px var(--uitkGrid-shadow-color);
+.uitkTableLeftPart-raised {
+  box-shadow: 6px 0 4px -4px var(--uitkTable-shadow-color);
 }
 
-.uitkGridLeftPart-space {
+.uitkTableLeftPart-space {
   position: relative;
-  height: var(--uitkGrid-totalHeight);
-  width: var(--uitkGrid-leftWidth);
+  height: var(--uitkTable-totalHeight);
+  width: var(--uitkTable-leftWidth);
 }
 
-.uitkGridLeftPart table {
-  border-spacing: var(--uitkGrid-borderSpacing);
+.uitkTableLeftPart table {
+  border-spacing: var(--uitkTable-borderSpacing);
   table-layout: fixed;
   position: absolute;
-  top: var(--uitkGrid-bodyVisibleAreaTop);
-  width: var(--uitkGrid-leftWidth);
+  top: var(--uitkTable-bodyVisibleAreaTop);
+  width: var(--uitkTable-leftWidth);
 }

@@ -2,7 +2,7 @@ import "./CellMeasure.css";
 import { useEffect, useRef } from "react";
 import { makePrefixer, useDensity } from "@jpmorganchase/uitk-core";
 
-const withBaseName = makePrefixer("uitkGridCellMeasure");
+const withBaseName = makePrefixer("uitkTableCellMeasure");
 
 export interface CellMeasureProps<T> {
   setRowHeight: (rowHeight: number) => void;

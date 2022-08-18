@@ -2,7 +2,7 @@ import { FC } from "react";
 import "./Cursor.css";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
 
-const withBaseName = makePrefixer("uitkGridCursor");
+const withBaseName = makePrefixer("uitkTableCursor");
 
 export interface CursorProps {}
 

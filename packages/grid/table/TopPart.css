@@ -1,26 +1,26 @@
-.uitkGridTopPart {
+.uitkTableTopPart {
   position: absolute;
   top: 0;
   left: 0;
-  right: var(--uitkGrid-scrollBar-size); /* TODO scrollbar width and only when displayed */
+  right: var(--uitkTable-scrollBar-size); /* TODO scrollbar width and only when displayed */
   overflow-x: hidden;
   overflow-y: hidden;
   z-index: 2;
 
-  clip-path: inset(0 var(--uitkGrid-rightWidth) 0 var(--uitkGrid-leftWidth));
+  clip-path: inset(0 var(--uitkTable-rightWidth) 0 var(--uitkTable-leftWidth));
 }
 
-.uitkGridTopPart-space {
-  height: calc(1px + var(--uitkGrid-topHeight));
-  width: var(--uitkGrid-totalWidth);
+.uitkTableTopPart-space {
+  height: calc(1px + var(--uitkTable-topHeight));
+  width: var(--uitkTable-totalWidth);
 }
 
-.uitkGridTopPart table {
+.uitkTableTopPart table {
   table-layout: fixed;
   position: absolute;
   top: 0;
 
-  width: var(--uitkGrid-headerVisibleColumnWidth);
-  height: var(--uitkGrid-topHeight);
-  left: var(--uitkGrid-headerVisibleAreaLeft);
+  width: var(--uitkTable-headerVisibleColumnWidth);
+  height: var(--uitkTable-topHeight);
+  left: var(--uitkTable-headerVisibleAreaLeft);
 }

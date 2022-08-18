@@ -6,7 +6,7 @@ import cn from "classnames";
 import { TableCellValueProps } from "./TableColumn";
 import { TableColumnModel, TableRowModel } from "./Table";
 
-const withBaseName = makePrefixer("uitkGridTableRow");
+const withBaseName = makePrefixer("uitkTableTableRow");
 
 export interface TableRowProps {
   row: TableRowModel;

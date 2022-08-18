@@ -1,7 +1,7 @@
 import { makePrefixer } from "@jpmorganchase/uitk-core";
 import { TableHeaderValueProps } from "./TableColumn";
 
-const withBaseName = makePrefixer("uitkGridHeaderCell");
+const withBaseName = makePrefixer("uitkTableHeaderCell");
 
 export const HeaderCellValue = function HeaderCellValue(
   props: TableHeaderValueProps

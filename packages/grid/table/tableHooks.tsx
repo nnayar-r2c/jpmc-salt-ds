@@ -1,6 +1,12 @@
-import { useCallback, useMemo, useRef } from "react";
-import { Rng } from "../src";
-import { Size, TableColumnModel } from "./Table";
+import { Children, isValidElement, useCallback, useMemo, useRef } from "react";
+import {
+  Size,
+  TableColumnGroupModel,
+  TableColumnModel,
+  TableRowModel,
+} from "./Table";
+import { ColumnGroupProps } from "./ColumnGroup";
+import { Rng } from "./Rng";
 
 const sizeEquals = (a: Size, b: Size) => {
   return a.height === b.height && a.width === b.width;
@@ -131,18 +137,11 @@ export const useVisibleRowRange = (
   return prevRef.current;
 };
 
-export const useBodyVisibleColumns = (
-  midColumns: TableColumnModel[],
-  bodyVisibleColumnRange: Rng
+export const useColumnRange = (
+  columns: TableColumnModel[],
+  range: Rng
 ): TableColumnModel[] =>
-  useMemo(
-    () =>
-      midColumns.slice(
-        bodyVisibleColumnRange.start,
-        bodyVisibleColumnRange.end
-      ),
-    [midColumns, bodyVisibleColumnRange]
-  );
+  useMemo(() => columns.slice(range.start, range.end), [columns, range]);
 
 export const useLeftScrolledOutWidth = (
   midColumns: TableColumnModel[],
@@ -231,4 +230,47 @@ export const useSelectRows = (
       rowIdxByKey,
       rowKeyGetter,
     ]
+  );
+
+export const useRowModels = (
+  getKey: (rowData: any) => string,
+  rowData: any[],
+  visibleRowRange: Rng
+) =>
+  useMemo(() => {
+    const rows: TableRowModel[] = [];
+    visibleRowRange.forEach((index) => {
+      const key = getKey(rowData[index]);
+      rows.push({ data: rowData[index], key, index });
+    });
+    return rows;
+  }, [getKey, rowData, visibleRowRange]);
+
+export const useColumnGroups = (
+  grpPs: ColumnGroupProps[],
+  startIdx: number
+): TableColumnGroupModel[] =>
+  useMemo(
+    () =>
+      grpPs.map((data, i) => {
+        const childrenIds = Children.toArray(data.children)
+          .map((child) => {
+            if (!isValidElement(child)) {
+              return undefined;
+            }
+            return child.props.id;
+          })
+          .filter((x) => x !== undefined) as string[];
+        const colSpan = childrenIds.length;
+
+        return {
+          data,
+          index: i + startIdx,
+          childrenIds,
+          colSpan,
+          columnSeparator: "regular",
+          rowSeparator: "regular",
+        };
+      }),
+    [grpPs, startIdx]
   );
