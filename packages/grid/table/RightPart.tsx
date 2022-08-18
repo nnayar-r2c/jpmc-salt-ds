@@ -14,10 +14,20 @@ export interface RightPartProps<T> {
   isRaised?: boolean;
   columns: TableColumnModel[];
   rows: TableRowModel[];
+  hoverOverRowKey?: string;
+  setHoverOverRowKey: (key: string | undefined) => void;
 }
 
 export function RightPart<T>(props: RightPartProps<T>) {
-  const { rightRef, onWheel, columns, isRaised, rows } = props;
+  const {
+    rightRef,
+    onWheel,
+    columns,
+    isRaised,
+    rows,
+    hoverOverRowKey,
+    setHoverOverRowKey,
+  } = props;
 
   return (
     <div
@@ -29,7 +39,12 @@ export function RightPart<T>(props: RightPartProps<T>) {
       <div className={withBaseName("space")}>
         <table onWheel={onWheel}>
           <TableColGroup columns={columns} />
-          <TableBody columns={columns} rows={rows} />
+          <TableBody
+            columns={columns}
+            rows={rows}
+            hoverRowKey={hoverOverRowKey}
+            setHoverRowKey={setHoverOverRowKey}
+          />
         </table>
       </div>
     </div>

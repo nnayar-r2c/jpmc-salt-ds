@@ -1,0 +1,13 @@
+.uitkGridTopRightPart {
+  position: absolute;
+  top: 0;
+  right: var(--uitkGrid-scrollBar-size);
+  z-index: 2;
+}
+
+.uitkGridTopRightPart table {
+  table-layout: fixed;
+
+  width: var(--uitkGrid-rightWidth);
+  height: var(--uitkGrid-topHeight);
+}

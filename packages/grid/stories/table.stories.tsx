@@ -108,11 +108,17 @@ const TableStoryTemplate: Story<{}> = (props) => {
         getValue={(x) => x.cohort}
       />
       <TableColumn
+        name={"Amount"}
+        id={"amount"}
+        width={200}
+        getValue={(x) => x.amount.toFixed(4)}
+      />
+      <TableColumn
         name={"Strategy"}
         id={"strategy"}
         width={200}
         getValue={(x) => x.strategy}
-        //pinned={"right"}
+        pinned={"right"}
       />
     </Table>
   );

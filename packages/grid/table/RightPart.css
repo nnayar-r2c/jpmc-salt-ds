@@ -6,6 +6,7 @@
   overflow-x: hidden;
   overflow-y: hidden;
   z-index: 2;
+  clip-path: inset(var(--uitkGrid-topHeight) 0 0 -10px);
 }
 
 .uitkGridRightPart-raised {

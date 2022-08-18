@@ -14,10 +14,20 @@ export interface LeftPartProps {
   isRaised?: boolean;
   columns: TableColumnModel[];
   rows: TableRowModel[];
+  hoverOverRowKey?: string;
+  setHoverOverRowKey: (key: string | undefined) => void;
 }
 
 export function LeftPart(props: LeftPartProps) {
-  const { leftRef, onWheel, isRaised, columns, rows } = props;
+  const {
+    leftRef,
+    onWheel,
+    isRaised,
+    columns,
+    rows,
+    hoverOverRowKey,
+    setHoverOverRowKey,
+  } = props;
 
   return (
     <div
@@ -29,7 +39,12 @@ export function LeftPart(props: LeftPartProps) {
       <div className={withBaseName("space")}>
         <table onWheel={onWheel}>
           <TableColGroup columns={columns} />
-          <TableBody columns={columns} rows={rows} />
+          <TableBody
+            columns={columns}
+            rows={rows}
+            hoverRowKey={hoverOverRowKey}
+            setHoverRowKey={setHoverOverRowKey}
+          />
         </table>
       </div>
     </div>

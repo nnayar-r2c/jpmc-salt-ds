@@ -6,7 +6,7 @@
   right: var(--uitkGrid-scrollBar-size);
   bottom: var(--uitkGrid-scrollBar-size);
   left: 0;
-  clip-path: inset(var(--uitkGrid-topHeight) 0 0 var(--uitkGrid-leftWidth));
+  clip-path: inset(var(--uitkGrid-topHeight) var(--uitkGrid-rightWidth) 0 var(--uitkGrid-leftWidth));
 }
 
 .uitkGridMiddlePart-space {

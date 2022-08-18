@@ -7,7 +7,7 @@
   overflow-y: hidden;
   z-index: 2;
 
-  clip-path: inset(0 0 0 var(--uitkGrid-leftWidth));
+  clip-path: inset(0 var(--uitkGrid-rightWidth) 0 var(--uitkGrid-leftWidth));
 }
 
 .uitkGridTopPart-space {
