@@ -164,7 +164,7 @@ export const useRowIdxByKey = (
     [rowData, rowKeyGetter]
   );
 
-type SetState<T> = (v: T | ((p: T) => T)) => void;
+export type SetState<T> = (v: T | ((p: T) => T)) => void;
 
 export const useSelectRows = (
   lastSelRowKey: string | undefined,
@@ -175,9 +175,12 @@ export const useSelectRows = (
   rowKeyGetter: (x: any) => string
 ) =>
   useCallback(
-    (rowKey: string, shift: boolean, meta: boolean) => {
+    (rowIdx: number, shift: boolean, meta: boolean) => {
+      const rowKey = rowKeyGetter(rowData[rowIdx]);
       console.log(
-        `Selecting "${rowKey}"; ${shift ? "shift;" : ""}${meta ? "meta" : ""}`
+        `Selecting row #${rowIdx} ("${rowKey}"); ${shift ? "shift;" : ""}${
+          meta ? "meta" : ""
+        }`
       );
       const idxFrom =
         lastSelRowKey !== undefined && shift

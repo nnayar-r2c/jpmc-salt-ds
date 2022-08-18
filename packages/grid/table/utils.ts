@@ -21,10 +21,10 @@ export function getRowKeyAttribute(element: HTMLElement): string {
   return rowKey;
 }
 
-// export function getCellPosition(element: HTMLElement): CellPosition {
-//   const [rowIndexAttr] = getAttribute(element, "data-row-index");
-//   const [columnIndexAttr] = getAttribute(element, "data-column-index");
-//   const rowIndex = parseInt(rowIndexAttr, 10);
-//   const columnIndex = parseInt(columnIndexAttr, 10);
-//   return { rowIndex, columnIndex };
-// }
+export function getCellPosition(element: HTMLElement): [number, number] {
+  const [rowIndexAttr] = getAttribute(element, "data-row-index");
+  const [columnIndexAttr] = getAttribute(element, "data-column-index");
+  const rowIndex = parseInt(rowIndexAttr, 10);
+  const columnIndex = parseInt(columnIndexAttr, 10);
+  return [rowIndex, columnIndex];
+}

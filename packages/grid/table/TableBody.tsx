@@ -1,7 +1,7 @@
 import { MouseEventHandler } from "react";
 import { TableRow } from "./TableRow";
 import { TableColumnModel, TableRowModel } from "./Table";
-import { getRowKeyAttribute } from "./utils";
+import { getCellPosition, getRowKeyAttribute } from "./utils";
 import { useSelectionContext } from "./SelectionContext";
 
 export interface TableBodyProps {
@@ -14,7 +14,8 @@ export interface TableBodyProps {
 export function TableBody(props: TableBodyProps) {
   const { columns, rows, hoverRowKey, setHoverRowKey } = props;
 
-  const { selRowKeys, selectRows } = useSelectionContext();
+  const { selRowKeys, selectRows, cursorRowKey, cursorColKey, moveCursor } =
+    useSelectionContext();
 
   const onRowMouseEnter: MouseEventHandler<HTMLTableRowElement> = (event) => {
     const target = event.target as HTMLElement;
@@ -28,8 +29,9 @@ export function TableBody(props: TableBodyProps) {
 
   const onMouseDown: MouseEventHandler<HTMLTableSectionElement> = (event) => {
     const target = event.target as HTMLElement;
-    const rowKey = getRowKeyAttribute(target);
-    selectRows(rowKey, event.shiftKey, event.metaKey);
+    const [rowIdx, colIdx] = getCellPosition(target);
+    selectRows(rowIdx, event.shiftKey, event.metaKey);
+    moveCursor(rowIdx, colIdx);
     event.preventDefault();
     event.stopPropagation();
   };
@@ -38,7 +40,7 @@ export function TableBody(props: TableBodyProps) {
     <tbody onMouseLeave={onMouseLeave} onMouseDown={onMouseDown}>
       {rows.map((row) => {
         const isSelected = selRowKeys.has(row.key);
-
+        const cursorKey = cursorRowKey === row.key ? cursorColKey : undefined;
         return (
           <TableRow
             key={row.key}
@@ -48,6 +50,7 @@ export function TableBody(props: TableBodyProps) {
             columns={columns}
             isHoverOver={row.key === hoverRowKey}
             isSelected={isSelected}
+            cursorColKey={cursorKey}
             // backgroundVariant={backgroundVariant}
             // isColumnDivided={isColumnDivided}
           />

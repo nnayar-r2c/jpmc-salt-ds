@@ -9,6 +9,7 @@ export interface TableCellProps {
   column: TableColumnModel;
   className?: string;
   style?: CSSProperties;
+  isFocused?: boolean;
 }
 
 export interface TableCellValueProps {

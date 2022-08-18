@@ -14,6 +14,7 @@ export interface TableRowProps {
   isHoverOver?: boolean;
   isZebra?: boolean;
   columns: TableColumnModel[];
+  cursorColKey?: string;
   onMouseEnter?: MouseEventHandler<HTMLTableRowElement>;
   onMouseLeave?: MouseEventHandler<HTMLTableRowElement>;
 }
@@ -32,6 +33,7 @@ export const TableRow = function TableRow(props: TableRowProps) {
     columns,
     onMouseEnter,
     onMouseLeave,
+    cursorColKey,
   } = props;
 
   return (
@@ -53,8 +55,14 @@ export const TableRow = function TableRow(props: TableRowProps) {
         const value = column.data.getValue
           ? column.data.getValue(row.data)
           : null;
+        const isFocused = cursorColKey === column.data.id;
         return (
-          <Cell key={column.data.id} row={row} column={column}>
+          <Cell
+            key={column.data.id}
+            row={row}
+            column={column}
+            isFocused={isFocused}
+          >
             <CellValue column={column} row={row} value={value} />
           </Cell>
         );

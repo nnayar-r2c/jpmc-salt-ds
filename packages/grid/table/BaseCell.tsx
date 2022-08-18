@@ -8,6 +8,7 @@ import {
   TableColumnProps,
 } from "./TableColumn";
 import { TableColumnModel } from "./Table";
+import { Cursor } from "./Cursor";
 
 const withBaseName = makePrefixer("uitkTableBaseCell");
 
@@ -16,7 +17,7 @@ export function getCellId(rowKey: string, column: TableColumnModel) {
 }
 
 export const BaseCell: FC<TableCellProps> = function BaseCell(props) {
-  const { column, className, row, style, children } = props;
+  const { column, className, row, style, isFocused, children } = props;
   return (
     <td
       id={getCellId(row.key, column)}
@@ -27,7 +28,7 @@ export const BaseCell: FC<TableCellProps> = function BaseCell(props) {
       className={cn(withBaseName(), className)}
       style={style}
     >
-      {/*{isFocused ? <Cursor /> : null}*/}
+      {isFocused ? <Cursor /> : null}
       {/*{isColumnDivided ? (*/}
       {/*  <div className={withBaseName("columnDivider")} />*/}
       {/*) : null}*/}

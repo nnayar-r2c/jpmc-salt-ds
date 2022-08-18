@@ -38,9 +38,13 @@ import {
   useSumRangeWidth,
   useSumWidth,
   useVisibleRowRange,
+  SetState,
 } from "./tableHooks";
 import { ColumnGroupProps } from "./ColumnGroup";
 import { Rng } from "./Rng";
+
+const PAGE_SIZE = 10;
+const scrollBarSize = 15; // TODO
 
 const withBaseName = makePrefixer("uitkTable");
 
@@ -160,6 +164,68 @@ const useCols = (
     return cs;
   }, [colPs, startIdx, groups]);
 
+const clamp = (x: number, min: number, max: number) => {
+  if (x < min) {
+    return min;
+  }
+  if (x > max) {
+    return max;
+  }
+  return x;
+};
+
+const useScrollToCell = (
+  visRowRng: Rng,
+  setScrollTop: SetState<number>,
+  rowHeight: number,
+  clientMidHt: number,
+  midCols: TableColumnModel[],
+  bodyVisColRng: Rng,
+  setScrollLeft: SetState<number>,
+  clientMidWidth: number
+) =>
+  useCallback(
+    (rowIdx: number, colIdx: number) => {
+      if (rowIdx <= visRowRng.start) {
+        setScrollTop(rowHeight * rowIdx);
+      } else if (rowIdx >= visRowRng.end - 1) {
+        setScrollTop(
+          rowHeight * rowIdx - clientMidHt + rowHeight + scrollBarSize
+        );
+      }
+      const isMidCol =
+        midCols.length > 0 &&
+        colIdx >= midCols[0].index &&
+        colIdx <= last(midCols).index;
+      if (isMidCol) {
+        const midColIdx = colIdx - midCols[0].index;
+        if (midColIdx <= bodyVisColRng.start) {
+          let w = 0;
+          for (let i = 0; i < midColIdx; ++i) {
+            w += midCols[i].data.width;
+          }
+          setScrollLeft(w);
+        } else if (midColIdx >= bodyVisColRng.end - 1) {
+          let w = 0;
+          for (let i = 0; i <= midColIdx; ++i) {
+            w += midCols[i].data.width;
+          }
+          setScrollLeft(w - clientMidWidth + scrollBarSize);
+        }
+      }
+    },
+    [
+      visRowRng,
+      setScrollTop,
+      rowHeight,
+      clientMidHt,
+      midCols,
+      bodyVisColRng,
+      setScrollLeft,
+      clientMidWidth,
+    ]
+  );
+
 export const Table = (props: TableProps) => {
   const { rowData, isZebra, className, rowKeyGetter } = props;
 
@@ -191,6 +257,13 @@ export const Table = (props: TableProps) => {
     undefined
   );
   const [rowHeight, setRowHeight] = useState<number>(0);
+
+  const [cursorRowKey, setCursorRowKey] = useState<string | undefined>(
+    undefined
+  );
+  const [cursorColKey, setCursorColKey] = useState<string | undefined>(
+    undefined
+  );
 
   const rowIdxByKey = useRowIdxByKey(rowKeyGetter, rowData);
 
@@ -399,11 +472,85 @@ export const Table = (props: TableProps) => {
     []
   );
 
+  const cols = useMemo(
+    () => [...leftCols, ...midCols, ...rightCols],
+    [leftCols, midCols, rightCols]
+  );
+
+  const colIdxByKey = useMemo(
+    () => new Map<string, number>(cols.map((c, i) => [c.data.id, c.index])),
+    [cols]
+  );
+
+  const cursorColIdx =
+    cursorColKey === undefined ? 0 : colIdxByKey.get(cursorColKey) || 0;
+  const cursorRowIdx =
+    cursorRowKey === undefined ? 0 : rowIdxByKey.get(cursorRowKey) || 0;
+
+  const scrollToCell = useScrollToCell(
+    visRowRng,
+    setScrollTop,
+    rowHeight,
+    clientMidHt,
+    midCols,
+    bodyVisColRng,
+    setScrollLeft,
+    clientMidWidth
+  );
+
+  const moveCursor = useCallback(
+    (rowIdx: number, colIdx: number) => {
+      if (rowData.length < 1 || cols.length < 1) {
+        return;
+      }
+      rowIdx = clamp(rowIdx, 0, rowData.length - 1);
+      colIdx = clamp(colIdx, 0, cols.length - 1);
+      setCursorRowKey(rowKeyGetter(rowData[rowIdx]));
+      setCursorColKey(cols[colIdx].data.id);
+      scrollToCell(rowIdx, colIdx);
+      rootRef.current?.focus();
+    },
+    [
+      setCursorRowKey,
+      setCursorColKey,
+      rowData,
+      rowKeyGetter,
+      cols,
+      rootRef.current,
+      scrollToCell,
+    ]
+  );
+
   const onKeyDown: KeyboardEventHandler<HTMLDivElement> = useCallback(
     (event) => {
-      // TODO
+      switch (event.key) {
+        case "ArrowLeft":
+          moveCursor(cursorRowIdx, cursorColIdx - 1);
+          break;
+        case "ArrowRight":
+          moveCursor(cursorRowIdx, cursorColIdx + 1);
+          break;
+        case "ArrowUp":
+          moveCursor(cursorRowIdx - 1, cursorColIdx);
+          break;
+        case "ArrowDown":
+          moveCursor(cursorRowIdx + 1, cursorColIdx);
+          break;
+        case "PageUp":
+          moveCursor(cursorRowIdx - PAGE_SIZE, cursorColIdx);
+          break;
+        case "PageDown":
+          moveCursor(cursorRowIdx + PAGE_SIZE, cursorColIdx);
+          break;
+        case "Home":
+          moveCursor(0, cursorColIdx);
+          break;
+        case "End":
+          moveCursor(rowData.length - 1, cursorColIdx);
+          break;
+      }
     },
-    []
+    [cursorRowIdx, cursorColIdx, moveCursor]
   );
 
   const rows = useRowModels(rowKeyGetter, rowData, visRowRng);
@@ -434,8 +581,11 @@ export const Table = (props: TableProps) => {
     () => ({
       selRowKeys,
       selectRows,
+      cursorRowKey,
+      cursorColKey,
+      moveCursor,
     }),
-    [selRowKeys, selectRows]
+    [selRowKeys, selectRows, cursorRowKey, cursorColKey, moveCursor]
   );
 
   return (
