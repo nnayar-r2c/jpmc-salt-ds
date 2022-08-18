@@ -1,4 +1,6 @@
 import {
+  Children,
+  isValidElement,
   KeyboardEventHandler,
   ReactNode,
   useCallback,
@@ -11,7 +13,7 @@ import {
 import { makePrefixer } from "@jpmorganchase/uitk-core";
 import { TableColumnProps } from "./TableColumn";
 import { TableContext } from "./TableContext";
-import { Rng } from "../src/grid";
+import { Rng } from "./Rng";
 import cx from "classnames";
 import { CellMeasure } from "./CellMeasure";
 import { Scrollable } from "./Scrollable";
@@ -23,10 +25,28 @@ import { TopLeftPart } from "./TopLeftPart";
 import { RightPart } from "./RightPart";
 import { TopRightPart } from "./TopRightPart";
 import { SelectionContext } from "./SelectionContext";
+import {
+  useBodyVisibleAreaTop,
+  useBodyVisibleColumnRange,
+  useBodyVisibleColumns,
+  useClientMidHeight,
+  useClientMidWidth,
+  useLeftScrolledOutWidth,
+  useProd,
+  useRowIdxByKey,
+  useSelectRows,
+  useSum,
+  useSumRangeWidth,
+  useSumWidth,
+  useVisibleRowRange,
+} from "./tableHooks";
+import { ColumnGroupProps } from "./ColumnGroup";
 
 const withBaseName = makePrefixer("uitkGrid");
 
 export type ColumnSeparatorType = "regular" | "none" | "groupEdge";
+export type ColumnGroupRowSeparatorType = "first" | "regular" | "last";
+export type ColumnGroupColumnSeparatorType = "regular" | "none";
 
 export interface TableProps {
   children: ReactNode;
@@ -41,234 +61,6 @@ export interface Size {
   width: number;
 }
 
-const sizeEquals = (a: Size, b: Size) => {
-  return a.height === b.height && a.width === b.width;
-};
-
-const sumWidth = (columns: TableColumnModel[]) =>
-  columns.reduce((p, x) => p + x.data.width, 0);
-
-const useSumWidth = (columns: TableColumnModel[]) =>
-  useMemo(() => sumWidth(columns), [columns]);
-
-const useSum = (source: number[]) =>
-  useMemo(() => source.reduce((p, x) => p + x, 0), source);
-
-const sumRangeWidth = (columns: TableColumnModel[], range: Rng) => {
-  let w = 0;
-  range.forEach((i) => {
-    w += columns[i].data.width;
-  });
-  return w;
-};
-
-const useSumRangeWidth = (columns: TableColumnModel[], range: Rng) =>
-  useMemo(() => sumRangeWidth(columns, range), [columns, range]);
-
-const useProd = (source: number[]) =>
-  useMemo(() => source.reduce((p, x) => p * x, 1), source);
-
-// TODO rewrite this!!!
-const useBodyVisibleColumnRange = (
-  midColumns: TableColumnModel[],
-  scrollLeft: number,
-  clientMidWidth: number
-): Rng => {
-  const prevRef = useRef<Rng>(Rng.empty);
-  const range = useMemo(() => {
-    if (clientMidWidth === 0 || midColumns.length === 0) {
-      return Rng.empty;
-    }
-    let width = scrollLeft;
-    let start = 0;
-    for (let i = 0; i < midColumns.length; ++i) {
-      const colWidth = midColumns[i].data.width;
-      if (width > colWidth) {
-        width -= colWidth;
-      } else {
-        start = i;
-        width += clientMidWidth;
-        break;
-      }
-    }
-    let end = start + 1;
-    for (let i = start; i < midColumns.length; ++i) {
-      const colWidth = midColumns[i].data.width;
-      width -= colWidth;
-      end = i + 1;
-      if (width <= 0) {
-        break;
-      }
-    }
-    if (end > midColumns.length) {
-      end = midColumns.length;
-    }
-    return new Rng(start, end);
-  }, [midColumns, scrollLeft, clientMidWidth]);
-
-  if (!Rng.equals(prevRef.current, range)) {
-    console.log(`visibleColumnRange: ${range.toString()}`);
-    prevRef.current = range;
-  }
-  return range;
-};
-
-const useClientMidWidth = (
-  clientWidth: number,
-  leftWidth: number,
-  rightWidth: number
-) =>
-  useMemo(
-    () => clientWidth - leftWidth - rightWidth,
-    [clientWidth, leftWidth, rightWidth]
-  );
-
-const useClientMidHeight = (
-  clientHeight: number,
-  topHeight: number,
-  botHeight: number
-) =>
-  useMemo(
-    () => clientHeight - topHeight - botHeight,
-    [clientHeight, topHeight, botHeight]
-  );
-
-const useBodyVisibleAreaTop = (
-  rowHeight: number,
-  visibleRowRange: Rng,
-  topHeight: number
-) =>
-  useMemo(
-    () => topHeight + visibleRowRange.start * rowHeight,
-    [rowHeight, visibleRowRange, topHeight]
-  );
-
-const useVisibleRowRange = (
-  scrollTop: number,
-  clientMidHeight: number,
-  rowHeight: number,
-  rowCount: number
-) => {
-  const prevRef = useRef<Rng>(Rng.empty);
-  const range = useMemo(() => {
-    if (rowHeight < 1) {
-      return Rng.empty;
-    }
-    const start = Math.floor(scrollTop / rowHeight);
-    let end = Math.max(
-      start,
-      Math.ceil((scrollTop + clientMidHeight) / rowHeight)
-    );
-    if (end > rowCount) {
-      end = rowCount;
-    }
-    return new Rng(start, end);
-  }, [scrollTop, clientMidHeight, rowHeight, rowCount]);
-  if (!Rng.equals(prevRef.current, range)) {
-    prevRef.current = range;
-  }
-  return prevRef.current;
-};
-
-const useBodyVisibleColumns = (
-  midColumns: TableColumnModel[],
-  bodyVisibleColumnRange: Rng
-): TableColumnModel[] =>
-  useMemo(
-    () =>
-      midColumns.slice(
-        bodyVisibleColumnRange.start,
-        bodyVisibleColumnRange.end
-      ),
-    [midColumns, bodyVisibleColumnRange]
-  );
-
-const useLeftScrolledOutWidth = (
-  midColumns: TableColumnModel[],
-  bodyVisibleColumnRange: Rng
-) =>
-  useMemo(() => {
-    let w = 0;
-    for (let i = 0; i < bodyVisibleColumnRange.start; ++i) {
-      w += midColumns[i].data.width;
-    }
-    return w;
-  }, [midColumns, bodyVisibleColumnRange]);
-
-const useRowIdxByKey = (rowKeyGetter: (x: any) => string, rowData: any[]) =>
-  useMemo(
-    () => new Map<string, number>(rowData.map((r, i) => [rowKeyGetter(r), i])),
-    [rowData, rowKeyGetter]
-  );
-
-type SetState<T> = (v: T | ((p: T) => T)) => void;
-
-const useSelectRows = (
-  lastSelRowKey: string | undefined,
-  setSelRowKeys: SetState<Set<string>>,
-  setLastSelRowKey: SetState<string | undefined>,
-  rowData: any[],
-  rowIdxByKey: Map<string, number>,
-  rowKeyGetter: (x: any) => string
-) =>
-  useCallback(
-    (rowKey: string, shift: boolean, meta: boolean) => {
-      console.log(
-        `Selecting "${rowKey}"; ${shift ? "shift;" : ""}${meta ? "meta" : ""}`
-      );
-      const idxFrom =
-        lastSelRowKey !== undefined && shift
-          ? rowIdxByKey.get(lastSelRowKey)
-          : undefined;
-      if (idxFrom === undefined) {
-        console.log(`Selecting single item "${rowKey}"`);
-        if (!meta) {
-          setSelRowKeys(new Set<string>([rowKey]));
-          setLastSelRowKey(rowKey);
-        } else {
-          setSelRowKeys((p) => {
-            const n = new Set<string>(p);
-            if (n.has(rowKey)) {
-              n.delete(rowKey);
-              setLastSelRowKey(undefined);
-            } else {
-              n.add(rowKey);
-              setLastSelRowKey(rowKey);
-            }
-            return n;
-          });
-        }
-      } else {
-        console.log(`Selecting range from "${lastSelRowKey}" to "${rowKey}"`);
-        setSelRowKeys((p) => {
-          const s = meta ? new Set<string>(p) : new Set<string>();
-          const idxs = [rowIdxByKey.get(rowKey)!, idxFrom];
-          idxs.sort((a, b) => a - b);
-          console.log(`Selecting indices: ${idxs}`);
-          const rowKeys = [];
-          for (let i = idxs[0]; i <= idxs[1]; ++i) {
-            rowKeys.push(rowKeyGetter(rowData[i]));
-          }
-          if (p.has(rowKey)) {
-            rowKeys.forEach((k) => s.delete(k));
-          } else {
-            rowKeys.forEach((k) => s.add(k));
-          }
-          return s;
-        });
-        setLastSelRowKey(rowKey);
-      }
-    },
-    [
-      lastSelRowKey,
-      setSelRowKeys,
-      setLastSelRowKey,
-      rowData,
-      rowIdxByKey,
-      rowKeyGetter,
-    ]
-  );
-
 export interface TableRowModel {
   key: string;
   index: number;
@@ -279,6 +71,15 @@ export interface TableColumnModel {
   index: number;
   separator: ColumnSeparatorType;
   data: TableColumnProps;
+}
+
+export interface TableColumnGroupModel {
+  index: number;
+  data: ColumnGroupProps;
+  childrenIds: string[];
+  rowSeparator: ColumnGroupRowSeparatorType;
+  columnSeparator: ColumnGroupColumnSeparatorType;
+  colSpan: number;
 }
 
 const useRowModels = (
@@ -312,6 +113,11 @@ export const Table = (props: TableProps) => {
   const [leftColPs, setLeftColPs] = useState<TableColumnProps[]>([]);
   const [rightColPs, setRightColPs] = useState<TableColumnProps[]>([]);
   const [midColPs, setMidColPs] = useState<TableColumnProps[]>([]);
+
+  const [leftGrpPs, setLeftGrpPs] = useState<ColumnGroupProps[]>([]);
+  const [rightGrpPs, setRightGrpPs] = useState<ColumnGroupProps[]>([]);
+  const [midGrpPs, setMidGrpPs] = useState<ColumnGroupProps[]>([]);
+
   const [hoverRowKey, setHoverRowKey] = useState<string | undefined>(undefined);
 
   const [clientWidth, setClientWidth] = useState(0);
@@ -444,13 +250,11 @@ export const Table = (props: TableProps) => {
     [scrollableRef.current]
   );
 
-  // const columns = useMemo(() => {
-  //   return [...leftCols, ...midCols, ...rightCols];
-  // }, [leftCols, midCols, rightCols]);
-
   const onColumnAdded = useCallback((columnProps: TableColumnProps) => {
-    console.log(`Column added: ${columnProps.name}`);
     const { pinned = null } = columnProps;
+    console.log(
+      `Column added: "${columnProps.name}"${pinned ? ` pinned ${pinned}` : ""}`
+    );
     const adder = (old: TableColumnProps[]) => [...old, columnProps];
     if (pinned === "left") {
       setLeftColPs(adder);
@@ -462,7 +266,7 @@ export const Table = (props: TableProps) => {
   }, []);
 
   const onColumnRemoved = useCallback((columnProps: TableColumnProps) => {
-    console.log(`Column removed: ${columnProps.name}`);
+    console.log(`Column removed: "${columnProps.name}"`);
     const { pinned } = columnProps;
     const remover = (old: TableColumnProps[]) =>
       old.filter((x) => x.name !== columnProps.name);
@@ -474,6 +278,50 @@ export const Table = (props: TableProps) => {
       setMidColPs(remover);
     }
   }, []);
+
+  const onColumnGroupAdded = useCallback((colGroupProps: ColumnGroupProps) => {
+    let childrenIds = Children.toArray(colGroupProps.children)
+      .map((child) => {
+        if (!isValidElement(child)) {
+          return undefined;
+        }
+        return child.props.id;
+      })
+      .filter((x) => x !== undefined);
+    const { pinned = null } = colGroupProps;
+
+    const adder = (old: ColumnGroupProps[]) => [...old, colGroupProps];
+    if (pinned === "left") {
+      setLeftGrpPs(adder);
+    } else if (pinned === "right") {
+      setRightGrpPs(adder);
+    } else {
+      setMidGrpPs(adder);
+    }
+
+    console.log(
+      `Group added: "${colGroupProps.name}": [${childrenIds
+        .map((x) => `"${x}"`)
+        .join(", ")}].`
+    );
+  }, []);
+
+  const onColumnGroupRemoved = useCallback(
+    (colGroupProps: ColumnGroupProps) => {
+      console.log(`Group removed: "${colGroupProps.name}"`);
+      const { pinned } = colGroupProps;
+      const remover = (old: ColumnGroupProps[]) =>
+        old.filter((x) => x.name !== colGroupProps.name);
+      if (pinned === "left") {
+        setLeftGrpPs(remover);
+      } else if (pinned === "right") {
+        setRightGrpPs(remover);
+      } else {
+        setMidGrpPs(remover);
+      }
+    },
+    []
+  );
 
   const onKeyDown: KeyboardEventHandler<HTMLDivElement> = useCallback(
     (event) => {
@@ -488,8 +336,10 @@ export const Table = (props: TableProps) => {
     () => ({
       onColumnAdded,
       onColumnRemoved,
+      onColumnGroupAdded,
+      onColumnGroupRemoved,
     }),
-    [onColumnAdded, onColumnRemoved]
+    [onColumnAdded, onColumnRemoved, onColumnGroupAdded, onColumnGroupRemoved]
   );
 
   const isLeftRaised = scrollLeft > 0;

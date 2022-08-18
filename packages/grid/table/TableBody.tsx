@@ -1,7 +1,7 @@
 import { MouseEventHandler } from "react";
 import { TableRow } from "./TableRow";
 import { TableColumnModel, TableRowModel } from "./Table";
-import { getRowIndexAttribute, getRowKeyAttribute } from "./utils";
+import { getRowKeyAttribute } from "./utils";
 import { useSelectionContext } from "./SelectionContext";
 
 export interface TableBodyProps {
@@ -10,16 +10,6 @@ export interface TableBodyProps {
   hoverRowKey?: string;
   setHoverRowKey: (key: string | undefined) => void;
 }
-
-// const toggleSelection = (oldSelRowKeys: Set<string>, rowKey: string) => {
-//   const next = new Set<string>(oldSelRowKeys);
-//   if (next.has(rowKey)) {
-//     next.delete(rowKey);
-//   } else {
-//     next.add(rowKey);
-//   }
-//   return next;
-// };
 
 export function TableBody(props: TableBodyProps) {
   const { columns, rows, hoverRowKey, setHoverRowKey } = props;

@@ -4,6 +4,7 @@ import { Table } from "../table/Table";
 import { TableColumn } from "../table/TableColumn";
 import { randomAmount } from "./grid/utils";
 import { TableCol } from "../table/TableColGroup";
+import { ColumnGroup } from "../table/ColumnGroup";
 
 export default {
   title: "Grid/New Api Experiment",
@@ -88,38 +89,46 @@ const rowKeyGetter = (rowData: Investor) => rowData.name;
 const TableStoryTemplate: Story<{}> = (props) => {
   return (
     <Table rowData={dummyInvestors} rowKeyGetter={rowKeyGetter}>
-      <TableColumn
-        name={"Name"}
-        id={"name"}
-        width={200}
-        getValue={(x) => x.name}
-        pinned={"left"}
-      />
-      <TableColumn
-        name={"Location"}
-        id={"location"}
-        width={200}
-        getValue={(x) => x.location}
-      />
-      <TableColumn
-        name={"Cohort"}
-        id={"cohort"}
-        width={200}
-        getValue={(x) => x.cohort}
-      />
-      <TableColumn
-        name={"Amount"}
-        id={"amount"}
-        width={200}
-        getValue={(x) => x.amount.toFixed(4)}
-      />
-      <TableColumn
-        name={"Strategy"}
-        id={"strategy"}
-        width={200}
-        getValue={(x) => x.strategy}
-        pinned={"right"}
-      />
+      <ColumnGroup id={"groupOne"} name={"Group One"} pinned={"left"}>
+        <TableColumn
+          name={"Name"}
+          id={"name"}
+          width={200}
+          getValue={(x) => x.name}
+          pinned={"right"}
+        />
+      </ColumnGroup>
+      <ColumnGroup id={"groupTwo"} name={"Group Two"}>
+        <TableColumn
+          name={"Location"}
+          id={"location"}
+          width={150}
+          getValue={(x) => x.location}
+        />
+        <TableColumn
+          name={"Cohort"}
+          id={"cohort"}
+          width={200}
+          getValue={(x) => x.cohort}
+        />
+      </ColumnGroup>
+      <ColumnGroup id={"groupThree"} name={"Group Three"}>
+        <TableColumn
+          name={"Amount"}
+          id={"amount"}
+          width={200}
+          getValue={(x) => x.amount.toFixed(4)}
+        />
+      </ColumnGroup>
+      <ColumnGroup id={"groupFour"} name={"Group Four"}>
+        <TableColumn
+          name={"Strategy"}
+          id={"strategy"}
+          width={200}
+          getValue={(x) => x.strategy}
+          pinned={"right"}
+        />
+      </ColumnGroup>
     </Table>
   );
 };
