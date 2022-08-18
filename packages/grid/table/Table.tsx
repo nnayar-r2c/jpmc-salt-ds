@@ -143,18 +143,22 @@ const useHeadVisibleColumnRange = (
 };
 
 const useCols = (
-  leftColPs: TableColumnProps[],
-  startIdx: number
+  colPs: TableColumnProps[],
+  startIdx: number,
+  groups: TableColumnGroupModel[]
 ): TableColumnModel[] =>
-  useMemo(
-    () =>
-      leftColPs.map((data, i) => ({
-        data,
-        index: i + startIdx,
-        separator: "regular",
-      })),
-    [leftColPs]
-  );
+  useMemo(() => {
+    const edgeColIds = new Set<string>();
+    groups.forEach((g) => {
+      edgeColIds.add(last(g.childrenIds));
+    });
+    const cs: TableColumnModel[] = colPs.map((data, i) => ({
+      data,
+      index: i + startIdx,
+      separator: edgeColIds.has(data.id) ? "groupEdge" : "regular",
+    }));
+    return cs;
+  }, [colPs, startIdx, groups]);
 
 export const Table = (props: TableProps) => {
   const { rowData, isZebra, className, rowKeyGetter } = props;
@@ -167,7 +171,7 @@ export const Table = (props: TableProps) => {
   const rightRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const [scrollLeft, setScrollLeft] = useState<number>(0); // TODO
+  const [scrollLeft, setScrollLeft] = useState<number>(0);
   const [scrollTop, setScrollTop] = useState<number>(0);
 
   const [leftColPs, setLeftColPs] = useState<TableColumnProps[]>([]);
@@ -190,24 +194,28 @@ export const Table = (props: TableProps) => {
 
   const rowIdxByKey = useRowIdxByKey(rowKeyGetter, rowData);
 
-  const leftCols: TableColumnModel[] = useCols(leftColPs, 0);
-
-  const midCols: TableColumnModel[] = useCols(midColPs, leftCols.length);
-  const rightCols: TableColumnModel[] = useCols(
-    rightColPs,
-    leftCols.length + midCols.length
-  );
-
-  const midColsById = useMemo(
-    () => new Map<string, TableColumnModel>(midCols.map((c) => [c.data.id, c])),
-    [midCols]
-  );
-
   const leftGrps = useColumnGroups(leftGrpPs, 0);
   const midGrps = useColumnGroups(midGrpPs, leftGrps.length);
   const rightGrps = useColumnGroups(
     rightGrpPs,
     leftGrps.length + midGrps.length
+  );
+
+  const leftCols: TableColumnModel[] = useCols(leftColPs, 0, leftGrps);
+  const midCols: TableColumnModel[] = useCols(
+    midColPs,
+    leftCols.length,
+    midGrps
+  );
+  const rightCols: TableColumnModel[] = useCols(
+    rightColPs,
+    leftCols.length + midCols.length,
+    rightGrps
+  );
+
+  const midColsById = useMemo(
+    () => new Map<string, TableColumnModel>(midCols.map((c) => [c.data.id, c])),
+    [midCols]
   );
 
   const leftWh = useSumWidth(leftCols);
