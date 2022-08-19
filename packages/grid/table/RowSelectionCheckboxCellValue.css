@@ -1,0 +1,12 @@
+.uitkTableRowSelectionCheckboxCellValue {
+  height: var(--uitkGrid-rowHeight);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.uitkTableRowSelectionCheckboxHeaderValue {
+  height: var(--uitkGrid-rowHeight);
+  overflow: hidden;
+}

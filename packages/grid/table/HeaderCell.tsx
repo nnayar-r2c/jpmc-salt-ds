@@ -3,6 +3,7 @@ import { ReactNode, useEffect, useLayoutEffect, useRef } from "react";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
 import cn from "classnames";
 import { ColumnSeparatorType, TableColumnModel } from "./Table";
+import { useSizingContext } from "./SizingContext";
 
 const withBaseName = makePrefixer("uitkTableHeaderCell");
 
@@ -49,45 +50,36 @@ export function HeaderCell(props: HeaderCellProps) {
   );
 }
 
-// // Auto-sizing header cell
-// // Cannot be resized manually or moved
-// // Currently used for row selector column only
-// export function AutoSizingHeaderCell<T>(props: HeaderCellProps<T>) {
-//   const { column, children } = props;
-//   const valueContainerRef = useRef<HTMLDivElement>(null);
-//
-//   const { model } = useGridContext();
-//   const separator = column.useSeparator();
-//   const columnWidth = column.useWidth();
-//   const rowHeight = model.useRowHeight();
-//
-//   useLayoutEffect(() => {
-//     const width = valueContainerRef.current
-//       ? valueContainerRef.current.offsetWidth
-//       : undefined;
-//     if (width != undefined && width !== columnWidth) {
-//       model.resizeColumn({
-//         columnIndex: column.index,
-//         width,
-//       });
-//     }
-//   }, [rowHeight, valueContainerRef.current, rowHeight, columnWidth]);
-//
-//   return (
-//     <th
-//       data-column-index={column.index}
-//       className={withBaseName()}
-//       role="columnheader"
-//     >
-//       <div className={withBaseName("autosizeContainer")}>
-//         <div
-//           ref={valueContainerRef}
-//           className={withBaseName("measuredContent")}
-//         >
-//           {children}
-//         </div>
-//       </div>
-//       <HeaderCellSeparator separatorType={separator} />
-//     </th>
-//   );
-// }
+export function AutoSizeHeaderCell<T>(props: HeaderCellProps) {
+  const { column, children } = props;
+  const { separator } = column;
+  const valueContainerRef = useRef<HTMLDivElement>(null);
+  const { resizeColumn, rowHeight } = useSizingContext();
+
+  useLayoutEffect(() => {
+    const width = valueContainerRef.current
+      ? valueContainerRef.current.offsetWidth
+      : undefined;
+    if (width != undefined && width !== column.data.width) {
+      resizeColumn(column.index, width);
+    }
+  }, [valueContainerRef.current, column.data.width, rowHeight]);
+
+  return (
+    <th
+      data-column-index={column.index}
+      className={withBaseName()}
+      role="columnheader"
+    >
+      <div className={withBaseName("autosizeContainer")}>
+        <div
+          ref={valueContainerRef}
+          className={withBaseName("measuredContent")}
+        >
+          {children}
+        </div>
+      </div>
+      <HeaderCellSeparator separatorType={separator} />
+    </th>
+  );
+}

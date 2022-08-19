@@ -1,10 +1,11 @@
 import { Story } from "@storybook/react";
 import "./data-grid.stories.css";
 import { Table } from "../table/Table";
-import { TableColumn } from "../table/TableColumn";
+import { RowSelectionColumn, TableColumn } from "../table/TableColumn";
 import { randomAmount } from "./grid/utils";
 import { TableCol } from "../table/TableColGroup";
 import { ColumnGroup } from "../table/ColumnGroup";
+import { RowSelectionCheckboxCellValue } from "../table/RowSelectionCheckboxCellValue";
 
 export default {
   title: "Grid/New Api Experiment",
@@ -90,12 +91,18 @@ const TableStoryTemplate: Story<{}> = (props) => {
   return (
     <Table rowData={dummyInvestors} rowKeyGetter={rowKeyGetter}>
       <ColumnGroup id={"groupOne"} name={"Group One"} pinned={"left"}>
+        <RowSelectionColumn
+          id={"rowSelection"}
+          name={"RSC"}
+          width={10}
+          index={0}
+        />
         <TableColumn
           name={"Name"}
           id={"name"}
           width={200}
           getValue={(x) => x.name}
-          pinned={"right"}
+          index={1}
         />
       </ColumnGroup>
       <ColumnGroup id={"groupTwo"} name={"Group Two"}>
@@ -104,12 +111,14 @@ const TableStoryTemplate: Story<{}> = (props) => {
           id={"location"}
           width={150}
           getValue={(x) => x.location}
+          index={2}
         />
         <TableColumn
           name={"Cohort"}
           id={"cohort"}
           width={200}
           getValue={(x) => x.cohort}
+          index={3}
         />
       </ColumnGroup>
       <ColumnGroup id={"groupThree"} name={"Group Three"}>
@@ -118,6 +127,7 @@ const TableStoryTemplate: Story<{}> = (props) => {
           id={"amount"}
           width={200}
           getValue={(x) => x.amount.toFixed(4)}
+          index={4}
         />
       </ColumnGroup>
       <ColumnGroup id={"groupFour"} name={"Group Four"} pinned={"right"}>
@@ -125,7 +135,8 @@ const TableStoryTemplate: Story<{}> = (props) => {
           name={"Strategy"}
           id={"strategy"}
           width={200}
-          getValue={(x) => x.strategy}
+          getValue={(x) => x.strategy.join(", ")}
+          index={5}
         />
       </ColumnGroup>
     </Table>

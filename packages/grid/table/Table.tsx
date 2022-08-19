@@ -23,28 +23,30 @@ import { RightPart } from "./RightPart";
 import { TopRightPart } from "./TopRightPart";
 import { SelectionContext } from "./SelectionContext";
 import {
+  clamp,
+  PAGE_SIZE,
   useBodyVisibleAreaTop,
   useBodyVisibleColumnRange,
-  useColumnRange,
   useClientMidHeight,
   useClientMidWidth,
+  useCols,
   useColumnGroups,
+  useColumnRange,
+  useHeadVisibleColumnRange,
   useLeftScrolledOutWidth,
   useProd,
   useRowIdxByKey,
   useRowModels,
+  useScrollToCell,
   useSelectRows,
   useSum,
   useSumRangeWidth,
   useSumWidth,
+  useVisibleColumnGroupRange,
   useVisibleRowRange,
-  SetState,
 } from "./tableHooks";
 import { ColumnGroupProps } from "./ColumnGroup";
-import { Rng } from "./Rng";
-
-const PAGE_SIZE = 10;
-const scrollBarSize = 15; // TODO
+import { SizingContext } from "./SizingContext";
 
 const withBaseName = makePrefixer("uitkTable");
 
@@ -86,146 +88,6 @@ export interface TableColumnGroupModel {
   colSpan: number;
 }
 
-const useVisibleColumnGroupRange = (
-  bodyVisColRng: Rng,
-  midCols: TableColumnModel[],
-  midGrpByColId: Map<string, TableColumnGroupModel>,
-  leftGrpCount: number
-): Rng => {
-  const prevRef = useRef<Rng>(Rng.empty);
-  const range = useMemo(() => {
-    if (bodyVisColRng.length === 0) {
-      return Rng.empty;
-    }
-    const firstVisibleCol = midCols[bodyVisColRng.start];
-    const lastVisibleCol = midCols[bodyVisColRng.end - 1];
-    const firstVisibleGroup = midGrpByColId.get(firstVisibleCol.data.id);
-    const lastVisibleGroup = midGrpByColId.get(lastVisibleCol.data.id);
-    if (!firstVisibleGroup || !lastVisibleGroup) {
-      return Rng.empty;
-    }
-    return new Rng(
-      firstVisibleGroup.index - leftGrpCount,
-      lastVisibleGroup.index + 1 - leftGrpCount
-    );
-  }, [bodyVisColRng, midCols, midGrpByColId, leftGrpCount]);
-  if (!Rng.equals(prevRef.current, range)) {
-    prevRef.current = range;
-  }
-  return prevRef.current;
-};
-
-function last<T>(source: T[]): T {
-  return source[source.length - 1];
-}
-
-const useHeadVisibleColumnRange = (
-  visColGrps: TableColumnGroupModel[],
-  midColsById: Map<string, TableColumnModel>,
-  leftColCount: number
-) => {
-  const prevRef = useRef<Rng>(Rng.empty);
-  const range = useMemo(() => {
-    if (visColGrps.length === 0) {
-      return Rng.empty;
-    }
-    const firstVisibleGroup = visColGrps[0];
-    const lastVisibleGroup = last(visColGrps);
-    const firstColId = firstVisibleGroup.childrenIds[0];
-    const lastColId = last(lastVisibleGroup.childrenIds);
-    const firstColIdx = midColsById.get(firstColId)?.index;
-    const lastColIdx = midColsById.get(lastColId)?.index;
-    if (firstColIdx === undefined || lastColIdx === undefined) {
-      return Rng.empty;
-    }
-    return new Rng(firstColIdx - leftColCount, lastColIdx + 1 - leftColCount);
-  }, [visColGrps, midColsById, leftColCount]);
-  if (!Rng.equals(range, prevRef.current)) {
-    prevRef.current = range;
-  }
-  return prevRef.current;
-};
-
-const useCols = (
-  colPs: TableColumnProps[],
-  startIdx: number,
-  groups: TableColumnGroupModel[]
-): TableColumnModel[] =>
-  useMemo(() => {
-    const edgeColIds = new Set<string>();
-    groups.forEach((g) => {
-      edgeColIds.add(last(g.childrenIds));
-    });
-    const cs: TableColumnModel[] = colPs.map((data, i) => ({
-      data,
-      index: i + startIdx,
-      separator: edgeColIds.has(data.id) ? "groupEdge" : "regular",
-    }));
-    return cs;
-  }, [colPs, startIdx, groups]);
-
-const clamp = (x: number, min: number, max: number) => {
-  if (x < min) {
-    return min;
-  }
-  if (x > max) {
-    return max;
-  }
-  return x;
-};
-
-const useScrollToCell = (
-  visRowRng: Rng,
-  setScrollTop: SetState<number>,
-  rowHeight: number,
-  clientMidHt: number,
-  midCols: TableColumnModel[],
-  bodyVisColRng: Rng,
-  setScrollLeft: SetState<number>,
-  clientMidWidth: number
-) =>
-  useCallback(
-    (rowIdx: number, colIdx: number) => {
-      if (rowIdx <= visRowRng.start) {
-        setScrollTop(rowHeight * rowIdx);
-      } else if (rowIdx >= visRowRng.end - 1) {
-        setScrollTop(
-          rowHeight * rowIdx - clientMidHt + rowHeight + scrollBarSize
-        );
-      }
-      const isMidCol =
-        midCols.length > 0 &&
-        colIdx >= midCols[0].index &&
-        colIdx <= last(midCols).index;
-      if (isMidCol) {
-        const midColIdx = colIdx - midCols[0].index;
-        if (midColIdx <= bodyVisColRng.start) {
-          let w = 0;
-          for (let i = 0; i < midColIdx; ++i) {
-            w += midCols[i].data.width;
-          }
-          setScrollLeft(w);
-        } else if (midColIdx >= bodyVisColRng.end - 1) {
-          let w = 0;
-          for (let i = 0; i <= midColIdx; ++i) {
-            w += midCols[i].data.width;
-          }
-          setScrollLeft(w - clientMidWidth + scrollBarSize);
-        }
-      }
-    },
-    [
-      visRowRng,
-      setScrollTop,
-      rowHeight,
-      clientMidHt,
-      midCols,
-      bodyVisColRng,
-      setScrollLeft,
-      clientMidWidth,
-    ]
-  );
-
 export const Table = (props: TableProps) => {
   const { rowData, isZebra, className, rowKeyGetter } = props;
 
@@ -240,9 +102,43 @@ export const Table = (props: TableProps) => {
   const [scrollLeft, setScrollLeft] = useState<number>(0);
   const [scrollTop, setScrollTop] = useState<number>(0);
 
-  const [leftColPs, setLeftColPs] = useState<TableColumnProps[]>([]);
-  const [rightColPs, setRightColPs] = useState<TableColumnProps[]>([]);
-  const [midColPs, setMidColPs] = useState<TableColumnProps[]>([]);
+  const [leftColMap, setLeftColMap] = useState<Map<number, TableColumnProps>>(
+    new Map()
+  );
+  const [rightColMap, setRightColMap] = useState<Map<number, TableColumnProps>>(
+    new Map()
+  );
+  const [midColMap, setMidColMap] = useState<Map<number, TableColumnProps>>(
+    new Map()
+  );
+
+  const leftColPs = useMemo(() => {
+    const entries = [...leftColMap.entries()].filter(
+      ([index, value]) => !!value
+    );
+    entries.sort((a, b) => a[0] - b[0]);
+    return entries.map((x) => x[1]);
+  }, [leftColMap]);
+
+  const rightColPs = useMemo(() => {
+    const entries = [...rightColMap.entries()].filter(
+      ([index, value]) => !!value
+    );
+    entries.sort((a, b) => a[0] - b[0]);
+    return entries.map((x) => x[1]);
+  }, [rightColMap]);
+
+  const midColPs = useMemo(() => {
+    const entries = [...midColMap.entries()].filter(
+      ([index, value]) => !!value
+    );
+    entries.sort((a, b) => a[0] - b[0]);
+    return entries.map((x) => x[1]);
+  }, [midColMap]);
+
+  // const [leftColPs, setLeftColPs] = useState<TableColumnProps[]>([]);
+  // const [rightColPs, setRightColPs] = useState<TableColumnProps[]>([]);
+  // const [midColPs, setMidColPs] = useState<TableColumnProps[]>([]);
 
   const [leftGrpPs, setLeftGrpPs] = useState<ColumnGroupProps[]>([]);
   const [rightGrpPs, setRightGrpPs] = useState<ColumnGroupProps[]>([]);
@@ -414,33 +310,45 @@ export const Table = (props: TableProps) => {
     [scrollableRef.current]
   );
 
-  const onColumnAdded = useCallback((columnProps: TableColumnProps) => {
-    const { pinned = null } = columnProps;
-    console.log(
-      `Column added: "${columnProps.name}"${pinned ? ` pinned ${pinned}` : ""}`
-    );
-    const adder = (old: TableColumnProps[]) => [...old, columnProps];
-    if (pinned === "left") {
-      setLeftColPs(adder);
-    } else if (pinned === "right") {
-      setRightColPs(adder);
-    } else {
-      setMidColPs(adder);
-    }
-  }, []);
+  const onColumnAdded = useCallback(
+    (columnProps: TableColumnProps) => {
+      const { pinned = null } = columnProps;
+      //const adder = (old: TableColumnProps[]) => [...old, columnProps];
+      const adder = (old: Map<number, TableColumnProps>) => {
+        const next = new Map(old);
+        next.set(columnProps.index, columnProps);
+        return next;
+      };
+      if (pinned === "left") {
+        setLeftColMap(adder);
+      } else if (pinned === "right") {
+        setRightColMap(adder);
+      } else {
+        setMidColMap(adder);
+      }
+      console.log(`Column added: "${columnProps.name}"`);
+    },
+    [props.children]
+  );
 
   const onColumnRemoved = useCallback((columnProps: TableColumnProps) => {
-    console.log(`Column removed: "${columnProps.name}"`);
+    // console.log(`Column removed: "${columnProps.name}"`);
     const { pinned } = columnProps;
-    const remover = (old: TableColumnProps[]) =>
-      old.filter((x) => x.name !== columnProps.name);
+    // const remover = (old: TableColumnProps[]) =>
+    //   old.filter((x) => x.name !== columnProps.name);
+    const remover = (old: Map<number, TableColumnProps>) => {
+      const next = new Map(old);
+      next.delete(columnProps.index);
+      return next;
+    };
     if (pinned === "left") {
-      setLeftColPs(remover);
+      setLeftColMap(remover);
     } else if (pinned === "right") {
-      setRightColPs(remover);
+      setRightColMap(remover);
     } else {
-      setMidColPs(remover);
+      setMidColMap(remover);
     }
+    console.log(`Column removed: "${columnProps.name}"`);
   }, []);
 
   const onColumnGroupAdded = useCallback((colGroupProps: ColumnGroupProps) => {
@@ -453,11 +361,12 @@ export const Table = (props: TableProps) => {
     } else {
       setMidGrpPs(adder);
     }
+    console.log(`Group added: "${colGroupProps.name}"`);
   }, []);
 
   const onColumnGroupRemoved = useCallback(
     (colGroupProps: ColumnGroupProps) => {
-      console.log(`Group removed: "${colGroupProps.name}"`);
+      // console.log(`Group removed: "${colGroupProps.name}"`);
       const { pinned } = colGroupProps;
       const remover = (old: ColumnGroupProps[]) =>
         old.filter((x) => x.name !== colGroupProps.name);
@@ -468,6 +377,7 @@ export const Table = (props: TableProps) => {
       } else {
         setMidGrpPs(remover);
       }
+      console.log(`Group removed: "${colGroupProps.name}"`);
     },
     []
   );
@@ -588,79 +498,99 @@ export const Table = (props: TableProps) => {
     [selRowKeys, selectRows, cursorRowKey, cursorColKey, moveCursor]
   );
 
+  const resizeColumn = useCallback(
+    (colIdx: number, width: number) => {
+      const col = cols[colIdx];
+      if (col.data.onWidthChanged) {
+        col.data.onWidthChanged(width);
+      }
+    },
+    [cols]
+  );
+
+  const sizingCtValue: SizingContext = useMemo(
+    () => ({
+      resizeColumn,
+      rowHeight,
+    }),
+    [resizeColumn, rowHeight]
+  );
+
   return (
     <TableContext.Provider value={contextValue}>
       {props.children}
       <SelectionContext.Provider value={selCtValue}>
-        <div
-          className={cx(withBaseName(), {
-            [withBaseName("zebra")]: isZebra,
-            className,
-          })}
-          style={style}
-          ref={rootRef}
-          tabIndex={0}
-          onKeyDown={onKeyDown}
-          data-name={"grid-root"}
-        >
-          <CellMeasure setRowHeight={setRowHeight} />
-          <Scrollable
-            scrollLeft={scrollLeft}
-            scrollTop={scrollTop}
-            setScrollLeft={setScrollLeft}
-            setScrollTop={setScrollTop}
-            scrollerRef={scrollableRef}
-            topRef={topRef}
-            rightRef={rightRef}
-            bottomRef={bottomRef}
-            leftRef={leftRef}
-            middleRef={middleRef}
-          />
-          <MiddlePart
-            middleRef={middleRef}
-            onWheel={onWheel}
-            columns={bodyVisibleColumns}
-            rows={rows}
-            hoverOverRowKey={hoverRowKey}
-            setHoverOverRowKey={setHoverRowKey}
-          />
-          <TopPart
-            columns={headVisibleColumns}
-            columnGroups={visColGrps}
-            topRef={topRef}
-            onWheel={onWheel}
-          />
-          <LeftPart
-            leftRef={leftRef}
-            onWheel={onWheel}
-            columns={leftCols}
-            rows={rows}
-            isRaised={isLeftRaised}
-            hoverOverRowKey={hoverRowKey}
-            setHoverOverRowKey={setHoverRowKey}
-          />
-          <RightPart
-            rightRef={rightRef}
-            onWheel={onWheel}
-            columns={rightCols}
-            rows={rows}
-            isRaised={isRightRaised}
-            hoverOverRowKey={hoverRowKey}
-            setHoverOverRowKey={setHoverRowKey}
-          />
-          <TopLeftPart
-            onWheel={onWheel}
-            columns={leftCols}
-            columnGroups={leftGrps}
-            isRaised={isLeftRaised}
-          />
-          <TopRightPart
-            onWheel={onWheel}
-            columns={rightCols}
-            columnGroups={rightGrps}
-            isRaised={isRightRaised}
-          />
-        </div>
+        <SizingContext.Provider value={sizingCtValue}>
+          <div
+            className={cx(withBaseName(), {
+              [withBaseName("zebra")]: isZebra,
+              className,
+            })}
+            style={style}
+            ref={rootRef}
+            tabIndex={0}
+            onKeyDown={onKeyDown}
+            data-name={"grid-root"}
+          >
+            <CellMeasure setRowHeight={setRowHeight} />
+            <Scrollable
+              scrollLeft={scrollLeft}
+              scrollTop={scrollTop}
+              setScrollLeft={setScrollLeft}
+              setScrollTop={setScrollTop}
+              scrollerRef={scrollableRef}
+              topRef={topRef}
+              rightRef={rightRef}
+              bottomRef={bottomRef}
+              leftRef={leftRef}
+              middleRef={middleRef}
+            />
+            <MiddlePart
+              middleRef={middleRef}
+              onWheel={onWheel}
+              columns={bodyVisibleColumns}
+              rows={rows}
+              hoverOverRowKey={hoverRowKey}
+              setHoverOverRowKey={setHoverRowKey}
+            />
+            <TopPart
+              columns={headVisibleColumns}
+              columnGroups={visColGrps}
+              topRef={topRef}
+              onWheel={onWheel}
+            />
+            <LeftPart
+              leftRef={leftRef}
+              onWheel={onWheel}
+              columns={leftCols}
+              rows={rows}
+              isRaised={isLeftRaised}
+              hoverOverRowKey={hoverRowKey}
+              setHoverOverRowKey={setHoverRowKey}
+            />
+            <RightPart
+              rightRef={rightRef}
+              onWheel={onWheel}
+              columns={rightCols}
+              rows={rows}
+              isRaised={isRightRaised}
+              hoverOverRowKey={hoverRowKey}
+              setHoverOverRowKey={setHoverRowKey}
+            />
+            <TopLeftPart
+              onWheel={onWheel}
+              columns={leftCols}
+              columnGroups={leftGrps}
+              isRaised={isLeftRaised}
+            />
+            <TopRightPart
+              onWheel={onWheel}
+              columns={rightCols}
+              columnGroups={rightGrps}
+              isRaised={isRightRaised}
+            />
+          </div>
+        </SizingContext.Provider>
       </SelectionContext.Provider>
     </TableContext.Provider>
   );

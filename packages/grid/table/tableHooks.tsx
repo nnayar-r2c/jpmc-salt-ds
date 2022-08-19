@@ -7,6 +7,7 @@ import {
 } from "./Table";
 import { ColumnGroupProps } from "./ColumnGroup";
 import { Rng } from "./Rng";
+import { TableColumnProps } from "./TableColumn";
 
 const sizeEquals = (a: Size, b: Size) => {
   return a.height === b.height && a.width === b.width;
@@ -276,4 +277,145 @@ export const useColumnGroups = (
         };
       }),
     [grpPs, startIdx]
+  );
+export const PAGE_SIZE = 10;
+const scrollBarSize = 15; // TODO
+export const useVisibleColumnGroupRange = (
+  bodyVisColRng: Rng,
+  midCols: TableColumnModel[],
+  midGrpByColId: Map<string, TableColumnGroupModel>,
+  leftGrpCount: number
+): Rng => {
+  const prevRef = useRef<Rng>(Rng.empty);
+  const range = useMemo(() => {
+    if (bodyVisColRng.length === 0) {
+      return Rng.empty;
+    }
+    const firstVisibleCol = midCols[bodyVisColRng.start];
+    const lastVisibleCol = midCols[bodyVisColRng.end - 1];
+    const firstVisibleGroup = midGrpByColId.get(firstVisibleCol.data.id);
+    const lastVisibleGroup = midGrpByColId.get(lastVisibleCol.data.id);
+    if (!firstVisibleGroup || !lastVisibleGroup) {
+      return Rng.empty;
+    }
+    return new Rng(
+      firstVisibleGroup.index - leftGrpCount,
+      lastVisibleGroup.index + 1 - leftGrpCount
+    );
+  }, [bodyVisColRng, midCols, midGrpByColId, leftGrpCount]);
+  if (!Rng.equals(prevRef.current, range)) {
+    prevRef.current = range;
+  }
+  return prevRef.current;
+};
+
+function last<T>(source: T[]): T {
+  return source[source.length - 1];
+}
+
+export const useHeadVisibleColumnRange = (
+  visColGrps: TableColumnGroupModel[],
+  midColsById: Map<string, TableColumnModel>,
+  leftColCount: number
+) => {
+  const prevRef = useRef<Rng>(Rng.empty);
+  const range = useMemo(() => {
+    if (visColGrps.length === 0) {
+      return Rng.empty;
+    }
+    const firstVisibleGroup = visColGrps[0];
+    const lastVisibleGroup = last(visColGrps);
+    const firstColId = firstVisibleGroup.childrenIds[0];
+    const lastColId = last(lastVisibleGroup.childrenIds);
+    const firstColIdx = midColsById.get(firstColId)?.index;
+    const lastColIdx = midColsById.get(lastColId)?.index;
+    if (firstColIdx === undefined || lastColIdx === undefined) {
+      return Rng.empty;
+    }
+    return new Rng(firstColIdx - leftColCount, lastColIdx + 1 - leftColCount);
+  }, [visColGrps, midColsById, leftColCount]);
+  if (!Rng.equals(range, prevRef.current)) {
+    prevRef.current = range;
+  }
+  return prevRef.current;
+};
+
+export const useCols = (
+  colPs: TableColumnProps[],
+  startIdx: number,
+  groups: TableColumnGroupModel[]
+): TableColumnModel[] =>
+  useMemo(() => {
+    const edgeColIds = new Set<string>();
+    groups.forEach((g) => {
+      edgeColIds.add(last(g.childrenIds));
+    });
+    const cs: TableColumnModel[] = colPs.map((data, i) => ({
+      data,
+      index: i + startIdx,
+      separator: edgeColIds.has(data.id) ? "groupEdge" : "regular",
+    }));
+    return cs;
+  }, [colPs, startIdx, groups]);
+
+export const clamp = (x: number, min: number, max: number) => {
+  if (x < min) {
+    return min;
+  }
+  if (x > max) {
+    return max;
+  }
+  return x;
+};
+
+export const useScrollToCell = (
+  visRowRng: Rng,
+  setScrollTop: SetState<number>,
+  rowHeight: number,
+  clientMidHt: number,
+  midCols: TableColumnModel[],
+  bodyVisColRng: Rng,
+  setScrollLeft: SetState<number>,
+  clientMidWidth: number
+) =>
+  useCallback(
+    (rowIdx: number, colIdx: number) => {
+      if (rowIdx <= visRowRng.start) {
+        setScrollTop(rowHeight * rowIdx);
+      } else if (rowIdx >= visRowRng.end - 1) {
+        setScrollTop(
+          rowHeight * rowIdx - clientMidHt + rowHeight + scrollBarSize
+        );
+      }
+      const isMidCol =
+        midCols.length > 0 &&
+        colIdx >= midCols[0].index &&
+        colIdx <= last(midCols).index;
+      if (isMidCol) {
+        const midColIdx = colIdx - midCols[0].index;
+        if (midColIdx <= bodyVisColRng.start) {
+          let w = 0;
+          for (let i = 0; i < midColIdx; ++i) {
+            w += midCols[i].data.width;
+          }
+          setScrollLeft(w);
+        } else if (midColIdx >= bodyVisColRng.end - 1) {
+          let w = 0;
+          for (let i = 0; i <= midColIdx; ++i) {
+            w += midCols[i].data.width;
+          }
+          setScrollLeft(w - clientMidWidth + scrollBarSize);
+        }
+      }
+    },
+    [
+      visRowRng,
+      setScrollTop,
+      rowHeight,
+      clientMidHt,
+      midCols,
+      bodyVisColRng,
+      setScrollLeft,
+      clientMidWidth,
+    ]
   );
