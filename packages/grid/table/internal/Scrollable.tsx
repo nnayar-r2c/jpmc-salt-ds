@@ -7,8 +7,8 @@ const withBaseName = makePrefixer("uitkTableScrollable");
 export interface ScrollableProps<T> {
   scrollLeft: number;
   scrollTop: number;
-  setScrollLeft: (x: number) => void;
-  setScrollTop: (x: number) => void;
+  scrollSource: "user" | "table";
+  scroll: (left?: number, top?: number, source?: "user" | "table") => void;
 
   scrollerRef: RefObject<HTMLDivElement>;
   middleRef: RefObject<HTMLDivElement>;
@@ -49,22 +49,30 @@ export function Scrollable<T>(props: ScrollableProps<T>) {
       middle.scrollTop = scrollTop;
       middle.scrollLeft = scrollLeft;
     }
-    props.setScrollLeft(scrollLeft);
-    props.setScrollTop(scrollTop);
+    // console.log(`Scrollable.onScroll setting scroll top to ${scrollTop}`);
+    props.scroll(scrollLeft, scrollTop, "user");
   };
 
   useEffect(() => {
     if (!scrollerRef.current) {
       return;
     }
-    const { scrollLeft, scrollTop } = props;
-    if (scrollLeft !== scrollerRef.current.scrollLeft) {
-      scrollerRef.current.scrollLeft = scrollLeft;
+    const { scrollLeft, scrollTop, scrollSource } = props;
+    if (scrollSource === "table") {
+      if (scrollLeft !== scrollerRef.current.scrollLeft) {
+        scrollerRef.current.scrollLeft = scrollLeft;
+      }
+      if (scrollTop !== scrollerRef.current.scrollTop) {
+        console.log(`Scrollable.useEffect scrolling to ${scrollTop}`);
+        scrollerRef.current.scrollTop = scrollTop;
+      }
     }
-    if (scrollTop !== scrollerRef.current.scrollTop) {
-      scrollerRef.current.scrollTop = scrollTop;
-    }
-  }, [props.scrollLeft, props.scrollTop, scrollerRef.current]);
+  }, [
+    props.scrollLeft,
+    props.scrollTop,
+    props.scrollSource,
+    scrollerRef.current,
+  ]);
 
   return (
     <div ref={scrollerRef} className={withBaseName()} onScroll={onScroll}>

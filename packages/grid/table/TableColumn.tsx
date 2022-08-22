@@ -7,9 +7,7 @@ import {
 } from "react";
 import { useTableContext } from "./TableContext";
 import { TableColumnModel, TableRowModel } from "./Table";
-import { CheckboxIcon, useId } from "../../core";
-import { AutoSizeHeaderCell, HeaderCellProps } from "./HeaderCell";
-import { RowSelectionCheckboxCellValue } from "./RowSelectionCheckboxCellValue";
+import { HeaderCellProps } from "./HeaderCell";
 
 export type TableColumnPin = "left" | "right" | null;
 
@@ -19,12 +17,13 @@ export interface TableCellProps {
   className?: string;
   style?: CSSProperties;
   isFocused?: boolean;
+  children?: ReactNode;
 }
 
 export interface TableCellValueProps {
   row: TableRowModel;
   column: TableColumnModel;
-  value?: ReactNode;
+  value?: any;
 }
 
 export interface TableHeaderValueProps {
@@ -33,48 +32,51 @@ export interface TableHeaderValueProps {
 
 export interface TableColumnProps {
   id: string;
-  index: number;
-  name: string;
-  width: number;
+  name?: string;
+  defaultWidth?: number;
   onWidthChanged?: (width: number) => void;
   pinned?: TableColumnPin;
+  align?: "left" | "right";
   cellComponent?: ComponentType<TableCellProps>;
   cellValueComponent?: ComponentType<TableCellValueProps>;
-  getValue?: (rowData: any) => ReactNode;
+  getValue?: (rowData: any) => any;
   headerClassName?: string;
   headerComponent?: ComponentType<HeaderCellProps>;
   headerValueComponent?: ComponentType<TableHeaderValueProps>;
 }
 
+export interface TableColumnInfo {
+  width: number;
+  onWidthChanged: (width: number) => void;
+  props: TableColumnProps;
+}
+
 export const TableColumn = (props: TableColumnProps) => {
+  const { defaultWidth } = props;
+  const [width, setWidth] = useState<number>(
+    defaultWidth !== undefined ? defaultWidth : 100
+  );
+
+  const onWidthChanged = (w: number) => {
+    setWidth(w);
+    if (props.onWidthChanged) {
+      props.onWidthChanged(w);
+    }
+  };
+
   const table = useTableContext();
+  const info: TableColumnInfo = {
+    width,
+    onWidthChanged,
+    props,
+  };
+
   useEffect(() => {
-    table.onColumnAdded(props);
+    table.onColumnAdded(info);
     return () => {
-      table.onColumnRemoved(props);
+      table.onColumnRemoved(info);
     };
   });
+
   return null;
-};
-
-const CheckboxHeaderCell = (props: HeaderCellProps) => {
-  return (
-    <AutoSizeHeaderCell {...props}>
-      <CheckboxIcon checked={true} />
-    </AutoSizeHeaderCell>
-  );
-};
-
-export const RowSelectionColumn = (props: TableColumnProps) => {
-  const [width, setWidth] = useState<number>(100);
-  const onWidthChanged = (width: number) => setWidth(width);
-  return (
-    <TableColumn
-      {...props}
-      width={width}
-      onWidthChanged={onWidthChanged}
-      headerComponent={CheckboxHeaderCell}
-      cellValueComponent={RowSelectionCheckboxCellValue}
-    />
-  );
 };

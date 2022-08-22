@@ -1,0 +1,12 @@
+.uitkTableFakeCell {
+  box-sizing: border-box;
+  border-style: none;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+  position: relative;
+  font-size: var(--uitkTable-fontSize);
+  font-weight: normal;
+  z-index: var(--uitkTable-cell-zIndex);
+}

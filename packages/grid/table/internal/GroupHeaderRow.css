@@ -1,0 +1,3 @@
+.uitkTableGroupHeaderRow {
+  height: var(--uitkTable-rowHeight);
+}

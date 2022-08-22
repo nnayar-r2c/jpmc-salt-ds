@@ -1,5 +1,5 @@
 import "./HeaderCell.css";
-import { ReactNode, useEffect, useLayoutEffect, useRef } from "react";
+import { ReactNode, useLayoutEffect, useRef } from "react";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
 import cn from "classnames";
 import { ColumnSeparatorType, TableColumnModel } from "./Table";
@@ -26,22 +26,26 @@ export function HeaderCellSeparator(props: HeaderCellSeparatorProps) {
 export function HeaderCell(props: HeaderCellProps) {
   const { column, children } = props;
   const { separator } = column;
-
-  // const onResizeHandleMouseDown = useColumnResize();
-  // const onMoveHandleMouseDown = useColumnMove();
+  const { onResizeHandleMouseDown } = useSizingContext();
 
   return (
     <th
       data-column-index={column.index}
-      className={cn(withBaseName(), column.data.headerClassName)}
+      className={cn(withBaseName(), column.info.props.headerClassName)}
       role="columnheader"
     >
-      <div className={withBaseName("valueContainer")}>{children}</div>
+      <div
+        className={cn(withBaseName("valueContainer"), {
+          [withBaseName("alignRight")]: column.info.props.align === "right",
+        })}
+      >
+        {children}
+      </div>
       <HeaderCellSeparator separatorType={separator} />
-      {/*<div*/}
-      {/*  className={withBaseName("resizeHandle")}*/}
-      {/*  onMouseDown={onResizeHandleMouseDown}*/}
-      {/*/>*/}
+      <div
+        className={withBaseName("resizeHandle")}
+        onMouseDown={onResizeHandleMouseDown}
+      />
       {/*<div*/}
       {/*  className={withBaseName("moveHandle")}*/}
       {/*  onMouseDown={onMoveHandleMouseDown}*/}
@@ -60,10 +64,10 @@ export function AutoSizeHeaderCell<T>(props: HeaderCellProps) {
     const width = valueContainerRef.current
       ? valueContainerRef.current.offsetWidth
       : undefined;
-    if (width != undefined && width !== column.data.width) {
+    if (width != undefined && width !== column.info.width) {
       resizeColumn(column.index, width);
     }
-  }, [valueContainerRef.current, column.data.width, rowHeight]);
+  }, [valueContainerRef.current, column.info.width, rowHeight]);
 
   return (
     <th

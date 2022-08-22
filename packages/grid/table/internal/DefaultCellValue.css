@@ -1,0 +1,8 @@
+.uitkTableDefaultCellValue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.uitkTableDefaultCellValue-alignRight {
+  text-align: right;
+}

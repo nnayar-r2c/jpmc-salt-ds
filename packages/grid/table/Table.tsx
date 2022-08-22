@@ -1,4 +1,6 @@
-import {
+import React, {
+  Children,
+  isValidElement,
   KeyboardEventHandler,
   ReactNode,
   useCallback,
@@ -9,22 +11,20 @@ import {
   WheelEventHandler,
 } from "react";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
-import { TableColumnProps } from "./TableColumn";
+import { TableColumnInfo } from "./TableColumn";
 import { TableContext } from "./TableContext";
 import cx from "classnames";
-import { CellMeasure } from "./CellMeasure";
-import { Scrollable } from "./Scrollable";
-import "./Table.css";
-import { MiddlePart } from "./MiddlePart";
-import { TopPart } from "./TopPart";
-import { LeftPart } from "./LeftPart";
-import { TopLeftPart } from "./TopLeftPart";
-import { RightPart } from "./RightPart";
-import { TopRightPart } from "./TopRightPart";
-import { SelectionContext } from "./SelectionContext";
 import {
+  CellMeasure,
   clamp,
+  LeftPart,
+  MiddlePart,
   PAGE_SIZE,
+  RightPart,
+  Scrollable,
+  TopLeftPart,
+  TopPart,
+  TopRightPart,
   useBodyVisibleAreaTop,
   useBodyVisibleColumnRange,
   useClientMidHeight,
@@ -32,6 +32,8 @@ import {
   useCols,
   useColumnGroups,
   useColumnRange,
+  useColumnResize,
+  useFlatten,
   useHeadVisibleColumnRange,
   useLeftScrolledOutWidth,
   useProd,
@@ -44,9 +46,12 @@ import {
   useSumWidth,
   useVisibleColumnGroupRange,
   useVisibleRowRange,
-} from "./tableHooks";
+} from "./internal";
+import "./Table.css";
+import { SelectionContext } from "./SelectionContext";
 import { ColumnGroupProps } from "./ColumnGroup";
 import { SizingContext } from "./SizingContext";
+import { LayoutContext } from "./LayoutContext"; // TODO remove
 
 const withBaseName = makePrefixer("uitkTable");
 
@@ -76,7 +81,8 @@ export interface TableRowModel {
 export interface TableColumnModel {
   index: number;
   separator: ColumnSeparatorType;
-  data: TableColumnProps;
+
+  info: TableColumnInfo;
 }
 
 export interface TableColumnGroupModel {
@@ -89,7 +95,11 @@ export interface TableColumnGroupModel {
 }
 
 export const Table = (props: TableProps) => {
-  const { rowData, isZebra, className, rowKeyGetter } = props;
+  const { rowData, isZebra, className, rowKeyGetter, children } = props;
+
+  // if (rowData.length > 0) {
+  //   console.log(`Row 0 price: ${rowData[0].price}`);
+  // }
 
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollableRef = useRef<HTMLDivElement>(null);
@@ -99,59 +109,47 @@ export const Table = (props: TableProps) => {
   const rightRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  const [scrollSource, setScrollSource] = useState<"user" | "table">("user");
   const [scrollLeft, setScrollLeft] = useState<number>(0);
   const [scrollTop, setScrollTop] = useState<number>(0);
 
-  const [leftColMap, setLeftColMap] = useState<Map<number, TableColumnProps>>(
+  const [leftColMap, setLeftColMap] = useState<Map<number, TableColumnInfo>>(
     new Map()
   );
-  const [rightColMap, setRightColMap] = useState<Map<number, TableColumnProps>>(
+  const [rightColMap, setRightColMap] = useState<Map<number, TableColumnInfo>>(
     new Map()
   );
-  const [midColMap, setMidColMap] = useState<Map<number, TableColumnProps>>(
+  const [midColMap, setMidColMap] = useState<Map<number, TableColumnInfo>>(
+    new Map()
+  );
+  const [leftGrpMap, setLeftGrpMap] = useState<Map<number, ColumnGroupProps>>(
+    new Map()
+  );
+  const [rightGrpMap, setRightGrpMap] = useState<Map<number, ColumnGroupProps>>(
+    new Map()
+  );
+  const [midGrpMap, setMidGrpMap] = useState<Map<number, ColumnGroupProps>>(
     new Map()
   );
 
-  const leftColPs = useMemo(() => {
-    const entries = [...leftColMap.entries()].filter(
-      ([index, value]) => !!value
-    );
-    entries.sort((a, b) => a[0] - b[0]);
-    return entries.map((x) => x[1]);
-  }, [leftColMap]);
+  const leftColInfos = useFlatten(leftColMap);
+  const rightColInfos = useFlatten(rightColMap);
+  const midColInfos = useFlatten(midColMap);
 
-  const rightColPs = useMemo(() => {
-    const entries = [...rightColMap.entries()].filter(
-      ([index, value]) => !!value
-    );
-    entries.sort((a, b) => a[0] - b[0]);
-    return entries.map((x) => x[1]);
-  }, [rightColMap]);
-
-  const midColPs = useMemo(() => {
-    const entries = [...midColMap.entries()].filter(
-      ([index, value]) => !!value
-    );
-    entries.sort((a, b) => a[0] - b[0]);
-    return entries.map((x) => x[1]);
-  }, [midColMap]);
-
-  // const [leftColPs, setLeftColPs] = useState<TableColumnProps[]>([]);
-  // const [rightColPs, setRightColPs] = useState<TableColumnProps[]>([]);
-  // const [midColPs, setMidColPs] = useState<TableColumnProps[]>([]);
-
-  const [leftGrpPs, setLeftGrpPs] = useState<ColumnGroupProps[]>([]);
-  const [rightGrpPs, setRightGrpPs] = useState<ColumnGroupProps[]>([]);
-  const [midGrpPs, setMidGrpPs] = useState<ColumnGroupProps[]>([]);
+  const leftGrpPs = useFlatten(leftGrpMap);
+  const rightGrpPs = useFlatten(rightGrpMap);
+  const midGrpPs = useFlatten(midGrpMap);
 
   const [hoverRowKey, setHoverRowKey] = useState<string | undefined>(undefined);
 
   const [clientWidth, setClientWidth] = useState(0);
   const [clientHeight, setClientHeight] = useState(0);
+
   const [selRowKeys, setSelRowKeys] = useState<Set<string>>(new Set());
   const [lastSelRowKey, setLastSelRowKey] = useState<string | undefined>(
     undefined
   );
+
   const [rowHeight, setRowHeight] = useState<number>(0);
 
   const [cursorRowKey, setCursorRowKey] = useState<string | undefined>(
@@ -163,46 +161,51 @@ export const Table = (props: TableProps) => {
 
   const rowIdxByKey = useRowIdxByKey(rowKeyGetter, rowData);
 
-  const leftGrps = useColumnGroups(leftGrpPs, 0);
-  const midGrps = useColumnGroups(midGrpPs, leftGrps.length);
-  const rightGrps = useColumnGroups(
+  const leftGroups = useColumnGroups(leftGrpPs, 0);
+  const midGroups = useColumnGroups(midGrpPs, leftGroups.length);
+  const rightGroups = useColumnGroups(
     rightGrpPs,
-    leftGrps.length + midGrps.length
+    leftGroups.length + midGroups.length
   );
 
-  const leftCols: TableColumnModel[] = useCols(leftColPs, 0, leftGrps);
+  const leftCols: TableColumnModel[] = useCols(leftColInfos, 0, leftGroups);
   const midCols: TableColumnModel[] = useCols(
-    midColPs,
+    midColInfos,
     leftCols.length,
-    midGrps
+    midGroups
   );
   const rightCols: TableColumnModel[] = useCols(
-    rightColPs,
+    rightColInfos,
     leftCols.length + midCols.length,
-    rightGrps
+    rightGroups
   );
 
   const midColsById = useMemo(
-    () => new Map<string, TableColumnModel>(midCols.map((c) => [c.data.id, c])),
+    () =>
+      new Map<string, TableColumnModel>(
+        midCols.map((c) => [c.info.props.id, c])
+      ),
     [midCols]
   );
 
-  const leftWh = useSumWidth(leftCols);
+  const leftWidth = useSumWidth(leftCols);
   const midWidth = useSumWidth(midCols);
-  const rightWh = useSumWidth(rightCols);
-  const totalWh = useSum([leftWh, midWidth, rightWh]);
+  const rightWidth = useSumWidth(rightCols);
+  const totalWidth = useSum([leftWidth, midWidth, rightWidth]);
 
   const hasColumnGroups =
-    leftGrps.length > 0 || midGrps.length > 0 || rightGrps.length > 0;
+    leftGroups.length > 0 || midGroups.length > 0 || rightGroups.length > 0;
 
   const headRowCount = hasColumnGroups ? 2 : 1; // TODO multiple group levels
   const rowCount = rowData.length;
+  // console.log(`RowCount: ${rowCount}`);
   const botRowCount = 0; // TODO
-  const topHt = useProd([rowHeight, headRowCount]);
+  const topHeight = useProd([rowHeight, headRowCount]);
   const midHeight = useProd([rowHeight, rowCount]);
-  const botHt = useProd([botRowCount, rowHeight]);
-  const totalHt = useSum([topHt, midHeight, botHt]);
-  const clientMidWidth = useClientMidWidth(clientWidth, leftWh, rightWh);
+  const botHeight = useProd([botRowCount, rowHeight]);
+  const totalHeight = useSum([topHeight, midHeight, botHeight]);
+  const clientMidWidth = useClientMidWidth(clientWidth, leftWidth, rightWidth);
+  const midGap = Math.max(0, Math.floor(clientMidWidth - midWidth));
 
   const bodyVisColRng = useBodyVisibleColumnRange(
     midCols,
@@ -212,26 +215,27 @@ export const Table = (props: TableProps) => {
 
   const midGrpByColId = useMemo(() => {
     const m = new Map<string, TableColumnGroupModel>();
-    for (let g of midGrps) {
+    for (let g of midGroups) {
       for (let c of g.childrenIds) {
         m.set(c, g);
       }
     }
     return m;
-  }, [midGrps]);
+  }, [midGroups]);
 
   const visColGrpRng = useVisibleColumnGroupRange(
     bodyVisColRng,
     midCols,
     midGrpByColId,
-    leftGrps.length
+    leftGroups.length
   );
 
   const visColGrps = useMemo(() => {
-    return midGrps.slice(visColGrpRng.start, visColGrpRng.end);
-  }, [visColGrpRng, midGrps]);
+    return midGroups.slice(visColGrpRng.start, visColGrpRng.end);
+  }, [visColGrpRng, midGroups]);
 
   const headVisColRng = useHeadVisibleColumnRange(
+    bodyVisColRng,
     visColGrps,
     midColsById,
     leftCols.length
@@ -240,16 +244,21 @@ export const Table = (props: TableProps) => {
   const bodyScrOutColWh = useLeftScrolledOutWidth(midCols, bodyVisColRng);
   const headScrOutColWh = useLeftScrolledOutWidth(midCols, headVisColRng);
 
-  const bodyVisAreaLeft = useSum([leftWh, bodyScrOutColWh]);
-  const headVisAreaLeft = useSum([leftWh, headScrOutColWh]);
-  const clientMidHt = useClientMidHeight(clientHeight, topHt, botHt);
+  const bodyVisAreaLeft = useSum([leftWidth, bodyScrOutColWh]);
+  const headVisAreaLeft = useSum([leftWidth, headScrOutColWh]);
+  const clientMidHeight = useClientMidHeight(
+    clientHeight,
+    topHeight,
+    botHeight
+  );
   const visRowRng = useVisibleRowRange(
     scrollTop,
-    clientMidHt,
+    clientMidHeight,
     rowHeight,
     rowCount
   );
-  const bodyVisAreaTop = useBodyVisibleAreaTop(rowHeight, visRowRng, topHt);
+
+  const bodyVisAreaTop = useBodyVisibleAreaTop(rowHeight, visRowRng, topHeight);
 
   const bodyVisibleColumns = useColumnRange(midCols, bodyVisColRng);
   const headVisibleColumns = useColumnRange(midCols, headVisColRng);
@@ -260,25 +269,25 @@ export const Table = (props: TableProps) => {
   const style = useMemo(
     () =>
       ({
-        ["--uitkTable-totalWidth"]: `${totalWh}px`,
-        ["--uitkTable-totalHeight"]: `${totalHt}px`,
-        ["--uitkTable-topHeight"]: `${topHt}px`,
-        ["--uitkTable-leftWidth"]: `${leftWh}px`,
-        ["--uitkTable-rightWidth"]: `${rightWh}px`,
+        ["--uitkTable-totalWidth"]: `${totalWidth}px`,
+        ["--uitkTable-totalHeight"]: `${totalHeight}px`,
+        ["--uitkTable-topHeight"]: `${topHeight}px`,
+        ["--uitkTable-leftWidth"]: `${leftWidth}px`,
+        ["--uitkTable-rightWidth"]: `${rightWidth}px`,
         ["--uitkTable-bodyVisibleColumnWidth"]: `${bodyVisColWh}px`,
         ["--uitkTable-bodyVisibleAreaTop"]: `${bodyVisAreaTop}px`,
         ["--uitkTable-bodyVisibleAreaLeft"]: `${bodyVisAreaLeft}px`,
-        ["--uitkTable-bottomHeight"]: `${botHt}px`,
+        ["--uitkTable-bottomHeight"]: `${botHeight}px`,
         ["--uitkTable-headerVisibleColumnWidth"]: `${headVisColWh}px`,
         ["--uitkTable-headerVisibleAreaLeft"]: `${headVisAreaLeft}px`,
       } as any),
     [
-      totalHt,
-      totalWh,
-      topHt,
-      leftWh,
-      rightWh,
-      botHt,
+      totalHeight,
+      totalWidth,
+      topHeight,
+      leftWidth,
+      rightWidth,
+      botHeight,
       bodyVisColWh,
       bodyVisAreaLeft,
       bodyVisAreaTop,
@@ -310,35 +319,58 @@ export const Table = (props: TableProps) => {
     [scrollableRef.current]
   );
 
-  const onColumnAdded = useCallback(
-    (columnProps: TableColumnProps) => {
-      const { pinned = null } = columnProps;
-      //const adder = (old: TableColumnProps[]) => [...old, columnProps];
-      const adder = (old: Map<number, TableColumnProps>) => {
-        const next = new Map(old);
-        next.set(columnProps.index, columnProps);
-        return next;
-      };
-      if (pinned === "left") {
-        setLeftColMap(adder);
-      } else if (pinned === "right") {
-        setRightColMap(adder);
-      } else {
-        setMidColMap(adder);
-      }
-      console.log(`Column added: "${columnProps.name}"`);
-    },
-    [props.children]
-  );
+  const chPosById = useRef<Map<string, number>>(new Map());
 
-  const onColumnRemoved = useCallback((columnProps: TableColumnProps) => {
-    // console.log(`Column removed: "${columnProps.name}"`);
-    const { pinned } = columnProps;
-    // const remover = (old: TableColumnProps[]) =>
-    //   old.filter((x) => x.name !== columnProps.name);
-    const remover = (old: Map<number, TableColumnProps>) => {
+  const indexChildren = () => {
+    const m = new Map<string, number>();
+    let i = 0;
+    const indexChildrenRec = (c: ReactNode) => {
+      if (!c) {
+        return;
+      }
+      Children.forEach(c, (x) => {
+        if (isValidElement(x) && x.props.id !== undefined) {
+          m.set(x.props.id, i);
+          i++;
+          indexChildrenRec(x.props.children);
+        }
+      });
+    };
+    indexChildrenRec(children);
+    return m;
+  };
+  chPosById.current = indexChildren();
+
+  const getChildIndex = (id: string): number => {
+    const idx = chPosById.current.get(id);
+    if (idx === undefined) {
+      throw new Error(`Unknown child id: "${id}"`);
+    }
+    return idx;
+  };
+
+  const onColumnAdded = useCallback((columnInfo: TableColumnInfo) => {
+    const { pinned = null } = columnInfo.props;
+    const adder = (old: Map<number, TableColumnInfo>) => {
       const next = new Map(old);
-      next.delete(columnProps.index);
+      next.set(getChildIndex(columnInfo.props.id), columnInfo);
+      return next;
+    };
+    if (pinned === "left") {
+      setLeftColMap(adder);
+    } else if (pinned === "right") {
+      setRightColMap(adder);
+    } else {
+      setMidColMap(adder);
+    }
+    // console.log(`Column added: "${columnProps.name}"`);
+  }, []);
+
+  const onColumnRemoved = useCallback((columnInfo: TableColumnInfo) => {
+    const { pinned } = columnInfo.props;
+    const remover = (old: Map<number, TableColumnInfo>) => {
+      const next = new Map(old);
+      next.delete(getChildIndex(columnInfo.props.id));
       return next;
     };
     if (pinned === "left") {
@@ -348,36 +380,43 @@ export const Table = (props: TableProps) => {
     } else {
       setMidColMap(remover);
     }
-    console.log(`Column removed: "${columnProps.name}"`);
+    // console.log(`Column removed: "${columnProps.name}"`);
   }, []);
 
   const onColumnGroupAdded = useCallback((colGroupProps: ColumnGroupProps) => {
     const { pinned = null } = colGroupProps;
-    const adder = (old: ColumnGroupProps[]) => [...old, colGroupProps];
+    const adder = (old: Map<number, ColumnGroupProps>) => {
+      const next = new Map(old);
+      next.set(getChildIndex(colGroupProps.id), colGroupProps);
+      return next;
+    };
     if (pinned === "left") {
-      setLeftGrpPs(adder);
+      setLeftGrpMap(adder);
     } else if (pinned === "right") {
-      setRightGrpPs(adder);
+      setRightGrpMap(adder);
     } else {
-      setMidGrpPs(adder);
+      setMidGrpMap(adder);
     }
-    console.log(`Group added: "${colGroupProps.name}"`);
+    // console.log(`Group added: "${colGroupProps.name}"`);
   }, []);
 
   const onColumnGroupRemoved = useCallback(
     (colGroupProps: ColumnGroupProps) => {
       // console.log(`Group removed: "${colGroupProps.name}"`);
       const { pinned } = colGroupProps;
-      const remover = (old: ColumnGroupProps[]) =>
-        old.filter((x) => x.name !== colGroupProps.name);
+      const remover = (old: Map<number, ColumnGroupProps>) => {
+        const next = new Map(old);
+        old.delete(getChildIndex(colGroupProps.id));
+        return next;
+      };
       if (pinned === "left") {
-        setLeftGrpPs(remover);
+        setLeftGrpMap(remover);
       } else if (pinned === "right") {
-        setRightGrpPs(remover);
+        setRightGrpMap(remover);
       } else {
-        setMidGrpPs(remover);
+        setMidGrpMap(remover);
       }
-      console.log(`Group removed: "${colGroupProps.name}"`);
+      // console.log(`Group removed: "${colGroupProps.name}"`);
     },
     []
   );
@@ -388,7 +427,8 @@ export const Table = (props: TableProps) => {
   );
 
   const colIdxByKey = useMemo(
-    () => new Map<string, number>(cols.map((c, i) => [c.data.id, c.index])),
+    () =>
+      new Map<string, number>(cols.map((c, i) => [c.info.props.id, c.index])),
     [cols]
   );
 
@@ -397,15 +437,27 @@ export const Table = (props: TableProps) => {
   const cursorRowIdx =
     cursorRowKey === undefined ? 0 : rowIdxByKey.get(cursorRowKey) || 0;
 
+  const scroll = useCallback(
+    (left?: number, top?: number, source?: "user" | "table") => {
+      setScrollSource(source || "user");
+      if (left !== undefined) {
+        setScrollLeft(left);
+      }
+      if (top !== undefined) {
+        setScrollTop(top);
+      }
+    },
+    [setScrollLeft, setScrollTop, setScrollSource]
+  );
+
   const scrollToCell = useScrollToCell(
     visRowRng,
-    setScrollTop,
     rowHeight,
-    clientMidHt,
+    clientMidHeight,
     midCols,
     bodyVisColRng,
-    setScrollLeft,
-    clientMidWidth
+    clientMidWidth,
+    scroll
   );
 
   const moveCursor = useCallback(
@@ -416,7 +468,7 @@ export const Table = (props: TableProps) => {
       rowIdx = clamp(rowIdx, 0, rowData.length - 1);
       colIdx = clamp(colIdx, 0, cols.length - 1);
       setCursorRowKey(rowKeyGetter(rowData[rowIdx]));
-      setCursorColKey(cols[colIdx].data.id);
+      setCursorColKey(cols[colIdx].info.props.id);
       scrollToCell(rowIdx, colIdx);
       rootRef.current?.focus();
     },
@@ -487,111 +539,157 @@ export const Table = (props: TableProps) => {
     rowKeyGetter
   );
 
-  const selCtValue: SelectionContext = useMemo(
+  const isAllSelected = selRowKeys.size === rowData.length;
+  const isAnySelected = selRowKeys.size > 0;
+
+  const selectAll = useCallback(() => {
+    setSelRowKeys(new Set(rowData.map((d) => rowKeyGetter(d))));
+  }, [rowData, setSelRowKeys]);
+
+  const unselectAll = useCallback(() => {
+    setSelRowKeys(new Set());
+  }, [setSelRowKeys]);
+
+  const selectionContext: SelectionContext = useMemo(
     () => ({
+      selRowKeys,
+      isAllSelected,
+      isAnySelected,
+      selectRows,
+      selectAll,
+      unselectAll,
+      cursorRowKey,
+      cursorColKey,
+      moveCursor,
+    }),
+    [
       selRowKeys,
       selectRows,
       cursorRowKey,
       cursorColKey,
       moveCursor,
-    }),
-    [selRowKeys, selectRows, cursorRowKey, cursorColKey, moveCursor]
+      isAllSelected,
+      isAnySelected,
+      selectAll,
+      unselectAll,
+    ]
   );
 
   const resizeColumn = useCallback(
     (colIdx: number, width: number) => {
       const col = cols[colIdx];
-      if (col.data.onWidthChanged) {
-        col.data.onWidthChanged(width);
-      }
+      col.info.onWidthChanged(width);
     },
     [cols]
   );
 
-  const sizingCtValue: SizingContext = useMemo(
+  const onResizeHandleMouseDown = useColumnResize(resizeColumn);
+
+  const sizingContext: SizingContext = useMemo(
     () => ({
       resizeColumn,
       rowHeight,
+      onResizeHandleMouseDown,
     }),
-    [resizeColumn, rowHeight]
+    [resizeColumn, rowHeight, onResizeHandleMouseDown]
+  );
+
+  const layoutContext: LayoutContext = useMemo(
+    () => ({
+      totalHeight,
+      totalWidth,
+      clientWidth,
+      clientHeight,
+    }),
+    [totalHeight, totalWidth]
   );
 
   return (
     <TableContext.Provider value={contextValue}>
-      {props.children}
-      <SelectionContext.Provider value={selCtValue}>
-        <SizingContext.Provider value={sizingCtValue}>
-          <div
-            className={cx(withBaseName(), {
-              [withBaseName("zebra")]: isZebra,
-              className,
-            })}
-            style={style}
-            ref={rootRef}
-            tabIndex={0}
-            onKeyDown={onKeyDown}
-            data-name={"grid-root"}
-          >
-            <CellMeasure setRowHeight={setRowHeight} />
-            <Scrollable
-              scrollLeft={scrollLeft}
-              scrollTop={scrollTop}
-              setScrollLeft={setScrollLeft}
-              setScrollTop={setScrollTop}
-              scrollerRef={scrollableRef}
-              topRef={topRef}
-              rightRef={rightRef}
-              bottomRef={bottomRef}
-              leftRef={leftRef}
-              middleRef={middleRef}
-            />
-            <MiddlePart
-              middleRef={middleRef}
-              onWheel={onWheel}
-              columns={bodyVisibleColumns}
-              rows={rows}
-              hoverOverRowKey={hoverRowKey}
-              setHoverOverRowKey={setHoverRowKey}
-            />
-            <TopPart
-              columns={headVisibleColumns}
-              columnGroups={visColGrps}
-              topRef={topRef}
-              onWheel={onWheel}
-            />
-            <LeftPart
-              leftRef={leftRef}
-              onWheel={onWheel}
-              columns={leftCols}
-              rows={rows}
-              isRaised={isLeftRaised}
-              hoverOverRowKey={hoverRowKey}
-              setHoverOverRowKey={setHoverRowKey}
-            />
-            <RightPart
-              rightRef={rightRef}
-              onWheel={onWheel}
-              columns={rightCols}
-              rows={rows}
-              isRaised={isRightRaised}
-              hoverOverRowKey={hoverRowKey}
-              setHoverOverRowKey={setHoverRowKey}
-            />
-            <TopLeftPart
-              onWheel={onWheel}
-              columns={leftCols}
-              columnGroups={leftGrps}
-              isRaised={isLeftRaised}
-            />
-            <TopRightPart
-              onWheel={onWheel}
-              columns={rightCols}
-              columnGroups={rightGrps}
-              isRaised={isRightRaised}
-            />
-          </div>
-        </SizingContext.Provider>
-      </SelectionContext.Provider>
+      <LayoutContext.Provider value={layoutContext}>
+        <SelectionContext.Provider value={selectionContext}>
+          <SizingContext.Provider value={sizingContext}>
+            {props.children}
+            <div
+              className={cx(
+                withBaseName(),
+                {
+                  [withBaseName("zebra")]: isZebra,
+                },
+                className
+              )}
+              style={style}
+              ref={rootRef}
+              tabIndex={0}
+              onKeyDown={onKeyDown}
+              data-name={"grid-root"}
+            >
+              <CellMeasure setRowHeight={setRowHeight} />
+              <Scrollable
+                scrollLeft={scrollLeft}
+                scrollTop={scrollTop}
+                scrollSource={scrollSource}
+                scroll={scroll}
+                scrollerRef={scrollableRef}
+                topRef={topRef}
+                rightRef={rightRef}
+                bottomRef={bottomRef}
+                leftRef={leftRef}
+                middleRef={middleRef}
+              />
+              <MiddlePart
+                middleRef={middleRef}
+                onWheel={onWheel}
+                columns={bodyVisibleColumns}
+                rows={rows}
+                hoverOverRowKey={hoverRowKey}
+                setHoverOverRowKey={setHoverRowKey}
+                midGap={midGap}
+                isZebra={isZebra}
+              />
+              <TopPart
+                columns={headVisibleColumns}
+                columnGroups={visColGrps}
+                topRef={topRef}
+                onWheel={onWheel}
+                midGap={midGap}
+              />
+              <LeftPart
+                leftRef={leftRef}
+                onWheel={onWheel}
+                columns={leftCols}
+                rows={rows}
+                isRaised={isLeftRaised}
+                hoverOverRowKey={hoverRowKey}
+                setHoverOverRowKey={setHoverRowKey}
+                isZebra={isZebra}
+              />
+              <RightPart
+                rightRef={rightRef}
+                onWheel={onWheel}
+                columns={rightCols}
+                rows={rows}
+                isRaised={isRightRaised}
+                hoverOverRowKey={hoverRowKey}
+                setHoverOverRowKey={setHoverRowKey}
+                isZebra={isZebra}
+              />
+              <TopLeftPart
+                onWheel={onWheel}
+                columns={leftCols}
+                columnGroups={leftGroups}
+                isRaised={isLeftRaised}
+              />
+              <TopRightPart
+                onWheel={onWheel}
+                columns={rightCols}
+                columnGroups={rightGroups}
+                isRaised={isRightRaised}
+              />
+            </div>
+          </SizingContext.Provider>
+        </SelectionContext.Provider>
+      </LayoutContext.Provider>
     </TableContext.Provider>
   );
 };

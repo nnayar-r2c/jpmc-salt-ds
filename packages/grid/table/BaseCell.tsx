@@ -2,18 +2,14 @@ import { FC } from "react";
 import cn from "classnames";
 import "./BaseCell.css";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
-import {
-  TableCellProps,
-  TableCellValueProps,
-  TableColumnProps,
-} from "./TableColumn";
+import { TableCellProps } from "./TableColumn";
 import { TableColumnModel } from "./Table";
-import { Cursor } from "./Cursor";
+import { Cursor } from "./internal";
 
 const withBaseName = makePrefixer("uitkTableBaseCell");
 
 export function getCellId(rowKey: string, column: TableColumnModel) {
-  return `R${rowKey}C${column.data.id}`;
+  return `R${rowKey}C${column.info.props.id}`;
 }
 
 export const BaseCell: FC<TableCellProps> = function BaseCell(props) {

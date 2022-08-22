@@ -1,7 +1,4 @@
 .uitkTableBaseCell {
-}
-
-.uitkTableBaseCell {
   box-sizing: border-box;
   overflow: hidden;
   margin: 0;
@@ -9,7 +6,6 @@
   border-style: none;
   white-space: nowrap;
   position: relative;
-  height: var(--uitkTable-rowHeight);
   font-size: var(--uitkTable-fontSize);
   font-weight: normal;
   z-index: var(--uitkTable-cell-zIndex);

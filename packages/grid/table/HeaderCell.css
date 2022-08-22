@@ -2,7 +2,6 @@
   text-align: left;
   font-size: var(--uitkTable-fontSize);
   font-weight: normal;
-  height: var(--uitkTable-rowHeight);
   line-height: var(--uitkTable-rowHeight);
   position: relative;
   box-sizing: border-box;
@@ -19,6 +18,10 @@
   bottom: 0;
   left: 0;
   overflow: hidden;
+}
+
+.uitkTableHeaderCell-alignRight {
+  text-align: right;
 }
 
 .uitkTableHeaderCell-autosizeContainer {

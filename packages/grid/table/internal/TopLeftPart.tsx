@@ -1,22 +1,22 @@
 import { WheelEventHandler } from "react";
+import "./TopLeftPart.css";
 import { TableColGroup } from "./TableColGroup";
 import { HeaderRow } from "./HeaderRow";
-import "./TopRightPart.css";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
-import { TableColumnGroupModel, TableColumnModel } from "./Table";
+import { TableColumnGroupModel, TableColumnModel } from "../Table";
 import { GroupHeaderRow } from "./GroupHeaderRow";
 import cx from "classnames";
 
-const withBaseName = makePrefixer("uitkTableTopRightPart");
+const withBaseName = makePrefixer("uitkTableTopLeftPart");
 
-export interface TopRightPartProps<T> {
+export interface TopLeftPartProps<T> {
   onWheel: WheelEventHandler<HTMLTableElement>;
   columns: TableColumnModel[];
   columnGroups: TableColumnGroupModel[];
   isRaised?: boolean;
 }
 
-export function TopRightPart<T>(props: TopRightPartProps<T>) {
+export function TopLeftPart<T>(props: TopLeftPartProps<T>) {
   const { onWheel, columns, columnGroups, isRaised } = props;
 
   return (
@@ -25,12 +25,12 @@ export function TopRightPart<T>(props: TopRightPartProps<T>) {
         [withBaseName("raised")]: isRaised,
       })}
     >
-      <table className={withBaseName("table")} onWheel={onWheel}>
+      <table onWheel={onWheel}>
         <TableColGroup columns={columns} />
         <thead>
           <GroupHeaderRow groups={columnGroups} />
           <HeaderRow columns={columns} />
-          {/*{showToolbar ? <HeaderToolbarRow columns={rightColumns} /> : null}*/}
+          {/*{showToolbar ? <HeaderToolbarRow columns={leftColumns} /> : null}*/}
         </thead>
       </table>
     </div>

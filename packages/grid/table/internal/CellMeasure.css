@@ -1,0 +1,17 @@
+.uitkTableCellMeasure {
+  position: fixed;
+  top: -1000px;
+  left: 0;
+}
+
+.uitkTableCellMeasure table {
+}
+
+.uitkTableCellMeasure tr {
+  height: var(--uitkTable-rowHeight);
+}
+
+.uitkTableCellMeasure th {
+  box-sizing: border-box;
+  overflow: hidden;
+}

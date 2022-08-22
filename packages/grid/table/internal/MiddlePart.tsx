@@ -1,49 +1,47 @@
-import cn from "classnames";
+import { RefObject, WheelEventHandler } from "react";
 import { TableColGroup } from "./TableColGroup";
 import { TableBody } from "./TableBody";
-import { RefObject, WheelEventHandler } from "react";
-import "./LeftPart.css";
+import "./MiddlePart.css";
 import { makePrefixer } from "@jpmorganchase/uitk-core";
-import { TableColumnModel, TableRowModel } from "./Table";
+import { TableColumnModel, TableRowModel } from "../Table";
 
-const withBaseName = makePrefixer("uitkTableLeftPart");
+const withBaseName = makePrefixer("uitkTableMiddlePart");
 
-export interface LeftPartProps {
-  leftRef: RefObject<HTMLDivElement>;
+export interface MiddlePartProps<T> {
+  middleRef: RefObject<HTMLDivElement>;
   onWheel: WheelEventHandler<HTMLTableElement>;
-  isRaised?: boolean;
   columns: TableColumnModel[];
   rows: TableRowModel[];
   hoverOverRowKey?: string;
   setHoverOverRowKey: (key: string | undefined) => void;
+  midGap: number;
+  isZebra?: boolean;
 }
 
-export function LeftPart(props: LeftPartProps) {
+export function MiddlePart<T>(props: MiddlePartProps<T>) {
   const {
-    leftRef,
+    middleRef,
     onWheel,
-    isRaised,
     columns,
     rows,
     hoverOverRowKey,
     setHoverOverRowKey,
+    midGap,
+    isZebra,
   } = props;
 
   return (
-    <div
-      ref={leftRef}
-      className={cn(withBaseName(), {
-        [withBaseName("raised")]: isRaised,
-      })}
-    >
+    <div ref={middleRef} className={withBaseName()}>
       <div className={withBaseName("space")}>
         <table onWheel={onWheel}>
-          <TableColGroup columns={columns} />
+          <TableColGroup columns={columns} gap={midGap} />
           <TableBody
             columns={columns}
             rows={rows}
             hoverRowKey={hoverOverRowKey}
             setHoverRowKey={setHoverOverRowKey}
+            gap={midGap}
+            isZebra={isZebra}
           />
         </table>
       </div>

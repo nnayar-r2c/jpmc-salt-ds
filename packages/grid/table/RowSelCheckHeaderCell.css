@@ -1,5 +1,4 @@
-.uitkTableRowSelectionCheckboxCellValue {
-  height: 100%;
+.uitkTableRowSelCheckHeaderCell-content {
   display: flex;
   flex-direction: column;
   align-items: center;

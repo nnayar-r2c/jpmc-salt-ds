@@ -1,22 +1,15 @@
 import { Story } from "@storybook/react";
 import "./data-grid.stories.css";
-import { Table } from "../table/Table";
-import { RowSelectionColumn, TableColumn } from "../table/TableColumn";
+import { Table } from "../table";
+import { RowSelectionColumn, TableColumn } from "../table";
 import { randomAmount } from "./grid/utils";
-import { TableCol } from "../table/TableColGroup";
-import { ColumnGroup } from "../table/ColumnGroup";
-import { RowSelectionCheckboxCellValue } from "../table/RowSelectionCheckboxCellValue";
+import { ColumnGroup } from "../table";
+import "./table.stories.css";
 
 export default {
   title: "Grid/New Api Experiment",
   component: Table,
-  argTypes: {
-    // showTreeLines: { control: "boolean" },
-    // rowGrouping: {
-    //   control: "select",
-    //   options: [...rowGroupingOptions.keys()],
-    // },
-  },
+  argTypes: {},
 };
 
 interface Investor {
@@ -89,54 +82,47 @@ const rowKeyGetter = (rowData: Investor) => rowData.name;
 
 const TableStoryTemplate: Story<{}> = (props) => {
   return (
-    <Table rowData={dummyInvestors} rowKeyGetter={rowKeyGetter}>
+    <Table
+      rowData={dummyInvestors}
+      rowKeyGetter={rowKeyGetter}
+      className={"table"}
+    >
       <ColumnGroup id={"groupOne"} name={"Group One"} pinned={"left"}>
-        <RowSelectionColumn
-          id={"rowSelection"}
-          name={"RSC"}
-          width={10}
-          index={0}
-        />
+        <RowSelectionColumn id={"rowSelection"} />
         <TableColumn
           name={"Name"}
           id={"name"}
-          width={200}
+          defaultWidth={200}
           getValue={(x) => x.name}
-          index={1}
         />
       </ColumnGroup>
       <ColumnGroup id={"groupTwo"} name={"Group Two"}>
         <TableColumn
           name={"Location"}
           id={"location"}
-          width={150}
+          defaultWidth={150}
           getValue={(x) => x.location}
-          index={2}
         />
         <TableColumn
           name={"Cohort"}
           id={"cohort"}
-          width={200}
+          defaultWidth={200}
           getValue={(x) => x.cohort}
-          index={3}
         />
       </ColumnGroup>
       <ColumnGroup id={"groupThree"} name={"Group Three"}>
         <TableColumn
           name={"Amount"}
           id={"amount"}
-          width={200}
+          defaultWidth={200}
           getValue={(x) => x.amount.toFixed(4)}
-          index={4}
         />
       </ColumnGroup>
-      <ColumnGroup id={"groupFour"} name={"Group Four"} pinned={"right"}>
+      <ColumnGroup id={"groupFour"} name={"Group Four"}>
         <TableColumn
           name={"Strategy"}
           id={"strategy"}
-          width={200}
           getValue={(x) => x.strategy.join(", ")}
-          index={5}
         />
       </ColumnGroup>
     </Table>

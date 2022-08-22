@@ -1,10 +1,10 @@
-import { TableColumnProps } from "./TableColumn";
+import { TableColumnInfo } from "./TableColumn";
 import { createContext, useContext } from "react";
 import { ColumnGroupProps } from "./ColumnGroup";
 
 export interface TableContext {
-  onColumnAdded: (columnProps: TableColumnProps) => void;
-  onColumnRemoved: (columnProps: TableColumnProps) => void;
+  onColumnAdded: (columnInfo: TableColumnInfo) => void;
+  onColumnRemoved: (columnInfo: TableColumnInfo) => void;
   onColumnGroupAdded: (colGroupProps: ColumnGroupProps) => void;
   onColumnGroupRemoved: (colGroupProps: ColumnGroupProps) => void;
 }

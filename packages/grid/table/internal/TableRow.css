@@ -1,0 +1,48 @@
+.uitkTableTableRow {
+  height: var(--uitkTable-rowHeight);
+  /* Row border doesn't render properly in Chrome on Windows. Applying borders to cells */
+  --row-border-color: var(--uitkTable-rowDivider-color);
+}
+
+.uitkTableTableRow td, .uitkTableTableRow th {
+  border-style: solid;
+  border-color: var(--row-border-color);
+  border-width: 1px 0 0 0;
+}
+
+.uitkTableTableRow-selected + .uitkTableTableRow {
+  --row-border-color: var(--uitkTable-row-borderColor-selected);
+}
+
+.uitkTableTableRow-divided {
+  --row-border-color: var(--uitkTable-rowDivider-color-divided);
+}
+
+.uitkTableTableRow-zebra {
+  background: var(--uitkTable-zebraColor);
+}
+
+.uitkTableTableRow-hover {
+  background: var(--uitkTable-row-backgroundColor-hover);
+}
+
+.uitkTableTableRow-selected {
+  background: var(--uitkTable-row-backgroundColor-selected);
+  --row-border-color: var(--uitkTable-row-borderColor-selected);
+}
+
+.uitkTableTableRow-zebra.uitkTableTableRow-selected {
+  background: var(--uitkTable-row-backgroundColor-selected);
+}
+
+.uitkTableTableRow-zebra.uitkTableTableRow-hover {
+  background: var(--uitkTable-row-backgroundColor-hover);
+}
+
+.uitkTableTableRow-zebra.uitkTableTableRow-selected.uitkTableTableRow-hover {
+  background: var(--uitkTable-row-backgroundColor-hover);
+}
+
+.uitkTableTableRow-selected.uitkTableTableRow-hover {
+  background: var(--uitkTable-row-backgroundColor-hover);
+}

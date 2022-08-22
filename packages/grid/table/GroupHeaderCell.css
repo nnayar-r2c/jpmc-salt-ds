@@ -2,15 +2,12 @@
 }
 
 .uitkTableGroupHeaderCell {
-  /*border-collapse: collapse;*/
   text-align: left;
   padding: var(--uitkTable-cell-padding);
   position: relative;
-  /*background-color: var(--uitkTable-header-backgroundColor);*/
   color: var(--uitkTable-groupHeader-color);
   overflow: hidden;
   white-space: nowrap;
-  height: var(--uitkTable-rowHeight);
 }
 
 .uitkTableGroupHeaderCell-text {

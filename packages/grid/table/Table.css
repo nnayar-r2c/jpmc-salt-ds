@@ -167,6 +167,7 @@
   margin-left: 3px;
   margin-right: 0;
 }
+
 .uitk-density-ultrahigh .uitkTable .backwardCompat .uitkControlLabel-label {
   margin-right: 4px;
 }
@@ -260,15 +261,15 @@
 }
 
 .uitkTable {
-  height: 600px;
-  width: 800px;
+  /*height: 600px;*/
+  /*width: 800px;*/
   position: relative;
   outline: none;
-  border-collapse: collapse;
 }
 
 .uitkTable table {
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .uitkTable-framed {

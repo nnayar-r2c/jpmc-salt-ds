@@ -2,7 +2,7 @@ export function getAttribute(
   element: HTMLElement,
   attributeName: string
 ): [string, HTMLElement] {
-  if (!element) {
+  if (!element || !element.hasAttribute) {
     throw new Error(`Attribute "${attributeName}" not found`);
   }
   if (element.hasAttribute(attributeName)) {
