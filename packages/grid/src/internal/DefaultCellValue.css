@@ -1,0 +1,9 @@
+.uitkGridDefaultCellValue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: var(--uitkGrid-cell-padding);
+}
+
+.uitkGridDefaultCellValue-alignRight {
+  text-align: right;
+}

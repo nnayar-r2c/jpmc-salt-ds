@@ -1,0 +1,35 @@
+.uitkGridCellEditor {
+  margin: 0;
+  padding: 0;
+  height: var(--uitkGrid-rowHeight);
+  overflow: hidden;
+  position: relative;
+}
+
+.uitkGridCellEditor-inputContainer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+  border-style: dotted;
+  border-width: 2px;
+  border-color: var(--uitkGrid-cursor-borderColor);
+  padding: 0;
+}
+
+.uitkGridCellEditor input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  outline: none;
+  border: none;
+  padding: 0 calc(var(--uitkGrid-padding) - 2px);
+  font-size: var(--uitkGrid-fontSize);
+  font-family: inherit;
+  background-color: var(--uitkGrid-editableCell-background-active);
+  color: var(--uitkGrid-editableCell-color-active);
+}

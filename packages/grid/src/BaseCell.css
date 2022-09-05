@@ -1,0 +1,59 @@
+.uitkGridBaseCell {
+  box-sizing: border-box;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+
+  border-style: solid;
+  border-top-color: var(--row-border-color);
+  border-right-color: var(--column-separator-color);
+  border-width: 1px 1px 0 0;
+
+  white-space: nowrap;
+  position: relative;
+  font-size: var(--uitkGrid-fontSize);
+  font-weight: normal;
+  z-index: var(--uitkGrid-cell-zIndex);
+}
+
+.uitkGridBaseCell-selectedCell {
+  background-color: var(--uitkGrid-cell-backgroundColor-selected);
+}
+
+.uitkGridBaseCell-secondary {
+  background-color: var(--uitkGrid-backgroundColor-secondary);
+}
+
+.uitkGridBaseCell-valueContainer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: calc(var(--uitkGrid-rowHeight) - 2px);
+  border-style: solid;
+  border-width: 1px;
+  border-color: transparent;
+  --uitkGrid-cell-padding: 0 calc(var(--uitkGrid-padding) - 1px);
+}
+
+.uitkGridBaseCell-focused {
+  border-style: dotted;
+  border-width: 2px;
+  border-color: var(--uitkGrid-cursor-borderColor);
+  line-height: calc(var(--uitkGrid-rowHeight) - 4px);
+  --uitkGrid-cell-padding: 0 calc(var(--uitkGrid-padding) - 2px);
+}
+
+.uitkGridBaseCell-editable {
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--uitkGrid-editableCell-borderColor);
+}
+
+.uitkGridBaseCell-editable:hover {
+  border-color: var(--uitkGrid-editableCell-borderColor-hover);
+}

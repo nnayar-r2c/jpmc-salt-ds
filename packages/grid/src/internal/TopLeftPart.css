@@ -1,0 +1,16 @@
+.uitkGridTopLeftPart {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+.uitkGridTopLeftPart-raised {
+  box-shadow: 6px 0 4px -4px var(--uitkGrid-shadow-color);
+}
+
+.uitkGridTopLeftPart table {
+  table-layout: fixed;
+  width: var(--uitkGrid-leftWidth);
+  height: var(--uitkGrid-topHeight);
+}

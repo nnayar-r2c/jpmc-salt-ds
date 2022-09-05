@@ -1,0 +1,17 @@
+.uitkGridTopRightPart {
+  position: absolute;
+  top: 0;
+  right: var(--uitkGrid-scrollBarWidth);
+  z-index: 2;
+}
+
+.uitkGridTopRightPart-raised {
+  box-shadow: -6px 0 4px -4px var(--uitkGrid-shadow-color);
+}
+
+.uitkGridTopRightPart table {
+  table-layout: fixed;
+
+  width: var(--uitkGrid-rightWidth);
+  height: var(--uitkGrid-topHeight);
+}
