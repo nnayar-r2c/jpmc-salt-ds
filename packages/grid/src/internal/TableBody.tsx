@@ -33,6 +33,7 @@ export function TableBody<T>(props: TableBodyProps<T>) {
     setHoverRowKey(undefined);
   };
 
+  // TODO extract this to useCellMouseDown?
   const onMouseDown: MouseEventHandler<HTMLTableSectionElement> = (event) => {
     const target = event.target as HTMLElement;
     try {
@@ -41,7 +42,6 @@ export function TableBody<T>(props: TableBodyProps<T>) {
       if (colIdx >= 0) {
         moveCursor(rowIdx, colIdx);
       }
-      // if (cellSelectionMode)
       event.preventDefault();
       event.stopPropagation();
     } catch (e) {

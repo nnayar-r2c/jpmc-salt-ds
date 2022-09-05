@@ -1,48 +1,48 @@
 .uitkGridTableRow {
-  height: var(--uitkGrid-rowHeight);
+  height: var(--grid-row-height);
   /* Row border doesn't render properly in Chrome on Windows. Applying borders to cells */
-  --row-border-color: var(--uitkGrid-rowDivider-color);
+  --grid-row-borderColor: var(--grid-rowDivider-color);
 }
 
 .uitkGridTableRow th {
   border-style: solid;
-  border-color: var(--row-border-color);
+  border-color: var(--grid-row-borderColor);
   border-width: 1px 0 0 0;
 }
 
 .uitkGridTableRow-selected + .uitkGridTableRow {
-  --row-border-color: var(--uitkGrid-row-borderColor-selected);
+  --grid-row-borderColor: var(--grid-row-borderColor-selected);
 }
 
 .uitkGridTableRow-divided {
-  --row-border-color: var(--uitkGrid-rowDivider-color-divided);
+  --grid-row-borderColor: var(--grid-rowDivider-color-divided);
 }
 
 .uitkGridTableRow-zebra {
-  background: var(--uitkGrid-zebraColor);
+  background: var(--grid-zebraColor);
 }
 
 .uitkGridTableRow-hover {
-  background: var(--uitkGrid-row-backgroundColor-hover);
+  background: var(--grid-row-background-hover);
 }
 
 .uitkGridTableRow-selected {
-  background: var(--uitkGrid-row-backgroundColor-selected);
-  --row-border-color: var(--uitkGrid-row-borderColor-selected);
+  background: var(--grid-row-background-selected);
+  --grid-row-borderColor: var(--grid-row-borderColor-selected);
 }
 
 .uitkGridTableRow-zebra.uitkGridTableRow-selected {
-  background: var(--uitkGrid-row-backgroundColor-selected);
+  background: var(--grid-row-background-selected);
 }
 
 .uitkGridTableRow-zebra.uitkGridTableRow-hover {
-  background: var(--uitkGrid-row-backgroundColor-hover);
+  background: var(--grid-row-background-hover);
 }
 
 .uitkGridTableRow-zebra.uitkGridTableRow-selected.uitkGridTableRow-hover {
-  background: var(--uitkGrid-row-backgroundColor-hover);
+  background: var(--grid-row-background-hover);
 }
 
 .uitkGridTableRow-selected.uitkGridTableRow-hover {
-  background: var(--uitkGrid-row-backgroundColor-hover);
+  background: var(--grid-row-background-hover);
 }

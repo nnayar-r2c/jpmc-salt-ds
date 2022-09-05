@@ -8,7 +8,7 @@
 }
 
 .uitkGridCellMeasure tr {
-  height: var(--uitkGrid-rowHeight);
+  height: var(--grid-row-height);
 }
 
 .uitkGridCellMeasure th {

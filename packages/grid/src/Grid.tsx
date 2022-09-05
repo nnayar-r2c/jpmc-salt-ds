@@ -274,19 +274,19 @@ export const Grid = function <T>(props: GridProps<T>) {
     () =>
       ({
         ...style,
-        ["--uitkGrid-totalWidth"]: `${totalWidth}px`,
-        ["--uitkGrid-totalHeight"]: `${totalHeight}px`,
-        ["--uitkGrid-topHeight"]: `${topHeight}px`,
-        ["--uitkGrid-leftWidth"]: `${leftWidth}px`,
-        ["--uitkGrid-rightWidth"]: `${rightWidth}px`,
-        ["--uitkGrid-bodyVisibleColumnWidth"]: `${bodyVisColWh}px`,
-        ["--uitkGrid-bodyVisibleAreaTop"]: `${bodyVisAreaTop}px`,
-        ["--uitkGrid-bodyVisibleAreaLeft"]: `${bodyVisAreaLeft}px`,
-        ["--uitkGrid-bottomHeight"]: `${botHeight}px`,
-        ["--uitkGrid-headerVisibleColumnWidth"]: `${headVisColWh}px`,
-        ["--uitkGrid-headerVisibleAreaLeft"]: `${headVisAreaLeft}px`,
-        ["--uitkGrid-scrollBarHeight"]: `${scrollBarHeight}px`,
-        ["--uitkGrid-scrollBarWidth"]: `${scrollBarWidth}px`,
+        ["--grid-total-width"]: `${totalWidth}px`,
+        ["--grid-total-height"]: `${totalHeight}px`,
+        ["--grid-topPart-height"]: `${topHeight}px`,
+        ["--grid-leftPart-width"]: `${leftWidth}px`,
+        ["--grid-rightPart-width"]: `${rightWidth}px`,
+        ["--grid-bodyVisibleColumn-width"]: `${bodyVisColWh}px`,
+        ["--grid-bodyVisibleArea-top"]: `${bodyVisAreaTop}px`,
+        ["--grid-bodyVisibleArea-left"]: `${bodyVisAreaLeft}px`,
+        ["--grid-bottomHeight"]: `${botHeight}px`,
+        ["--grid-headerVisibleColumn-width"]: `${headVisColWh}px`,
+        ["--grid-headerVisibleArea-left"]: `${headVisAreaLeft}px`,
+        ["--grid-scrollBar-height"]: `${scrollBarHeight}px`,
+        ["--grid-scrollBar-width"]: `${scrollBarWidth}px`,
       } as any),
     [
       style,
@@ -574,7 +574,6 @@ export const Grid = function <T>(props: GridProps<T>) {
   );
 
   const onColumnMove = (fromIndex: number, toIndex: number) => {
-    console.log(`Column moved from ${fromIndex} to ${toIndex}`);
     if (onColumnMoved && fromIndex !== toIndex) {
       onColumnMoved(fromIndex, toIndex);
     }
@@ -599,10 +598,6 @@ export const Grid = function <T>(props: GridProps<T>) {
     }),
     [columnDnD, onColumnMoveHandleMouseDown]
   );
-
-  // console.log(
-  //   cols.map((c) => `"${c.info.props.name}": ${c.info.width}`).join("\n")
-  // );
 
   return (
     <GridContext.Provider value={contextValue}>

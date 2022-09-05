@@ -22,7 +22,7 @@
 }
 
 .customTreeCell {
-  padding: var(--uitkGrid-cell-padding);
+  padding: var(--grid-cell-padding);
   display: flex;
   flex-direction: row;
   align-items: center;

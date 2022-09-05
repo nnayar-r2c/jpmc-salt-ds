@@ -2,26 +2,26 @@
   position: absolute;
   top: 0;
   left: 0;
-  bottom: var(--uitkGrid-scrollBarHeight);
+  bottom: var(--grid-scrollBar-height);
   overflow-x: hidden;
   overflow-y: hidden;
   z-index: 2;
-  clip-path: inset(var(--uitkGrid-topHeight) -10px 0 0);
+  clip-path: inset(var(--grid-topPart-height) -10px 0 0);
 }
 
 .uitkGridLeftPart-raised {
-  box-shadow: 6px 0 4px -4px var(--uitkGrid-shadow-color);
+  box-shadow: 6px 0 4px -4px var(--grid-shadow-color);
 }
 
 .uitkGridLeftPart-space {
   position: relative;
-  height: var(--uitkGrid-totalHeight);
-  width: var(--uitkGrid-leftWidth);
+  height: var(--grid-total-height);
+  width: var(--grid-leftPart-width);
 }
 
 .uitkGridLeftPart table {
   table-layout: fixed;
   position: absolute;
-  top: var(--uitkGrid-bodyVisibleAreaTop);
-  width: var(--uitkGrid-leftWidth);
+  top: var(--grid-bodyVisibleArea-top);
+  width: var(--grid-leftPart-width);
 }

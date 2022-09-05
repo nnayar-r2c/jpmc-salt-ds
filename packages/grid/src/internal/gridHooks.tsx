@@ -19,7 +19,12 @@ import {
 import { ColumnGroupProps } from "../ColumnGroup";
 import { Rng } from "../Rng";
 import { GridColumnInfo, GridColumnPin } from "../GridColumn";
-import { getAttribute, makeMapAdder, makeMapDeleter } from "./utils";
+import {
+  getAttribute,
+  getCellPosition,
+  makeMapAdder,
+  makeMapDeleter,
+} from "./utils";
 import { GridContext } from "../GridContext";
 import { SelectionContext } from "../SelectionContext";
 
@@ -894,4 +899,36 @@ export function useColumnMove<T = any>(
   activeTargetRef.current = activeTarget;
 
   return { onColumnMoveHandleMouseDown, dragState, activeTarget };
+}
+
+export function useRangeSelection() {
+  const ref = useRef<{
+    unsubscribe: () => void;
+    startRowIdx: number;
+    startColIdx: number;
+  }>();
+
+  const onMouseMove = useCallback((event: MouseEvent) => {
+    const { clientX, clientY } = event;
+  }, []);
+
+  const onMouseUp = useCallback((event: MouseEvent) => {}, []);
+
+  const onCellMouseDown = (event: React.MouseEvent) => {
+    const target = event.target as HTMLElement;
+    try {
+      const [rowIdx, colIdx] = getCellPosition(target);
+      // Drag start
+      document.addEventListener("mouseup", onMouseUp);
+      document.addEventListener("mousemove", onMouseMove);
+      ref.current = {
+        startRowIdx: rowIdx,
+        startColIdx: colIdx,
+        unsubscribe: () => {
+          document.removeEventListener("mouseup", onMouseUp);
+          document.removeEventListener("mousemove", onMouseMove);
+        },
+      };
+    } catch (exc) {}
+  };
 }
