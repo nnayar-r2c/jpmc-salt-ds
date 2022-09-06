@@ -209,7 +209,7 @@
   --grid-row-background-selected: var(--uitk-color-blue-30);
 
   --grid-row-borderColor-selected: var(--uitk-color-blue-500);
-  --grid-cell-background-selected: #64b1e4;
+  --grid-cell-background-selected: var(--uitk-color-blue-30);
   --grid-editableCell-borderColor: var(--uitk-color-grey-100);
   --grid-editableCell-borderColor-hover: var(--uitk-color-blue-500);
   --grid-editableCell-background-active: var(--uitk-color-white);
@@ -242,7 +242,7 @@
   --grid-row-background-selected: var(--uitk-color-blue-800);
 
   --grid-row-borderColor-selected: var(--uitk-color-blue-300);
-  --grid-cell-background-selected: #64b1e4;
+  --grid-cell-background-selected: var(--uitk-color-blue-800);
   --grid-editableCell-borderColor: var(--uitk-color-grey-200);
   --grid-editableCell-borderColor-hover: var(--uitk-color-blue-300);
   --grid-editableCell-background-active: var(--uitk-color-grey-800);

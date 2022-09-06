@@ -1,6 +1,7 @@
 import React, {
   CSSProperties,
   KeyboardEventHandler,
+  MouseEventHandler,
   ReactNode,
   useCallback,
   useMemo,
@@ -15,6 +16,7 @@ import cx from "classnames";
 import {
   CellMeasure,
   clamp,
+  getCellPosition,
   LeftPart,
   MiddlePart,
   PAGE_SIZE,
@@ -34,6 +36,7 @@ import {
   useHeadVisibleColumnRange,
   useLeftScrolledOutWidth,
   useProd,
+  useRangeSelection,
   useRowIdxByKey,
   useRowModels,
   useRowSelection,
@@ -45,7 +48,7 @@ import {
   useVisibleRowRange,
 } from "./internal";
 import "./Grid.css";
-import { SelectionContext } from "./SelectionContext";
+import { RowSelectionContext } from "./RowSelectionContext";
 import { SizingContext } from "./SizingContext";
 import { LayoutContext } from "./LayoutContext";
 import { EditorContext } from "./EditorContext"; // TODO remove
@@ -54,6 +57,7 @@ import { ColumnGroupProps } from "./ColumnGroup";
 import { ColumnDragContext } from "./ColumnDragContext";
 import { ColumnGhost } from "./internal/ColumnGhost";
 import { ColumnDropTarget } from "./internal/ColumnDropTarget";
+import { CellSelectionContext } from "./CellSelectionContext";
 
 const withBaseName = makePrefixer("uitkGrid");
 
@@ -128,10 +132,6 @@ export const Grid = function <T>(props: GridProps<T>) {
     cellSelectionMode = "none",
   } = props;
 
-  // if (rowData.length > 0) {
-  //   console.log(`Row 0 price: ${rowData[0].price}`);
-  // }
-
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollableRef = useRef<HTMLDivElement>(null);
   const middleRef = useRef<HTMLDivElement>(null);
@@ -202,7 +202,7 @@ export const Grid = function <T>(props: GridProps<T>) {
 
   const headRowCount = hideHeader ? 0 : hasColumnGroups ? 2 : 1; // TODO multiple group levels
   const rowCount = rowData.length;
-  // console.log(`RowCount: ${rowCount}`);
+
   const botRowCount = 0; // TODO
   const topHeight = useProd([rowHeight, headRowCount]);
   const midHeight = useProd([rowHeight, rowCount]);
@@ -555,7 +555,7 @@ export const Grid = function <T>(props: GridProps<T>) {
     ]
   );
 
-  const selectionContext = useRowSelection(
+  const rowSelectionContext = useRowSelection(
     rowKeyGetter,
     rowData,
     rowIdxByKey,
@@ -599,115 +599,150 @@ export const Grid = function <T>(props: GridProps<T>) {
     [columnDnD, onColumnMoveHandleMouseDown]
   );
 
+  const { onCellMouseDown: onCellSelectionMouseDown, selectedCellRange } =
+    useRangeSelection();
+
+  const onMouseDown: MouseEventHandler<HTMLDivElement> = (event) => {
+    const target = event.target as HTMLElement;
+    try {
+      const [rowIdx, colIdx] = getCellPosition(target);
+      rowSelectionContext.selectRows(
+        rowIdx,
+        event.shiftKey,
+        event.metaKey || event.ctrlKey
+      );
+      if (cellSelectionMode === "range") {
+        onCellSelectionMouseDown(event);
+      }
+      if (colIdx >= 0) {
+        moveCursor(rowIdx, colIdx);
+      }
+      event.preventDefault();
+      event.stopPropagation();
+    } catch (e) {
+      // TODO Do editors need any keyboard handling from the table body?
+    }
+  };
+
+  const cellSelectionContext: CellSelectionContext = useMemo(
+    () => ({
+      selectedCellRange,
+    }),
+    [selectedCellRange]
+  );
+
   return (
     <GridContext.Provider value={contextValue}>
       <LayoutContext.Provider value={layoutContext}>
-        <SelectionContext.Provider value={selectionContext}>
-          <ColumnDragContext.Provider value={columnDragContext}>
-            <CursorContext.Provider value={cursorContext}>
-              <SizingContext.Provider value={sizingContext}>
-                <EditorContext.Provider value={editorContext}>
-                  {props.children}
-                  <div
-                    className={cx(
-                      withBaseName(),
-                      {
-                        [withBaseName("zebra")]: zebra,
-                        [withBaseName("columnSeparators")]: columnSeparators,
-                        [withBaseName("primaryBackground")]:
-                          variant === "primary",
-                        [withBaseName("secondaryBackground")]:
-                          variant === "secondary",
-                      },
-                      className
-                    )}
-                    style={rootStyle}
-                    ref={rootRef}
-                    tabIndex={0}
-                    onKeyDown={onKeyDown}
-                    data-name={"grid-root"}
-                  >
-                    <CellMeasure setRowHeight={setRowHeight} />
-                    <Scrollable
-                      resizeClient={resizeClient}
-                      scrollLeft={scrollLeft}
-                      scrollTop={scrollTop}
-                      scrollSource={scrollSource}
-                      scroll={scroll}
-                      scrollerRef={scrollableRef}
-                      topRef={topRef}
-                      rightRef={rightRef}
-                      bottomRef={bottomRef}
-                      leftRef={leftRef}
-                      middleRef={middleRef}
-                    />
-                    <MiddlePart
-                      middleRef={middleRef}
-                      onWheel={onWheel}
-                      columns={bodyVisibleColumns}
-                      rows={rows}
-                      hoverOverRowKey={hoverRowKey}
-                      setHoverOverRowKey={setHoverRowKey}
-                      midGap={midGap}
-                      zebra={zebra}
-                    />
-                    {!hideHeader && (
-                      <TopPart
-                        columns={headVisibleColumns}
-                        columnGroups={visColGrps}
+        <RowSelectionContext.Provider value={rowSelectionContext}>
+          <CellSelectionContext.Provider value={cellSelectionContext}>
+            <ColumnDragContext.Provider value={columnDragContext}>
+              <CursorContext.Provider value={cursorContext}>
+                <SizingContext.Provider value={sizingContext}>
+                  <EditorContext.Provider value={editorContext}>
+                    {props.children}
+                    <div
+                      className={cx(
+                        withBaseName(),
+                        {
+                          [withBaseName("zebra")]: zebra,
+                          [withBaseName("columnSeparators")]: columnSeparators,
+                          [withBaseName("primaryBackground")]:
+                            variant === "primary",
+                          [withBaseName("secondaryBackground")]:
+                            variant === "secondary",
+                        },
+                        className
+                      )}
+                      style={rootStyle}
+                      ref={rootRef}
+                      tabIndex={0}
+                      onKeyDown={onKeyDown}
+                      onMouseDown={onMouseDown}
+                      data-name={"grid-root"}
+                    >
+                      <CellMeasure setRowHeight={setRowHeight} />
+                      <Scrollable
+                        resizeClient={resizeClient}
+                        scrollLeft={scrollLeft}
+                        scrollTop={scrollTop}
+                        scrollSource={scrollSource}
+                        scroll={scroll}
+                        scrollerRef={scrollableRef}
                         topRef={topRef}
-                        onWheel={onWheel}
-                        midGap={midGap}
+                        rightRef={rightRef}
+                        bottomRef={bottomRef}
+                        leftRef={leftRef}
+                        middleRef={middleRef}
                       />
-                    )}
-                    <LeftPart
-                      leftRef={leftRef}
-                      onWheel={onWheel}
-                      columns={leftCols}
-                      rows={rows}
-                      isRaised={isLeftRaised}
-                      hoverOverRowKey={hoverRowKey}
-                      setHoverOverRowKey={setHoverRowKey}
-                      zebra={zebra}
-                    />
-                    <RightPart
-                      rightRef={rightRef}
-                      onWheel={onWheel}
-                      columns={rightCols}
-                      rows={rows}
-                      isRaised={isRightRaised}
-                      hoverOverRowKey={hoverRowKey}
-                      setHoverOverRowKey={setHoverRowKey}
-                      zebra={zebra}
-                    />
-                    {!hideHeader && (
-                      <TopLeftPart
+                      <MiddlePart
+                        middleRef={middleRef}
+                        onWheel={onWheel}
+                        columns={bodyVisibleColumns}
+                        rows={rows}
+                        hoverOverRowKey={hoverRowKey}
+                        setHoverOverRowKey={setHoverRowKey}
+                        midGap={midGap}
+                        zebra={zebra}
+                      />
+                      {!hideHeader && (
+                        <TopPart
+                          columns={headVisibleColumns}
+                          columnGroups={visColGrps}
+                          topRef={topRef}
+                          onWheel={onWheel}
+                          midGap={midGap}
+                        />
+                      )}
+                      <LeftPart
+                        leftRef={leftRef}
                         onWheel={onWheel}
                         columns={leftCols}
-                        columnGroups={leftGroups}
+                        rows={rows}
                         isRaised={isLeftRaised}
+                        hoverOverRowKey={hoverRowKey}
+                        setHoverOverRowKey={setHoverRowKey}
+                        zebra={zebra}
                       />
-                    )}
-                    {!hideHeader && (
-                      <TopRightPart
+                      <RightPart
+                        rightRef={rightRef}
                         onWheel={onWheel}
                         columns={rightCols}
-                        columnGroups={rightGroups}
+                        rows={rows}
                         isRaised={isRightRaised}
+                        hoverOverRowKey={hoverRowKey}
+                        setHoverOverRowKey={setHoverRowKey}
+                        zebra={zebra}
                       />
-                    )}
-                    <ColumnGhost
-                      columns={cols}
-                      rows={rows}
-                      dragState={dragState}
-                    />
-                    <ColumnDropTarget x={activeTarget?.x} />
-                  </div>
-                </EditorContext.Provider>
-              </SizingContext.Provider>
-            </CursorContext.Provider>
-          </ColumnDragContext.Provider>
-        </SelectionContext.Provider>
+                      {!hideHeader && (
+                        <TopLeftPart
+                          onWheel={onWheel}
+                          columns={leftCols}
+                          columnGroups={leftGroups}
+                          isRaised={isLeftRaised}
+                        />
+                      )}
+                      {!hideHeader && (
+                        <TopRightPart
+                          onWheel={onWheel}
+                          columns={rightCols}
+                          columnGroups={rightGroups}
+                          isRaised={isRightRaised}
+                        />
+                      )}
+                      <ColumnGhost
+                        columns={cols}
+                        rows={rows}
+                        dragState={dragState}
+                      />
+                      <ColumnDropTarget x={activeTarget?.x} />
+                    </div>
+                  </EditorContext.Provider>
+                </SizingContext.Provider>
+              </CursorContext.Provider>
+            </ColumnDragContext.Provider>
+          </CellSelectionContext.Provider>
+        </RowSelectionContext.Provider>
       </LayoutContext.Provider>
     </GridContext.Provider>
   );

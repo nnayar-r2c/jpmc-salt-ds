@@ -26,7 +26,7 @@ import {
   makeMapDeleter,
 } from "./utils";
 import { GridContext } from "../GridContext";
-import { SelectionContext } from "../SelectionContext";
+import { RowSelectionContext } from "../RowSelectionContext";
 
 function sumWidth<T>(columns: GridColumnModel<T>[]) {
   return columns.reduce((p, x) => p + x.info.width, 0);
@@ -667,7 +667,7 @@ export function useRowSelection<T>(
     }
   }, [setSelRowKeys]);
 
-  const selectionContext: SelectionContext = useMemo(
+  const selectionContext: RowSelectionContext = useMemo(
     () => ({
       selRowKeys,
       isAllSelected,
@@ -901,34 +901,80 @@ export function useColumnMove<T = any>(
   return { onColumnMoveHandleMouseDown, dragState, activeTarget };
 }
 
+export interface CellPosition {
+  rowIdx: number;
+  colIdx: number;
+}
+
+export interface CellRange {
+  start: CellPosition;
+  end: CellPosition;
+}
+
+function cellPositionEquals(a: CellPosition, b: CellPosition) {
+  return a.rowIdx === b.rowIdx && a.colIdx === b.colIdx;
+}
+
+function cellRangeEquals(a: CellRange | undefined, b: CellRange | undefined) {
+  if (!a) {
+    return !b;
+  }
+  return (
+    !!b &&
+    cellPositionEquals(a.start, b.start) &&
+    cellPositionEquals(a.end, b.end)
+  );
+}
+
 export function useRangeSelection() {
   const ref = useRef<{
     unsubscribe: () => void;
-    startRowIdx: number;
-    startColIdx: number;
+    start: CellPosition;
   }>();
+
+  const [selectedCellRange, setSelectedCellRange] = useState<
+    CellRange | undefined
+  >(undefined);
 
   const onMouseMove = useCallback((event: MouseEvent) => {
     const { clientX, clientY } = event;
+    const element = document.elementFromPoint(clientX, clientY) as HTMLElement;
+    try {
+      const [rowIdx, colIdx] = getCellPosition(element);
+
+      setSelectedCellRange((old) => {
+        const { start } = ref.current!;
+        const p: CellRange = { start, end: { rowIdx, colIdx } };
+        return cellRangeEquals(old, p) ? old : p;
+      });
+    } catch (exc) {}
   }, []);
 
-  const onMouseUp = useCallback((event: MouseEvent) => {}, []);
+  const onMouseUp = useCallback((event: MouseEvent) => {
+    if (!ref.current) {
+      throw new Error(`useRangeSelection state is not initialized`);
+    }
+    ref.current.unsubscribe();
+    ref.current = undefined;
+  }, []);
 
-  const onCellMouseDown = (event: React.MouseEvent) => {
+  const onCellMouseDown = useCallback((event: React.MouseEvent) => {
     const target = event.target as HTMLElement;
     try {
       const [rowIdx, colIdx] = getCellPosition(target);
-      // Drag start
       document.addEventListener("mouseup", onMouseUp);
       document.addEventListener("mousemove", onMouseMove);
+      const pos: CellPosition = { rowIdx, colIdx };
       ref.current = {
-        startRowIdx: rowIdx,
-        startColIdx: colIdx,
+        start: pos,
         unsubscribe: () => {
           document.removeEventListener("mouseup", onMouseUp);
           document.removeEventListener("mousemove", onMouseMove);
         },
       };
+      setSelectedCellRange({ start: pos, end: pos });
     } catch (exc) {}
-  };
+  }, []);
+
+  return { selectedCellRange, onCellMouseDown };
 }

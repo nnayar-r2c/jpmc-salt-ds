@@ -21,6 +21,7 @@ export interface TableRowProps<T> {
   onMouseLeave?: MouseEventHandler<HTMLTableRowElement>;
   gap?: number;
   editorColKey?: string;
+  isCellSelected?: (rowIdx: number, colIdx: number) => boolean;
 }
 
 export function TableRow<T>(props: TableRowProps<T>) {
@@ -35,6 +36,7 @@ export function TableRow<T>(props: TableRowProps<T>) {
     cursorColKey,
     gap,
     editorColKey,
+    isCellSelected,
   } = props;
 
   if (!row.key) {
@@ -68,8 +70,17 @@ export function TableRow<T>(props: TableRowProps<T>) {
           ? column.info.props.getValue(row.data)
           : null;
         const isFocused = cursorColKey === colKey;
+        const isSelected =
+          isCellSelected && isCellSelected(row.index, column.index);
+
         return (
-          <Cell key={colKey} row={row} column={column} isFocused={isFocused}>
+          <Cell
+            key={colKey}
+            row={row}
+            column={column}
+            isFocused={isFocused}
+            isSelected={isSelected}
+          >
             <CellValue column={column} row={row} value={value} />
           </Cell>
         );

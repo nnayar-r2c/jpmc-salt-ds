@@ -48,6 +48,10 @@
   --grid-cell-padding: 0 calc(var(--grid-padding) - 2px);
 }
 
+.uitkGridBaseCell-selected {
+  background-color: var(--grid-cell-background-selected);
+}
+
 .uitkGridBaseCell-editable {
   border-style: solid;
   border-width: 1px;

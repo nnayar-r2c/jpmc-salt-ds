@@ -11,7 +11,8 @@ export function getCellId<T>(rowKey: string, column: GridColumnModel<T>) {
 }
 
 export function BaseCell<T>(props: GridCellProps<T>) {
-  const { column, className, row, style, isFocused, children } = props;
+  const { column, className, row, style, isFocused, isSelected, children } =
+    props;
   return (
     <td
       id={getCellId(row.key, column)}
@@ -26,6 +27,7 @@ export function BaseCell<T>(props: GridCellProps<T>) {
         className={cn(withBaseName("valueContainer"), {
           [withBaseName("focused")]: isFocused,
           [withBaseName("editable")]: !isFocused && column.info.props.editable,
+          [withBaseName("selected")]: isSelected,
         })}
       >
         {children}

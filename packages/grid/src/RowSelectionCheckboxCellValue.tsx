@@ -1,6 +1,6 @@
 import { CheckboxIcon, makePrefixer } from "@jpmorganchase/uitk-core";
 import { GridCellValueProps } from "./GridColumn";
-import { useSelectionContext } from "./SelectionContext";
+import { useRowSelectionContext } from "./RowSelectionContext";
 import { MouseEventHandler } from "react";
 import "./RowSelectionCheckboxCellValue.css";
 
@@ -8,7 +8,7 @@ const withBaseName = makePrefixer("uitkGridRowSelectionCheckboxCellValue");
 
 export function RowSelectionCheckboxCellValue<T>(props: GridCellValueProps<T>) {
   const { row } = props;
-  const { selRowKeys, selectRows } = useSelectionContext();
+  const { selRowKeys, selectRows } = useRowSelectionContext();
 
   const isSelected = selRowKeys.has(row.key);
   const onMouseDown: MouseEventHandler<HTMLDivElement> = (event) => {

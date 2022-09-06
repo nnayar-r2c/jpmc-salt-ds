@@ -1,10 +1,11 @@
-import { MouseEventHandler } from "react";
+import { MouseEventHandler, useCallback, useMemo } from "react";
 import { TableRow } from "./TableRow";
 import { GridColumnModel, GridRowModel } from "../Grid";
-import { getCellPosition, getRowKeyAttribute } from "./utils";
-import { useSelectionContext } from "../SelectionContext";
+import { getRowKeyAttribute } from "./utils";
+import { useRowSelectionContext } from "../RowSelectionContext";
 import { useEditorContext } from "../EditorContext";
 import { useCursorContext } from "../CursorContext";
+import { useCellSelectionContext } from "../CellSelectionContext";
 
 export interface TableBodyProps<T> {
   columns: GridColumnModel<T>[];
@@ -18,8 +19,30 @@ export interface TableBodyProps<T> {
 export function TableBody<T>(props: TableBodyProps<T>) {
   const { columns, rows, hoverRowKey, setHoverRowKey, gap, zebra } = props;
 
-  const { selRowKeys, selectRows } = useSelectionContext();
-  const { cursorRowKey, cursorColKey, moveCursor } = useCursorContext();
+  const { selRowKeys } = useRowSelectionContext();
+  const { selectedCellRange } = useCellSelectionContext();
+
+  const isInRange = useCallback(
+    (rowIdx: number, colIdx: number) => {
+      if (!selectedCellRange) {
+        return false;
+      }
+      const { start, end } = selectedCellRange;
+      const minRowIdx = Math.min(start.rowIdx, end.rowIdx);
+      const maxRowIdx = Math.max(start.rowIdx, end.rowIdx);
+      const minColIdx = Math.min(start.colIdx, end.colIdx);
+      const maxColIdx = Math.max(start.colIdx, end.colIdx);
+      return (
+        rowIdx >= minRowIdx &&
+        rowIdx <= maxRowIdx &&
+        colIdx >= minColIdx &&
+        colIdx <= maxColIdx
+      );
+    },
+    [selectedCellRange]
+  );
+
+  const { cursorRowKey, cursorColKey } = useCursorContext();
 
   const { editMode, startEditMode } = useEditorContext();
 
@@ -33,32 +56,12 @@ export function TableBody<T>(props: TableBodyProps<T>) {
     setHoverRowKey(undefined);
   };
 
-  // TODO extract this to useCellMouseDown?
-  const onMouseDown: MouseEventHandler<HTMLTableSectionElement> = (event) => {
-    const target = event.target as HTMLElement;
-    try {
-      const [rowIdx, colIdx] = getCellPosition(target);
-      selectRows(rowIdx, event.shiftKey, event.metaKey || event.ctrlKey);
-      if (colIdx >= 0) {
-        moveCursor(rowIdx, colIdx);
-      }
-      event.preventDefault();
-      event.stopPropagation();
-    } catch (e) {
-      // TODO Do editors need any keyboard handling from the table body?
-    }
-  };
-
   const onDoubleClick: MouseEventHandler<HTMLTableSectionElement> = (event) => {
     startEditMode();
   };
 
   return (
-    <tbody
-      onMouseLeave={onMouseLeave}
-      onMouseDown={onMouseDown}
-      onDoubleClick={onDoubleClick}
-    >
+    <tbody onMouseLeave={onMouseLeave} onDoubleClick={onDoubleClick}>
       {rows.map((row) => {
         const isSelected = selRowKeys.has(row.key);
         const cursorKey = cursorRowKey === row.key ? cursorColKey : undefined;
@@ -68,7 +71,6 @@ export function TableBody<T>(props: TableBodyProps<T>) {
             key={row.key}
             row={row}
             onMouseEnter={onRowMouseEnter}
-            // onMouseLeave={onMouseLeave}
             columns={columns}
             isHoverOver={row.key === hoverRowKey}
             isSelected={isSelected}
@@ -76,7 +78,7 @@ export function TableBody<T>(props: TableBodyProps<T>) {
             gap={gap}
             zebra={zebra && row.index % 2 == 0}
             editorColKey={editorColKey}
-            // backgroundVariant={backgroundVariant}
+            isCellSelected={isInRange}
           />
         );
       })}

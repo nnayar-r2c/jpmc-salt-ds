@@ -7,7 +7,7 @@ export * from "./Rng";
 export * from "./RowSelCheckHeaderCell";
 export * from "./RowSelectionCheckboxCellValue";
 export * from "./RowSelectionRadioColumn";
-export * from "./SelectionContext";
+export * from "./RowSelectionContext";
 export * from "./SizingContext";
 export * from "./Grid";
 export * from "./GridColumn";
