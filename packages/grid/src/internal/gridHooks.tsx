@@ -15,6 +15,7 @@ import {
   GridColumnModel,
   GridRowModel,
   GridRowSelectionMode,
+  GridCellSelectionMode,
 } from "../Grid";
 import { ColumnGroupProps } from "../ColumnGroup";
 import { Rng } from "../Rng";
@@ -26,7 +27,7 @@ import {
   makeMapDeleter,
 } from "./utils";
 import { GridContext } from "../GridContext";
-import { RowSelectionContext } from "../RowSelectionContext";
+import { SelectionContext } from "../SelectionContext";
 
 function sumWidth<T>(columns: GridColumnModel<T>[]) {
   return columns.reduce((p, x) => p + x.info.width, 0);
@@ -572,6 +573,7 @@ export function useColumnRegistry<T>(children: ReactNode) {
   };
 }
 
+// TODO test use case when selection mode changes
 export function useRowSelection<T>(
   rowKeyGetter: RowKeyGetter<T>,
   rowData: T[],
@@ -667,26 +669,29 @@ export function useRowSelection<T>(
     }
   }, [setSelRowKeys]);
 
-  const selectionContext: RowSelectionContext = useMemo(
-    () => ({
-      selRowKeys,
-      isAllSelected,
-      isAnySelected,
-      selectRows,
-      selectAll,
-      unselectAll,
-    }),
-    [
-      selRowKeys,
-      selectRows,
-      isAllSelected,
-      isAnySelected,
-      selectAll,
-      unselectAll,
-    ]
+  const onMouseDown = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (rowSelectionMode === "none") {
+        return;
+      }
+      const target = event.target as HTMLElement;
+      try {
+        const [rowIdx] = getCellPosition(target);
+        selectRows(rowIdx, event.shiftKey, event.metaKey || event.ctrlKey);
+      } catch (e) {}
+    },
+    [selectRows]
   );
 
-  return selectionContext;
+  return {
+    onMouseDown,
+    selRowKeys,
+    isAllSelected,
+    isAnySelected,
+    selectRows,
+    selectAll,
+    unselectAll,
+  };
 }
 
 export interface ColumnDragState {
@@ -911,11 +916,14 @@ export interface CellRange {
   end: CellPosition;
 }
 
-function cellPositionEquals(a: CellPosition, b: CellPosition) {
+export function cellPositionEquals(a: CellPosition, b: CellPosition) {
   return a.rowIdx === b.rowIdx && a.colIdx === b.colIdx;
 }
 
-function cellRangeEquals(a: CellRange | undefined, b: CellRange | undefined) {
+export function cellRangeEquals(
+  a: CellRange | undefined,
+  b: CellRange | undefined
+) {
   if (!a) {
     return !b;
   }
@@ -926,11 +934,17 @@ function cellRangeEquals(a: CellRange | undefined, b: CellRange | undefined) {
   );
 }
 
-export function useRangeSelection() {
+// TODO test the use case when cellSelectionMode changes during dnd.
+export function useRangeSelection(cellSelectionMode?: GridCellSelectionMode) {
   const ref = useRef<{
     unsubscribe: () => void;
     start: CellPosition;
   }>();
+
+  if (cellSelectionMode !== "range" && ref.current) {
+    ref.current.unsubscribe();
+    ref.current = undefined;
+  }
 
   const [selectedCellRange, setSelectedCellRange] = useState<
     CellRange | undefined
@@ -958,23 +972,29 @@ export function useRangeSelection() {
     ref.current = undefined;
   }, []);
 
-  const onCellMouseDown = useCallback((event: React.MouseEvent) => {
-    const target = event.target as HTMLElement;
-    try {
-      const [rowIdx, colIdx] = getCellPosition(target);
-      document.addEventListener("mouseup", onMouseUp);
-      document.addEventListener("mousemove", onMouseMove);
-      const pos: CellPosition = { rowIdx, colIdx };
-      ref.current = {
-        start: pos,
-        unsubscribe: () => {
-          document.removeEventListener("mouseup", onMouseUp);
-          document.removeEventListener("mousemove", onMouseMove);
-        },
-      };
-      setSelectedCellRange({ start: pos, end: pos });
-    } catch (exc) {}
-  }, []);
+  const onCellMouseDown = useCallback(
+    (event: React.MouseEvent) => {
+      if (cellSelectionMode !== "range") {
+        return;
+      }
+      const target = event.target as HTMLElement;
+      try {
+        const [rowIdx, colIdx] = getCellPosition(target);
+        document.addEventListener("mouseup", onMouseUp);
+        document.addEventListener("mousemove", onMouseMove);
+        const pos: CellPosition = { rowIdx, colIdx };
+        ref.current = {
+          start: pos,
+          unsubscribe: () => {
+            document.removeEventListener("mouseup", onMouseUp);
+            document.removeEventListener("mousemove", onMouseMove);
+          },
+        };
+        setSelectedCellRange({ start: pos, end: pos });
+      } catch (exc) {}
+    },
+    [cellSelectionMode]
+  );
 
   return { selectedCellRange, onCellMouseDown };
 }

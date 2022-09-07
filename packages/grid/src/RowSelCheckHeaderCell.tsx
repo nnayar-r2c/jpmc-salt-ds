@@ -1,5 +1,5 @@
 import { AutoSizeHeaderCell, HeaderCellProps } from "./HeaderCell";
-import { useRowSelectionContext } from "./RowSelectionContext";
+import { useSelectionContext } from "./SelectionContext";
 import { MouseEventHandler } from "react";
 import { CheckboxIcon, makePrefixer } from "@jpmorganchase/uitk-core";
 import "./RowSelCheckHeaderCell.css";
@@ -8,7 +8,7 @@ const withBaseName = makePrefixer("uitkGridRowSelCheckHeaderCell");
 
 export function RowSelCheckHeaderCell<T>(props: HeaderCellProps<T>) {
   const { selectAll, unselectAll, isAllSelected, isAnySelected } =
-    useRowSelectionContext();
+    useSelectionContext();
 
   const onMousedown: MouseEventHandler<HTMLDivElement> = (event) => {
     if (isAllSelected) {

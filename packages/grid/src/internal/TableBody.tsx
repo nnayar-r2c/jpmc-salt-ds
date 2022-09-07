@@ -2,10 +2,9 @@ import { MouseEventHandler, useCallback, useMemo } from "react";
 import { TableRow } from "./TableRow";
 import { GridColumnModel, GridRowModel } from "../Grid";
 import { getRowKeyAttribute } from "./utils";
-import { useRowSelectionContext } from "../RowSelectionContext";
+import { useSelectionContext } from "../SelectionContext";
 import { useEditorContext } from "../EditorContext";
 import { useCursorContext } from "../CursorContext";
-import { useCellSelectionContext } from "../CellSelectionContext";
 
 export interface TableBodyProps<T> {
   columns: GridColumnModel<T>[];
@@ -18,11 +17,9 @@ export interface TableBodyProps<T> {
 
 export function TableBody<T>(props: TableBodyProps<T>) {
   const { columns, rows, hoverRowKey, setHoverRowKey, gap, zebra } = props;
+  const { selRowKeys, selectedCellRange } = useSelectionContext();
 
-  const { selRowKeys } = useRowSelectionContext();
-  const { selectedCellRange } = useCellSelectionContext();
-
-  const isInRange = useCallback(
+  const isCellInSelectedRange = useCallback(
     (rowIdx: number, colIdx: number) => {
       if (!selectedCellRange) {
         return false;
@@ -78,7 +75,7 @@ export function TableBody<T>(props: TableBodyProps<T>) {
             gap={gap}
             zebra={zebra && row.index % 2 == 0}
             editorColKey={editorColKey}
-            isCellSelected={isInRange}
+            isCellSelected={isCellInSelectedRange}
           />
         );
       })}
