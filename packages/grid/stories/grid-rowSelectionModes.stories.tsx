@@ -70,7 +70,14 @@ const RowSelectionModesTemplate: Story<{}> = () => {
         {rowSelectionMode === "single" && (
           <RowSelectionRadioColumn id="radio" />
         )}
-        <GridColumn name="A" id="a" defaultWidth={50} getValue={(r) => r.a} />
+        <GridColumn
+          name="AAA"
+          id="a"
+          defaultWidth={50}
+          // isSortable
+          // dataToSort={(r) => r.a}
+          getValue={(r) => r.a}
+        />
         <NumericColumn
           name="B"
           id="b"

@@ -1,5 +1,5 @@
 import "./HeaderCell.css";
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { makePrefixer } from "@salt-ds/core";
 import { clsx } from "clsx";
 import { ColumnSeparatorType } from "./Grid";
@@ -7,6 +7,7 @@ import { useSizingContext } from "./SizingContext";
 import { useColumnDragContext } from "./ColumnDragContext";
 import { Cursor, useFocusableContent } from "./internal";
 import { HeaderCellProps } from "./GridColumn";
+import { useColumnSortContext } from "./ColumnSortContext";
 
 const withBaseName = makePrefixer("saltGridHeaderCell");
 
@@ -21,7 +22,8 @@ export function HeaderCellSeparator(props: HeaderCellSeparatorProps) {
 
 export function HeaderCell<T>(props: HeaderCellProps<T>) {
   const { column, children, isFocused } = props;
-  const { separator } = column;
+  const { separator, info } = column;
+  const { dataToSort, isSortable, name } = info.props;
   const { onResizeHandleMouseDown } = useSizingContext();
 
   const { columnMove, onColumnMoveHandleMouseDown } = useColumnDragContext();
@@ -29,6 +31,13 @@ export function HeaderCell<T>(props: HeaderCellProps<T>) {
 
   const { ref, isFocusableContent, onFocus } =
     useFocusableContent<HTMLTableHeaderCellElement>();
+
+  const { onColumnHeaderClickHandleSort } = useColumnSortContext();
+
+  // pseudocode
+  // pass raw-to-display-data into sorting function
+  // sorting func with data here
+  // implement if condition for when sorting is enabled - i.e. sort api yes or no
 
   return (
     <th
@@ -40,6 +49,7 @@ export function HeaderCell<T>(props: HeaderCellProps<T>) {
       data-testid="column-header"
       tabIndex={isFocused && !isFocusableContent ? 0 : -1}
       onFocus={onFocus}
+      onClick={() => onColumnHeaderClickHandleSort(column.index)}
     >
       <div
         className={clsx(withBaseName("valueContainer"), {
