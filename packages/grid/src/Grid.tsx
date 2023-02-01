@@ -11,7 +11,7 @@ import React, {
   useState,
 } from "react";
 import { makePrefixer } from "@salt-ds/core";
-import { GridColumnInfo } from "./GridColumn";
+import { GridColumnInfo, GridColumnProps } from "./GridColumn";
 import { GridContext } from "./GridContext";
 import { clsx } from "clsx";
 import {
@@ -56,8 +56,7 @@ import { ColumnDragContext } from "./ColumnDragContext";
 import { ColumnGhost } from "./internal/ColumnGhost";
 import { ColumnDropTarget } from "./internal/ColumnDropTarget";
 import { ColumnDataContext } from "./ColumnDataContext";
-import { ColumnSortContext, useColumnSortContext } from "./ColumnSortContext";
-import { DummyRow } from "../stories/dummyData";
+import { ColumnSortContext } from "./ColumnSortContext";
 
 const withBaseName = makePrefixer("saltGrid");
 
@@ -225,7 +224,7 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
   const [editMode, setEditMode] = useState<boolean>(false);
   const [initialText, setInitialText] = useState<string | undefined>(undefined);
 
-  const [sortBy, setSortBy] = useState<number>(0);
+  const [sortBy, setSortBy] = useState<GridColumnProps<string>>();
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">(
     "default"
   );
@@ -429,62 +428,47 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
     [getColById]
   );
 
-  // const sortedRowData = useMemo(() => {
-  //   let r = [...rowData].sort((a, b) => (a[sortBy] < b[sortBy] ? -1 : 1));
-  //   if (sortOrder === "desc") {
-  //     r = r.reverse();
-  //   }
-  //   return r;
-  // }, [rowData, sortBy, sortOrder]);
+  const sortedRowData = useMemo(() => {
+    let sortedData = [...rowData].sort((a, b) =>
+      a[sortBy] < b[sortBy] ? -1 : 1
+    );
+    if (sortOrder === "desc") {
+      // console.log("sortOrder is desc, will reverse sortedData");
+      sortedData = sortedData.reverse();
+    }
+    return sortedData;
+  }, [rowData, sortBy, sortOrder]);
 
-  const sortData = (sortOrder: "default" | "asc" | "desc") => {
-    if (rowData) {
-      console.log(`inside sortData func`);
-      console.log("sortBy", sortBy);
-      // console.log("rowData", rowData);
-
-      // let r = [...rowData].sort((a, b) => (a["a"] < b["a"] ? -1 : 1));
-
-      let r = [...rowData].sort((a, b) => {
-        // console.log("what is inside a", a);
-
-        if (a[sortBy] < b[sortBy]) return -1;
-        if (a[sortBy] > b[sortBy]) return 1;
-        return 0;
-      });
-
-      if (sortOrder === "desc") {
-        r = r.reverse();
-      }
-      console.log("sortedData here", r);
-      return r;
+  const onColumnHeaderClickHandleSort = (
+    colHeaderId: GridColumnProps<string>
+  ) => {
+    if (sortBy === colHeaderId) {
+      setSortOrder(
+        sortOrder === "default"
+          ? "asc"
+          : sortOrder === "asc"
+          ? "desc"
+          : "default"
+      );
+      // if (sortOrder === "default") {
+      //   setSortOrder("asc");
+      //   console.log("set sortOrder to asc");
+      // } else if (sortOrder === "asc") {
+      //   setSortOrder("desc");
+      //   console.log("set sortOrder to desc");
+      // } else if (sortOrder === "desc") {
+      //   setSortOrder("default");
+      //   console.log("set sortOrder to default");
+      // }
+      // console.log(`set sortOrder to ${sortOrder}`);
+    } else {
+      setSortBy(colHeaderId);
+      setSortOrder("default");
+      console.log(`inside else: first set sortOrder to default`);
     }
   };
-  // [rowData, sortBy, sortOrder]
 
-  const onColumnHeaderClickHandleSort = useCallback(
-    (columnIndex: number) => {
-      // setSortBy(columnIndex);
-
-      if (sortOrder === "default") {
-        setSortOrder("asc");
-        console.log("set sortOrder to asc");
-        sortData("asc");
-      } else if (sortOrder === "asc") {
-        setSortOrder("desc");
-        console.log("set sortOrder to desc");
-        sortData("desc");
-      } else if (sortOrder === "desc") {
-        setSortOrder("default");
-        console.log("set sortOrder to default");
-        sortData("default");
-      }
-      return; // next sort, default -> asc -> desc
-    },
-    [sortOrder]
-  );
-
-  const columnSortContext: ColumnSortContext<T> = useMemo(
+  const columnSortContext: ColumnSortContext = useMemo(
     () => ({
       sortBy,
       setSortBy,
@@ -541,7 +525,7 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
     if (editMode || cursorRowIdx == undefined || cursorColIdx == undefined) {
       return;
     }
-    const r = rowData[cursorRowIdx];
+    const r = sortedRowData[cursorRowIdx];
     const c = cols[cursorColIdx];
     const isEditable = !!contextValue.getEditor(c.info.props.id);
     if (isEditable) {
@@ -569,7 +553,7 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
         `onChange is not specified for editable column "${c.info.props.id}".`
       );
     } else {
-      handler(rowData[cursorRowIdx], cursorRowIdx, value);
+      handler(sortedRowData[cursorRowIdx], cursorRowIdx, value);
     }
     setEditMode(false);
     focusCellElement(focusedPart, cursorRowIdx, cursorColIdx);
@@ -595,7 +579,7 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
     onMouseDown: onRowSelectionMouseDown,
   } = useRowSelection(
     rowKeyGetter,
-    rowData,
+    sortedRowData,
     defaultSelectedRowIdxs,
     selectedRowIdxs,
     rowSelectionMode,
@@ -616,10 +600,10 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
       setFocusedPart(part);
       colIdx = clamp(colIdx, 0, cols.length - 1);
       if (part === "body") {
-        if (rowData.length < 1 || cols.length < 1) {
+        if (sortedRowData.length < 1 || cols.length < 1) {
           return;
         }
-        rowIdx = clamp(rowIdx, 0, rowData.length - 1);
+        rowIdx = clamp(rowIdx, 0, sortedRowData.length - 1);
       } else if (part === "header") {
         rowIdx = 0; // There is only one row in the header currently
       }
@@ -634,7 +618,7 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
     [
       setCursorRowIdx,
       setCursorColIdx,
-      rowData,
+      sortedRowData,
       rowKeyGetter,
       cols,
       rootRef.current,
@@ -646,7 +630,7 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
     ]
   );
 
-  const rows = useRowModels(rowKeyGetter, rowData, visRowRng);
+  const rows = useRowModels(rowKeyGetter, sortedRowData, visRowRng);
 
   const isLeftRaised = scrollLeft > 0;
   const isRightRaised = scrollLeft + clientMidWidth < midWidth;
@@ -842,7 +826,7 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
               if (cursorColIdx != undefined) {
                 rangeSelection.selectRange({
                   start: { rowIdx: 0, colIdx: cursorColIdx },
-                  end: { rowIdx: rowData.length, colIdx: cursorColIdx },
+                  end: { rowIdx: sortedRowData.length, colIdx: cursorColIdx },
                 });
               }
             } else {
@@ -863,7 +847,7 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
           if (event.ctrlKey || event.metaKey) {
             rangeSelection.selectRange({
               start: { rowIdx: 0, colIdx: 0 },
-              end: { rowIdx: rowData.length, colIdx: cols.length },
+              end: { rowIdx: sortedRowData.length, colIdx: cols.length },
             });
             selectAll();
           }
@@ -882,7 +866,7 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
       selectAll,
       cursorColIdx,
       cursorRowIdx,
-      rowData.length,
+      sortedRowData.length,
       cols.length,
       focusedPart,
     ]
@@ -902,7 +886,7 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
         const [minCol, maxCol] = [start.colIdx, end.colIdx].sort(c);
         const text: string[] = [];
         for (let r = minRow; r <= maxRow; ++r) {
-          const row = rowData[r];
+          const row = sortedRowData[r];
           const rowText: string[] = [];
           for (let c = minCol; c <= maxCol; ++c) {
             const col = cols[c]!;
@@ -980,7 +964,7 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
           if (!event.ctrlKey) {
             moveCursor(focusedPart, cursorRowIdx, cols.length - 1);
           } else {
-            moveCursor(focusedPart, rowData.length - 1, cols.length - 1);
+            moveCursor(focusedPart, sortedRowData.length - 1, cols.length - 1);
           }
           break;
         case "Tab":
@@ -996,7 +980,7 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
               if (cursorColIdx < cols.length - 1) {
                 moveCursor(focusedPart, cursorRowIdx, cursorColIdx + 1);
               } else {
-                if (cursorRowIdx < rowData.length - 1) {
+                if (cursorRowIdx < sortedRowData.length - 1) {
                   moveCursor(focusedPart, cursorRowIdx + 1, 0);
                 }
               }
@@ -1042,7 +1026,7 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
       cursorRowIdx,
       cursorRowIdx,
       cols.length,
-      rowData.length,
+      sortedRowData.length,
       headerIsFocusable,
       pageSize,
     ]

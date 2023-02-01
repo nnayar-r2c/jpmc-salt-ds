@@ -1,18 +1,19 @@
 import React, { createContext, useContext } from "react";
-import { GridColumnProps } from ".";
+import { GridColumnProps } from "./GridColumn";
 
-export interface ColumnSortContext<T> {
-  // getColById: (id: string) => GridColumnModel<T> | undefined;
-  sortBy: any;
-  setSortBy: (c: any) => void;
-  sortOrder: "default" | "asc" | "desc";
-  setSortOrder: (o: "default" | "asc" | "desc") => void;
-  onColumnHeaderClickHandleSort: (columnIndex: number) => void;
+type SortOrder = "default" | "asc" | "desc";
+
+export interface ColumnSortContext {
+  sortBy: GridColumnProps<string> | undefined;
+  setSortBy: (c: React.SetStateAction<GridColumnProps<string>>) => void;
+  sortOrder: SortOrder;
+  setSortOrder: (o: SortOrder) => void;
+  onColumnHeaderClickHandleSort: (colHeaderId: any) => void;
 }
 
-export const ColumnSortContext = createContext<
-  ColumnSortContext<any> | undefined
->(undefined);
+export const ColumnSortContext = createContext<ColumnSortContext | undefined>(
+  undefined
+);
 
 export const useColumnSortContext = () => {
   const c = useContext(ColumnSortContext);
@@ -21,3 +22,6 @@ export const useColumnSortContext = () => {
   }
   return c;
 };
+
+// next step: add if else for isSortable ? sortedRowData : rowData
+// add arrow icons to header
