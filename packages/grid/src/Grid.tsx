@@ -224,7 +224,9 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
   const [editMode, setEditMode] = useState<boolean>(false);
   const [initialText, setInitialText] = useState<string | undefined>(undefined);
 
-  const [sortBy, setSortBy] = useState<GridColumnProps<string>>();
+  const [sortBy, setSortBy] = useState<GridColumnProps<string> | undefined>(
+    undefined
+  );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">(
     "default"
   );
@@ -421,6 +423,15 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
     [colsById]
   );
 
+  const getIsSortable = useCallback(() => {
+    const column = cols[cursorColIdx];
+    if (!column) return;
+
+    return column.info.props.isSortable;
+  }, [cols[cursorColIdx]]);
+
+  const isSortable = useMemo(getIsSortable, [getIsSortable]);
+
   const columnDataContext: ColumnDataContext<T> = useMemo(
     () => ({
       getColById,
@@ -429,6 +440,9 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
   );
 
   const sortedRowData = useMemo(() => {
+    if (!isSortable) return rowData;
+    if (isSortable && sortOrder === "default") return rowData;
+
     let sortedData = [...rowData].sort((a, b) =>
       a[sortBy] < b[sortBy] ? -1 : 1
     );
@@ -439,9 +453,7 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
     return sortedData;
   }, [rowData, sortBy, sortOrder]);
 
-  const onColumnHeaderClickHandleSort = (
-    colHeaderId: GridColumnProps<string>
-  ) => {
+  const onClickHandleSort = (colHeaderId: GridColumnProps<string>) => {
     if (sortBy === colHeaderId) {
       setSortOrder(
         sortOrder === "default"
@@ -470,13 +482,14 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
 
   const columnSortContext: ColumnSortContext = useMemo(
     () => ({
+      isSortable,
       sortBy,
       setSortBy,
       sortOrder,
       setSortOrder,
-      onColumnHeaderClickHandleSort,
+      onClickHandleSort,
     }),
-    [sortBy, setSortBy, sortOrder, setSortOrder, onColumnHeaderClickHandleSort]
+    [isSortable, sortBy, setSortBy, sortOrder, setSortOrder, onClickHandleSort]
   );
 
   const scroll = useCallback(

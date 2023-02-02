@@ -57,10 +57,10 @@ export interface GridColumnProps<T = any> {
    * Unique identifier of the column.
    * */
   id: string; // TODO make optional
+  /**
+   * Enables sorting for the column.
+   * */
   isSortable?: boolean;
-  // dataToSort?: T[];
-
-  dataToSort?: (rowData: T) => any;
   /**
    * Name is displayed on the column header by default.
    * */

@@ -4,11 +4,12 @@ import { GridColumnProps } from "./GridColumn";
 type SortOrder = "default" | "asc" | "desc";
 
 export interface ColumnSortContext {
-  sortBy: GridColumnProps<string> | undefined;
+  isSortable?: boolean;
+  sortBy?: GridColumnProps<string>;
   setSortBy: (c: React.SetStateAction<GridColumnProps<string>>) => void;
   sortOrder: SortOrder;
   setSortOrder: (o: SortOrder) => void;
-  onColumnHeaderClickHandleSort: (colHeaderId: any) => void;
+  onClickHandleSort: (colHeaderId: any) => void;
 }
 
 export const ColumnSortContext = createContext<ColumnSortContext | undefined>(
@@ -25,3 +26,8 @@ export const useColumnSortContext = () => {
 
 // next step: add if else for isSortable ? sortedRowData : rowData
 // add arrow icons to header
+
+// check the above is done correctly
+// add default sortBy as the column.info.props.id instead of undefined
+// sort out Grid type error for sortBy
+// tidy up HeaderCell ways to display icon

@@ -1,6 +1,6 @@
 import "./HeaderCell.css";
-import { useLayoutEffect, useRef, useState } from "react";
-import { makePrefixer } from "@salt-ds/core";
+import { useLayoutEffect, useRef } from "react";
+import { FlexContentAlignment, FlexLayout, makePrefixer } from "@salt-ds/core";
 import { clsx } from "clsx";
 import { ColumnSeparatorType } from "./Grid";
 import { useSizingContext } from "./SizingContext";
@@ -9,6 +9,7 @@ import { Cursor, useFocusableContent } from "./internal";
 import { HeaderCellProps } from "./GridColumn";
 import { useColumnDataContext } from "./ColumnDataContext";
 import { useColumnSortContext } from "./ColumnSortContext";
+import { ArrowDownIcon, ArrowUpIcon } from "@salt-ds/icons";
 
 const withBaseName = makePrefixer("saltGridHeaderCell");
 
@@ -32,9 +33,34 @@ export function HeaderCell<T>(props: HeaderCellProps<T>) {
   const { ref, isFocusableContent, onFocus } =
     useFocusableContent<HTMLTableHeaderCellElement>();
 
-  const { onColumnHeaderClickHandleSort, setSortBy } = useColumnSortContext();
+  const { onClickHandleSort, setSortBy, isSortable, sortOrder } =
+    useColumnSortContext();
 
   const { getColById } = useColumnDataContext();
+
+  const valueAlignRight = column.info.props.align === "right";
+  const valueAlignLeft = column.info.props.align === "left";
+
+  interface HeaderCellSortingIconProps {
+    justifyContent: FlexContentAlignment;
+  }
+
+  const HeaderCellSortingIcon = ({
+    justifyContent,
+  }: HeaderCellSortingIconProps) => {
+    const className = withBaseName("sortable");
+    const icon = (
+      <FlexLayout className={className} justify={justifyContent}>
+        {sortOrder === "asc" ? (
+          <ArrowUpIcon />
+        ) : sortOrder === "desc" ? (
+          <ArrowDownIcon />
+        ) : null}
+      </FlexLayout>
+    );
+
+    return icon;
+  };
 
   // pseudocode
   // pass raw-to-display-data into sorting function
@@ -55,20 +81,29 @@ export function HeaderCell<T>(props: HeaderCellProps<T>) {
       tabIndex={isFocused && !isFocusableContent ? 0 : -1}
       onFocus={onFocus}
       onClick={() => {
-        // console.log("column.info.props.id", column.info.props.id); // same as id
-        // console.log("col header id", id);
-        setSortBy(id);
-        onColumnHeaderClickHandleSort(id);
+        console.log("clicked on headerCell");
+        console.log("isSortable is", isSortable);
+
+        if (isSortable) {
+          setSortBy(id);
+          onClickHandleSort(id);
+        }
       }}
     >
+      {isSortable && valueAlignRight && (
+        <HeaderCellSortingIcon justifyContent="start" />
+      )}
       <div
         className={clsx(withBaseName("valueContainer"), {
-          [withBaseName("alignRight")]: column.info.props.align === "right",
+          [withBaseName("alignRight")]: valueAlignRight,
         })}
         onMouseDown={onMouseDown}
       >
         {children}
       </div>
+      {isSortable && valueAlignLeft && (
+        <HeaderCellSortingIcon justifyContent="end" />
+      )}
       <HeaderCellSeparator separatorType={separator} />
       <div
         data-testid={`column-${column.index}-resize-handle`}
