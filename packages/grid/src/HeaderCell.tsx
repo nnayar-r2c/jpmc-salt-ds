@@ -25,6 +25,7 @@ export function HeaderCellSeparator(props: HeaderCellSeparatorProps) {
 export function HeaderCell<T>(props: HeaderCellProps<T>) {
   const { column, children, isFocused } = props;
   const { separator } = column;
+  const { align, id } = column.info.props;
   const { onResizeHandleMouseDown } = useSizingContext();
 
   const { columnMove, onColumnMoveHandleMouseDown } = useColumnDragContext();
@@ -33,17 +34,20 @@ export function HeaderCell<T>(props: HeaderCellProps<T>) {
   const { ref, isFocusableContent, onFocus } =
     useFocusableContent<HTMLTableHeaderCellElement>();
 
-  const { onClickHandleSort, setSortBy, isSortable, sortOrder } =
+  const { onClickHandleSort, setSortBy, sortOrder, sortBy } =
     useColumnSortContext();
 
-  const { getColById } = useColumnDataContext();
-
-  const valueAlignRight = column.info.props.align === "right";
-  const valueAlignLeft = column.info.props.align === "left";
+  const valueAlignRight = align === "right";
+  const valueAlignLeft = align === "left";
 
   interface HeaderCellSortingIconProps {
     justifyContent: FlexContentAlignment;
   }
+
+  // gives header id for the header that is clicked on
+  // const { getColById } = useColumnDataContext();
+  // const { id } = getColById(column.info.props.id)?.info.props;
+  // console.log("id from getColById", id);
 
   const HeaderCellSortingIcon = ({
     justifyContent,
@@ -62,14 +66,6 @@ export function HeaderCell<T>(props: HeaderCellProps<T>) {
     return icon;
   };
 
-  // pseudocode
-  // pass raw-to-display-data into sorting function
-  // sorting func with data here
-  // implement if condition for when sorting is enabled - i.e. sort api yes or no
-
-  // gives header id for the header that is clicked on
-  const { id } = getColById(column.info.props.id)?.info.props;
-
   return (
     <th
       ref={ref}
@@ -80,17 +76,20 @@ export function HeaderCell<T>(props: HeaderCellProps<T>) {
       data-testid="column-header"
       tabIndex={isFocused && !isFocusableContent ? 0 : -1}
       onFocus={onFocus}
-      onClick={() => {
-        console.log("clicked on headerCell");
-        console.log("isSortable is", isSortable);
+      onClick={
+        !column.info.props.isSortable
+          ? undefined
+          : () => {
+              console.log("clicked on headerCell");
+              console.log("isSortable is", column.info.props.isSortable);
 
-        if (isSortable) {
-          setSortBy(id);
-          onClickHandleSort(id);
-        }
-      }}
+              setSortBy(id);
+              onClickHandleSort(id);
+            }
+      }
+      //add onkeydown for enter and space, aria sort descending/direction
     >
-      {isSortable && valueAlignRight && (
+      {sortBy === id && column.info.props.isSortable && valueAlignRight && (
         <HeaderCellSortingIcon justifyContent="start" />
       )}
       <div
@@ -101,7 +100,7 @@ export function HeaderCell<T>(props: HeaderCellProps<T>) {
       >
         {children}
       </div>
-      {isSortable && valueAlignLeft && (
+      {sortBy === id && column.info.props.isSortable && valueAlignLeft && (
         <HeaderCellSortingIcon justifyContent="end" />
       )}
       <HeaderCellSeparator separatorType={separator} />

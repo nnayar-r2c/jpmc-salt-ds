@@ -37,9 +37,6 @@ export interface HeaderCellProps<T> {
   column: GridColumnModel<T>;
   children: ReactNode;
   isFocused?: boolean;
-  // isSortable?: boolean;
-  // dataToSort?: T[];
-  // handleSort?: () => T[];
 }
 
 export interface GridHeaderValueProps<T> {
@@ -61,6 +58,14 @@ export interface GridColumnProps<T = any> {
    * Enables sorting for the column.
    * */
   isSortable?: boolean;
+  /**
+   * Cusotm sort fn
+   * */
+  customSort?: (args: {
+    rowData: T[];
+    sortBy: string;
+    sortOrder: string;
+  }) => T[];
   /**
    * Name is displayed on the column header by default.
    * */
@@ -102,6 +107,7 @@ export interface GridColumnProps<T = any> {
    * Cell value getter. Should return the value to be displayed in the cell
    * for the given row data item.
    * */
+  // default sort
   getValue?: (rowData: T) => any;
   /**
    * CSS class to be applied to the column header.

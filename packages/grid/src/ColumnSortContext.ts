@@ -4,8 +4,8 @@ import { GridColumnProps } from "./GridColumn";
 type SortOrder = "default" | "asc" | "desc";
 
 export interface ColumnSortContext {
-  isSortable?: boolean;
-  sortBy?: GridColumnProps<string>;
+  // isSortable?: boolean;
+  sortBy?: GridColumnProps["id"];
   setSortBy: (c: React.SetStateAction<GridColumnProps<string>>) => void;
   sortOrder: SortOrder;
   setSortOrder: (o: SortOrder) => void;
@@ -28,6 +28,7 @@ export const useColumnSortContext = () => {
 // add arrow icons to header
 
 // check the above is done correctly
+// DONE: arrows not to appear on columns without isSortable true
 // add default sortBy as the column.info.props.id instead of undefined
 // sort out Grid type error for sortBy
 // tidy up HeaderCell ways to display icon

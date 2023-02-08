@@ -71,12 +71,12 @@ const RowSelectionModesTemplate: Story<{}> = () => {
           <RowSelectionRadioColumn id="radio" />
         )}
         <GridColumn
-          name="AAA"
+          name="A"
           id="a"
           defaultWidth={50}
-          // isSortable
-          // dataToSort={(r) => r.a}
-          getValue={(r) => r.a}
+          getValue={(r) => r.a} // cosnider sorting in getValue: r.a.x < r.a.y return -1.
+          isSortable
+          align="left"
         />
         <NumericColumn
           name="B"
@@ -85,8 +85,28 @@ const RowSelectionModesTemplate: Story<{}> = () => {
           precision={2}
           getValue={(r: DummyRow) => r.b}
           align={"right"}
+          isSortable
+          customSort={({ rowData, sortBy, sortOrder }) => {
+            let sortedData = [...rowData].sort((a, b) =>
+              a[sortBy] < b[sortBy] ? -1 : 1
+            );
+
+            if (sortOrder === "desc") {
+              sortedData = sortedData.reverse();
+            }
+
+            console.log("inside customSort function");
+            return sortedData;
+          }}
         />
-        <GridColumn name="C" id="c" defaultWidth={50} getValue={(r) => r.c} />
+        <GridColumn
+          name="C"
+          id="c"
+          defaultWidth={50}
+          getValue={(r) => r.c}
+          align="left"
+          isSortable
+        />
       </Grid>
     </FlexLayout>
   );

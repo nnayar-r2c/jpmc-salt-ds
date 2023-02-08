@@ -224,12 +224,10 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
   const [editMode, setEditMode] = useState<boolean>(false);
   const [initialText, setInitialText] = useState<string | undefined>(undefined);
 
-  const [sortBy, setSortBy] = useState<GridColumnProps<string> | undefined>(
-    undefined
-  );
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">(
-    "default"
-  );
+  const [sortBy, setSortBy] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "none">("none");
+
+  const isSortMode = sortBy && sortOrder !== "none";
 
   const resizeClient = useCallback(
     (clW: number, clH: number, sbW: number, sbH: number) => {
@@ -423,14 +421,14 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
     [colsById]
   );
 
-  const getIsSortable = useCallback(() => {
-    const column = cols[cursorColIdx];
-    if (!column) return;
+  // const getIsSortable = useCallback(() => {
+  //   const column = cols[cursorColIdx];
+  //   if (!column) return;
 
-    return column.info.props.isSortable;
-  }, [cols[cursorColIdx]]);
+  //   return column.info.props.isSortable;
+  // }, [cols[cursorColIdx]]);
 
-  const isSortable = useMemo(getIsSortable, [getIsSortable]);
+  // const isSortable = useMemo(getIsSortable, [getIsSortable]);
 
   const columnDataContext: ColumnDataContext<T> = useMemo(
     () => ({
@@ -439,57 +437,54 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
     [getColById]
   );
 
+  // const sortType = sortBy as keyof typeof sortBy;
+  // getValue
   const sortedRowData = useMemo(() => {
-    if (!isSortable) return rowData;
-    if (isSortable && sortOrder === "default") return rowData;
+    if (!isSortMode) return rowData;
 
-    let sortedData = [...rowData].sort((a, b) =>
-      a[sortBy] < b[sortBy] ? -1 : 1
-    );
-    if (sortOrder === "desc") {
-      // console.log("sortOrder is desc, will reverse sortedData");
-      sortedData = sortedData.reverse();
+    const customSortingFn = getColById(sortBy)?.info.props.customSort;
+    // with this fn, no longer need everything below
+    if (customSortingFn) {
+      return customSortingFn({ rowData, sortBy, sortOrder });
+    } else {
+      const valueGetter =
+        getColById(sortBy)?.info.props.getValue ||
+        ((r: T[]) => {
+          return r[sortBy];
+        });
+
+      let sortedData = [...rowData].sort((a, b) =>
+        valueGetter(a) < valueGetter(b) ? -1 : 1
+      );
+
+      if (sortOrder === "desc") {
+        sortedData = sortedData.reverse();
+      }
+      return sortedData;
     }
-    return sortedData;
   }, [rowData, sortBy, sortOrder]);
 
   const onClickHandleSort = (colHeaderId: GridColumnProps<string>) => {
     if (sortBy === colHeaderId) {
       setSortOrder(
-        sortOrder === "default"
-          ? "asc"
-          : sortOrder === "asc"
-          ? "desc"
-          : "default"
+        sortOrder === "asc" ? "desc" : sortOrder === "desc" ? "none" : "asc"
       );
-      // if (sortOrder === "default") {
-      //   setSortOrder("asc");
-      //   console.log("set sortOrder to asc");
-      // } else if (sortOrder === "asc") {
-      //   setSortOrder("desc");
-      //   console.log("set sortOrder to desc");
-      // } else if (sortOrder === "desc") {
-      //   setSortOrder("default");
-      //   console.log("set sortOrder to default");
-      // }
-      // console.log(`set sortOrder to ${sortOrder}`);
     } else {
       setSortBy(colHeaderId);
-      setSortOrder("default");
-      console.log(`inside else: first set sortOrder to default`);
+      setSortOrder("asc");
+      console.log(`first click: set sortOrder to asc`);
     }
   };
 
   const columnSortContext: ColumnSortContext = useMemo(
     () => ({
-      isSortable,
       sortBy,
       setSortBy,
       sortOrder,
       setSortOrder,
       onClickHandleSort,
     }),
-    [isSortable, sortBy, setSortBy, sortOrder, setSortOrder, onClickHandleSort]
+    [sortBy, setSortBy, sortOrder, setSortOrder, onClickHandleSort]
   );
 
   const scroll = useCallback(
