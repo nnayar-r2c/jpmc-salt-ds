@@ -92,13 +92,3 @@
 [aria-label="sort column"] {
   cursor: pointer;
 }
-
-/* [aria-label="sort column"]:hover,
-[aria-label="sort column"]:active,
-[aria-label="sort column"]:focus {
-  --grid-cursor-borderColor: var(
-    --saltGrid-cursor-borderColor,
-    var(--salt-focused-outlineColor)
-  );
-  --grid-cursor-borderColor: red;
-} */
