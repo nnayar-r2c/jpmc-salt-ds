@@ -56,14 +56,16 @@ export interface GridColumnProps<T = any> {
   id: string; // TODO make optional
   /**
    * Enables sorting for the column.
+   * To enable column header's keyboard navigation on sort,
+   * users need to set `headerIsFocusable` prop to `true` in Grid component.
    * */
   isSortable?: boolean;
   /**
-   * Cusotm sort fn
+   * Custom sorting function.
    * */
   customSort?: (args: {
     rowData: T[];
-    sortBy: string;
+    sortByColumnId: string;
     sortOrder: string;
   }) => T[];
   /**
@@ -107,7 +109,6 @@ export interface GridColumnProps<T = any> {
    * Cell value getter. Should return the value to be displayed in the cell
    * for the given row data item.
    * */
-  // default sort
   getValue?: (rowData: T) => any;
   /**
    * CSS class to be applied to the column header.

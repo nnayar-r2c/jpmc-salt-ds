@@ -65,6 +65,7 @@ export type ColumnGroupRowSeparatorType = "first" | "regular" | "last";
 export type ColumnGroupColumnSeparatorType = "regular" | "none" | "pinned";
 export type GridRowSelectionMode = "single" | "multi" | "none";
 export type GridCellSelectionMode = "range" | "none";
+export type SortOrder = "none" | "asc" | "desc";
 
 export type RowKeyGetter<T> = (row: T, index: number) => string;
 
@@ -217,17 +218,17 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
 
   const [cursorRowIdx, setCursorRowIdx] = useState<number>(0);
   const [cursorColIdx, setCursorColIdx] = useState<number>(0);
+
+  const [sortByColumnId, setSortByColumnId] =
+    useState<GridColumnProps["id"]>("");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("none");
+
   const [focusedPart, setFocusedPart] = useState<FocusedPart>(
     headerIsFocusable ? "header" : "body"
   );
 
   const [editMode, setEditMode] = useState<boolean>(false);
   const [initialText, setInitialText] = useState<string | undefined>(undefined);
-
-  const [sortBy, setSortBy] = useState<string>("");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "none">("none");
-
-  const isSortMode = sortBy && sortOrder !== "none";
 
   const resizeClient = useCallback(
     (clW: number, clH: number, sbW: number, sbH: number) => {
@@ -296,8 +297,8 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
 
   const midGrpByColId = useMemo(() => {
     const m = new Map<string, GridColumnGroupModel>();
-    for (let g of midGroups) {
-      for (let c of g.childrenIds) {
+    for (const g of midGroups) {
+      for (const c of g.childrenIds) {
         m.set(c, g);
       }
     }
@@ -421,15 +422,6 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
     [colsById]
   );
 
-  // const getIsSortable = useCallback(() => {
-  //   const column = cols[cursorColIdx];
-  //   if (!column) return;
-
-  //   return column.info.props.isSortable;
-  // }, [cols[cursorColIdx]]);
-
-  // const isSortable = useMemo(getIsSortable, [getIsSortable]);
-
   const columnDataContext: ColumnDataContext<T> = useMemo(
     () => ({
       getColById,
@@ -437,20 +429,20 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
     [getColById]
   );
 
-  // const sortType = sortBy as keyof typeof sortBy;
-  // getValue
-  const sortedRowData = useMemo(() => {
-    if (!isSortMode) return rowData;
+  const isSortMode = sortByColumnId && sortOrder !== "none";
 
-    const customSortingFn = getColById(sortBy)?.info.props.customSort;
-    // with this fn, no longer need everything below
+  const sortedRowData = useMemo(() => {
+    if (!isSortMode) return rowData; // sortByColumnId && sortOrder !== "none";
+
+    const customSortingFn = getColById(sortByColumnId)?.info.props.customSort;
+
     if (customSortingFn) {
-      return customSortingFn({ rowData, sortBy, sortOrder });
+      return customSortingFn({ rowData, sortByColumnId, sortOrder });
     } else {
       const valueGetter =
-        getColById(sortBy)?.info.props.getValue ||
-        ((r: T[]) => {
-          return r[sortBy];
+        getColById(sortByColumnId)?.info.props.getValue ||
+        ((r: T) => {
+          return r[sortByColumnId];
         });
 
       let sortedData = [...rowData].sort((a, b) =>
@@ -462,29 +454,38 @@ export const Grid = function Grid<T>(props: GridProps<T>) {
       }
       return sortedData;
     }
-  }, [rowData, sortBy, sortOrder]);
+  }, [rowData, sortByColumnId, sortOrder]);
 
-  const onClickHandleSort = (colHeaderId: GridColumnProps<string>) => {
-    if (sortBy === colHeaderId) {
-      setSortOrder(
-        sortOrder === "asc" ? "desc" : sortOrder === "desc" ? "none" : "asc"
-      );
-    } else {
-      setSortBy(colHeaderId);
-      setSortOrder("asc");
-      console.log(`first click: set sortOrder to asc`);
-    }
-  };
+  const onClickSortColumn = useCallback(
+    (colHeaderId: GridColumnProps["id"]) => {
+      if (sortByColumnId === colHeaderId) {
+        setSortOrder(
+          sortOrder === "asc" ? "desc" : sortOrder === "desc" ? "none" : "asc"
+        );
+      } else {
+        setSortByColumnId(colHeaderId);
+        setSortOrder("asc");
+        console.log(`first click: set sortOrder to asc`);
+      }
+    },
+    [sortByColumnId, sortOrder]
+  );
 
   const columnSortContext: ColumnSortContext = useMemo(
     () => ({
-      sortBy,
-      setSortBy,
+      sortByColumnId,
+      setSortByColumnId,
       sortOrder,
       setSortOrder,
-      onClickHandleSort,
+      onClickSortColumn,
     }),
-    [sortBy, setSortBy, sortOrder, setSortOrder, onClickHandleSort]
+    [
+      sortByColumnId,
+      setSortByColumnId,
+      sortOrder,
+      setSortOrder,
+      onClickSortColumn,
+    ]
   );
 
   const scroll = useCallback(

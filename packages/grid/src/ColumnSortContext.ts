@@ -1,15 +1,13 @@
 import React, { createContext, useContext } from "react";
+import { SortOrder } from "./Grid";
 import { GridColumnProps } from "./GridColumn";
 
-type SortOrder = "default" | "asc" | "desc";
-
 export interface ColumnSortContext {
-  // isSortable?: boolean;
-  sortBy?: GridColumnProps["id"];
-  setSortBy: (c: React.SetStateAction<GridColumnProps<string>>) => void;
+  sortByColumnId?: GridColumnProps["id"];
+  setSortByColumnId: (c: React.SetStateAction<GridColumnProps["id"]>) => void;
   sortOrder: SortOrder;
   setSortOrder: (o: SortOrder) => void;
-  onClickHandleSort: (colHeaderId: any) => void;
+  onClickSortColumn: (colHeaderId: GridColumnProps["id"]) => void;
 }
 
 export const ColumnSortContext = createContext<ColumnSortContext | undefined>(
@@ -24,11 +22,3 @@ export const useColumnSortContext = () => {
   return c;
 };
 
-// next step: add if else for isSortable ? sortedRowData : rowData
-// add arrow icons to header
-
-// check the above is done correctly
-// DONE: arrows not to appear on columns without isSortable true
-// add default sortBy as the column.info.props.id instead of undefined
-// sort out Grid type error for sortBy
-// tidy up HeaderCell ways to display icon
