@@ -6252,6 +6252,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@salt-ds/countries@workspace:packages/countries":
+  version: 0.0.0-use.local
+  resolution: "@salt-ds/countries@workspace:packages/countries"
+  dependencies:
+    mustache: ^4.2.0
+    rimraf: ^4.4.0
+    svgo: ^3.0.0
+  peerDependencies:
+    "@types/react": ">=16.8.6"
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  languageName: unknown
+  linkType: soft
+
 "@salt-ds/data-grid@workspace:packages/grid":
   version: 0.0.0-use.local
   resolution: "@salt-ds/data-grid@workspace:packages/grid"
@@ -6417,6 +6434,7 @@ __metadata:
     eslint-plugin-storybook: ^0.6.10
     glob: ^8.0.0
     modular-scripts: "patch:modular-scripts@npm:3.6.0#.yarn/patches/modular-scripts-npm-3.4.0-8cdb747f13.patch"
+    modular-template-package: ^1.2.0
     no-scroll: ^2.1.1
     nyse-holidays: ^1.2.0
     prettier: ^2.6.2
@@ -18404,14 +18422,14 @@ __metadata:
   linkType: hard
 
 "glob@npm:^9.2.0":
-  version: 9.3.4
-  resolution: "glob@npm:9.3.4"
+  version: 9.2.1
+  resolution: "glob@npm:9.2.1"
   dependencies:
     fs.realpath: ^1.0.0
-    minimatch: ^8.0.2
+    minimatch: ^7.4.1
     minipass: ^4.2.4
     path-scurry: ^1.6.1
-  checksum: bcf49eaf475dc4ce8d4e98f896408a9f6507a2cb7d24a207c012cb318b969e04a02bcde2ff2920eadd5055ccae444a007b769e418147a56268fab2cda8694cde
+  checksum: ef9b1c32491e6b532bdd0d2abcc3c9f48e83446609e11285869156982fc5a756dfbaa6f59f797712343bd1e22500ac15708692806633653fde4ef67c85e2aab7
   languageName: node
   linkType: hard
 
@@ -23876,12 +23894,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:^8.0.2":
-  version: 8.0.2
-  resolution: "minimatch@npm:8.0.2"
+"minimatch@npm:^7.4.1":
+  version: 7.4.2
+  resolution: "minimatch@npm:7.4.2"
   dependencies:
     brace-expansion: ^2.0.1
-  checksum: ceb50867205c716a1d027e6de3bd5976a940cec266acf05ff41c29bff9967290a867b381f6317fcebddfb056f0eedff88484d121e4449c3bb16c552a51b7a745
+  checksum: 9e341b04e69d5ab03e4206dcb61c8a158e3b8709628bf5e1a4eaa9f3b72c0ba925e24ad959b1f6ce6835caa5a927131d5087fae6836b69e7d99d7d5e63ef0bd8
   languageName: node
   linkType: hard
 
@@ -24022,9 +24040,9 @@ __metadata:
   linkType: hard
 
 "minipass@npm:^4.0.2, minipass@npm:^4.2.4":
-  version: 4.2.5
-  resolution: "minipass@npm:4.2.5"
-  checksum: 4f9c19af23a5d4a9e7156feefc9110634b178a8cff8f8271af16ec5ebf7e221725a97429952c856f5b17b30c2065ebd24c81722d90c93d2122611d75b952b48f
+  version: 4.2.4
+  resolution: "minipass@npm:4.2.4"
+  checksum: c664f2ae4401408d1e7a6e4f50aca45f87b1b0634bc9261136df5c378e313e77355765f73f59c4a5abcadcdf43d83fcd3eb14e4a7cdcce8e36508e2290345753
   languageName: node
   linkType: hard
 
@@ -24324,6 +24342,13 @@ __metadata:
   bin:
     modular: dist-cjs/cli.js
   checksum: 82c7734861ad6212560861ddbbe168fb6e6ce29f7fc9a46e70ba6c5adaf8779c866917f97e1b81816b7ba90f101530457ae923dfa92e41c18aa6b9f4a7f6e8d2
+  languageName: node
+  linkType: hard
+
+"modular-template-package@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "modular-template-package@npm:1.2.0"
+  checksum: 5155df67d5e33319eb2949a7d98acb3e25ec0afe86763d8905b43b3b061961824b4b0f7b0b1b1dee216aa2f5e1163476a37b4c0369e8d06d16bc049a178a6ca4
   languageName: node
   linkType: hard
 
@@ -26093,12 +26118,12 @@ __metadata:
   linkType: hard
 
 "path-scurry@npm:^1.6.1":
-  version: 1.6.3
-  resolution: "path-scurry@npm:1.6.3"
+  version: 1.6.1
+  resolution: "path-scurry@npm:1.6.1"
   dependencies:
     lru-cache: ^7.14.1
     minipass: ^4.0.2
-  checksum: 814ebd7f8df717e2381dc707ba3a3ddf84d0a4f9d653036c7554cb1fea632d4d78eb17dd5f4c85111b78ba8b8c0a5b59c756645c9d343bdacacda4ba8d1626c2
+  checksum: 7ba57e823cb7bb879669a4e5e05a283cde1bb9e81b6d806b2609f8d8026d0aef08f4b655b17fc86b21c9c32807851bba95ca715db5ab0605fb13c7a3e9172e42
   languageName: node
   linkType: hard
 
@@ -29569,13 +29594,13 @@ __metadata:
   linkType: hard
 
 "rimraf@npm:^4.4.0":
-  version: 4.4.1
-  resolution: "rimraf@npm:4.4.1"
+  version: 4.4.0
+  resolution: "rimraf@npm:4.4.0"
   dependencies:
     glob: ^9.2.0
   bin:
     rimraf: dist/cjs/src/bin.js
-  checksum: b786adc02651e2e24bbedb04bbdea80652fc9612632931ff2d9f898c5e4708fe30956186597373c568bd5230a4dc2fadfc816ccacba8a1daded3a006a6b74f1a
+  checksum: 0cedaf9d138589d1bb0ab851f05804c6d30827aa66563472b04ab76245f83537e23e7b94f1f79ea6c368c0d84a18fcde6a756fca3a44c967e08792671b3a0a6e
   languageName: node
   linkType: hard
 
