@@ -8,7 +8,7 @@ import {
 import { makePrefixer, useControlled, useForkRef } from "@salt-ds/core";
 import { clsx } from "clsx";
 import "./ToggleButton.css";
-import { useToggleButtonGroup } from "./ToggleButtonGroupContext";
+import { useToggleButtonGroup } from "../toggle-button-group";
 
 export interface ToggleButtonProps extends ComponentProps<"button"> {
   selected?: boolean;
