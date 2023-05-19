@@ -682,11 +682,13 @@ export const componentDetails: ComponentDetails[] = [
     designStatus: ComponentStatus.IN_BACKLOG,
   },
   {
-    name: "Toggle Button",
+    name: "Toggle Button Group",
     description:
-      "Allows the user to switch between two possible states, or a related, grouped set of options.",
-    devStatus: ComponentStatus.IN_BACKLOG,
-    designStatus: ComponentStatus.IN_BACKLOG,
+      "Allows the user to switch between a related, grouped set of options.",
+    devStatus: ComponentStatus.IN_PROGRESS,
+    designStatus: ComponentStatus.IN_PROGRESS,
+    storybookUrl:
+      "https://storybook.saltdesignsystem.com/?path=/docs/documentation-lab-toggle-button-group--page",
   },
   {
     name: "Tokenized Input",
