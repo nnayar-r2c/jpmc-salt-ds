@@ -1,6 +1,16 @@
-import { Button, Text, Tooltip, TooltipProps } from "@salt-ds/core";
+import {
+  Button,
+  PlatformProvider,
+  Text,
+  Tooltip,
+  TooltipProps,
+} from "@salt-ds/core";
 import { ComponentMeta, ComponentStory, Story } from "@storybook/react";
-import { useCallback } from "react";
+import { ForwardedRef, forwardRef, useCallback } from "react";
+
+import { platform } from "@floating-ui/dom";
+import { FloatingPortal, Platform } from "@floating-ui/react";
+import { WindowProvider } from "@salt-ds/window";
 
 export default {
   title: "Core/Tooltip",
@@ -11,10 +21,48 @@ const defaultArgs: Omit<TooltipProps, "children"> = {
   content: "I am a tooltip",
 };
 
+const customPlatform: Platform = {
+  ...platform,
+  async getElementRects({ reference, floating, strategy }) {
+    const originalResult = await platform.getElementRects({
+      reference,
+      floating,
+      strategy,
+    });
+    console.log(originalResult.floating);
+    return originalResult;
+  },
+};
+
 export const Default: Story<TooltipProps> = (props: TooltipProps) => (
-  <Tooltip {...props}>
-    <Button>Hover</Button>
-  </Tooltip>
+  <WindowProvider
+    window={window}
+    Component={forwardRef((props, ref: ForwardedRef<HTMLDivElement>) => {
+      // @ts-ignore
+      const { style, ...rest } = props;
+      return (
+        // apply a custom position
+        <FloatingPortal>
+          <div
+            /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
+            style={{
+              ...style,
+              top: 0,
+              left: 0,
+            }}
+            {...rest}
+            ref={ref}
+          />
+        </FloatingPortal>
+      );
+    })}
+  >
+    <PlatformProvider platform={customPlatform}>
+      <Tooltip {...props}>
+        <Button>Hover</Button>
+      </Tooltip>
+    </PlatformProvider>
+  </WindowProvider>
 );
 Default.args = defaultArgs;
 
