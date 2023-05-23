@@ -1,20 +1,31 @@
 import {
-  createContext,
   ComponentType,
+  createContext,
+  ForwardedRef,
+  forwardRef,
+  PropsWithChildren,
   ReactNode,
-  useMemo,
   useContext,
+  useMemo,
 } from "react";
+import { FloatingPortal } from "@floating-ui/react";
 
 export interface WindowContextType {
   window: Window & typeof globalThis;
-  Component?: ComponentType;
+  Component: ComponentType<PropsWithChildren>;
 }
 
 const WindowContext = createContext<WindowContextType | null>(
   typeof window !== "undefined"
     ? {
         window,
+        Component: forwardRef((props, ref: ForwardedRef<HTMLDivElement>) => {
+          return (
+            <FloatingPortal>
+              <div {...props} ref={ref} />
+            </FloatingPortal>
+          );
+        }),
       }
     : null
 );
