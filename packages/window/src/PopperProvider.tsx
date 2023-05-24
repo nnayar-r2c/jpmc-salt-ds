@@ -48,7 +48,7 @@ export function PopperProvider(props: PopperProviderProps) {
 export function usePopper() {
   const value = useContext(PopperContext);
   if (!value) {
-    throw new Error("usePopper must be used within a WindowProvider");
+    throw new Error("usePopper must be used within a PopperProvider");
   }
   return value;
 }

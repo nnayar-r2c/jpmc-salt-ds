@@ -10,7 +10,7 @@ import { ForwardedRef, forwardRef, useCallback } from "react";
 
 import { platform } from "@floating-ui/dom";
 import { FloatingPortal, Platform } from "@floating-ui/react";
-import { WindowProvider } from "@salt-ds/window";
+import { PopperProvider } from "@salt-ds/window";
 
 export default {
   title: "Core/Tooltip",
@@ -35,13 +35,12 @@ const customPlatform: Platform = {
 };
 
 export const Default: Story<TooltipProps> = (props: TooltipProps) => (
-  <WindowProvider
-    window={window}
+  <PopperProvider
     Component={forwardRef((props, ref: ForwardedRef<HTMLDivElement>) => {
       // @ts-ignore
       const { style, ...rest } = props;
       return (
-        // apply a custom position
+        // The style information can be read here and the final position can be controlled
         <FloatingPortal>
           <div
             /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
@@ -62,7 +61,7 @@ export const Default: Story<TooltipProps> = (props: TooltipProps) => (
         <Button>Hover</Button>
       </Tooltip>
     </PlatformProvider>
-  </WindowProvider>
+  </PopperProvider>
 );
 Default.args = defaultArgs;
 
