@@ -7,7 +7,6 @@ import {
   ReactNode,
   Ref,
 } from "react";
-import { useWindow } from "@salt-ds/window";
 
 import { ValidationStatus } from "../status-indicator";
 import {
@@ -20,6 +19,7 @@ import { SaltProvider } from "../salt-provider";
 
 import { useTooltip, UseTooltipProps } from "./useTooltip";
 import { TooltipBase } from "./TooltipBase";
+import { usePopper } from "@salt-ds/window";
 
 const withBaseName = makePrefixer("saltTooltip");
 
@@ -85,7 +85,7 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
       ...rest
     } = props;
 
-    const { Component } = useWindow();
+    const { Component } = usePopper();
 
     const hookProps: UseTooltipProps = {
       open: openProp,
