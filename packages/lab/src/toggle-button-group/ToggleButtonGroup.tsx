@@ -70,8 +70,11 @@ export const ToggleButtonGroup = forwardRef<
   >(selected);
 
   const select = (event: SyntheticEvent<HTMLButtonElement>) => {
-    setSelected(event.currentTarget.value);
-    onSelectionChange?.(event);
+    const newValue = event.currentTarget.value;
+    setSelected(newValue);
+    if (selected !== newValue) {
+      onSelectionChange?.(event);
+    }
   };
 
   const isSelected = (
