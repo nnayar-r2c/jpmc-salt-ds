@@ -3,8 +3,8 @@ import { clsx } from "clsx";
 import { capitalize, makePrefixer } from "@salt-ds/core";
 import {
   AccordionSection,
-  AccordionDetails,
-  AccordionSummary,
+  AccordionPanel,
+  AccordionHeader,
 } from "@salt-ds/lab";
 import { JSONObj } from "../../../helpers/parseToJson";
 import { getShadowParts } from "./getShadowParts";
@@ -31,8 +31,9 @@ export const FlatShadow = (props: FlatShadowProps): ReactElement => {
   return (
     <AccordionSection
       key={`${props.themeName}-${props.innerPattern}-accordion`}
+      value={props.innerPattern}
       expanded={props.expandedSections.includes(props.innerPattern)}
-      onChange={(isExpanded) => {
+      onToggle={(isExpanded) => {
         let shadows;
         if (isExpanded) {
           const openShadows = props.searchParams.get("open");
@@ -53,10 +54,10 @@ export const FlatShadow = (props: FlatShadowProps): ReactElement => {
           : props.setSearchParams({});
       }}
     >
-      <AccordionSummary>
+      <AccordionHeader>
         {capitalize(props.innerPattern) as string}
-      </AccordionSummary>
-      <AccordionDetails>
+      </AccordionHeader>
+      <AccordionPanel>
         <div className={clsx(withBaseName("ValueSection"))}>
           {patternParts.map((shadowPart: string, index) => {
             const jsonObj: JSONObj = {};
@@ -96,7 +97,7 @@ export const FlatShadow = (props: FlatShadowProps): ReactElement => {
             );
           })}
         </div>
-      </AccordionDetails>
+      </AccordionPanel>
     </AccordionSection>
   );
 };

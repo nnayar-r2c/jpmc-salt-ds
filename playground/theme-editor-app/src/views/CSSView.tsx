@@ -1,9 +1,9 @@
 import { ReactElement } from "react";
 import {
   Accordion,
-  AccordionDetails,
+  AccordionPanel,
   AccordionSection,
-  AccordionSummary,
+  AccordionHeader,
 } from "@salt-ds/lab";
 import { CSSByPattern } from "@salt-ds/theme-editor/src/helpers/parseToCss";
 
@@ -22,13 +22,16 @@ export const CSSView = (props: CSSViewProps): ReactElement => {
         <Accordion>
           {props.cssByPattern.map((element) => {
             return (
-              <AccordionSection key={`${element.pattern}.css`}>
-                <AccordionSummary>{element.pattern}.css</AccordionSummary>
-                <AccordionDetails>
+              <AccordionSection
+                key={`${element.pattern}.css`}
+                value={element.pattern}
+              >
+                <AccordionHeader>{element.pattern}.css</AccordionHeader>
+                <AccordionPanel>
                   <pre>
                     <code style={{ fontSize: "12px" }}>{element.cssObj}</code>
                   </pre>
-                </AccordionDetails>
+                </AccordionPanel>
               </AccordionSection>
             );
           })}

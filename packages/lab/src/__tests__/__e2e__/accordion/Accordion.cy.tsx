@@ -1,9 +1,9 @@
 import {
   Accordion,
-  AccordionDetails,
+  AccordionPanel,
   AccordionProps,
   AccordionSection,
-  AccordionSummary,
+  AccordionHeader,
 } from "@salt-ds/lab";
 import { useReducer, useState } from "react";
 
@@ -11,16 +11,16 @@ const AccordionExample = (props: AccordionProps) => {
   return (
     <Accordion {...props}>
       <AccordionSection id="section-0" key="AccordionSection0">
-        <AccordionSummary>AccordionSummary0</AccordionSummary>
-        <AccordionDetails>AccordionDetails0</AccordionDetails>
+        <AccordionHeader>AccordionSummary0</AccordionHeader>
+        <AccordionPanel>AccordionDetails0</AccordionPanel>
       </AccordionSection>
       <AccordionSection id="section-1" key="AccordionSection1">
-        <AccordionSummary>AccordionSummary1</AccordionSummary>
-        <AccordionDetails>AccordionDetails1</AccordionDetails>
+        <AccordionHeader>AccordionSummary1</AccordionHeader>
+        <AccordionPanel>AccordionDetails1</AccordionPanel>
       </AccordionSection>
       <AccordionSection id="section-2" key="AccordionSection2">
-        <AccordionSummary>AccordionSummary2</AccordionSummary>
-        <AccordionDetails>AccordionDetails2</AccordionDetails>
+        <AccordionHeader>AccordionSummary2</AccordionHeader>
+        <AccordionPanel>AccordionDetails2</AccordionPanel>
       </AccordionSection>
     </Accordion>
   );
@@ -38,16 +38,16 @@ const ControlledAccordionExample = (props: AccordionProps) => {
   return (
     <Accordion expandedSectionIds={expanded} onChange={handleChange} {...rest}>
       <AccordionSection id="section-0" key="AccordionSection0">
-        <AccordionSummary>AccordionSummary0</AccordionSummary>
-        <AccordionDetails>AccordionDetails0</AccordionDetails>
+        <AccordionHeader>AccordionSummary0</AccordionHeader>
+        <AccordionPanel>AccordionDetails0</AccordionPanel>
       </AccordionSection>
       <AccordionSection id="section-1" key="AccordionSection1">
-        <AccordionSummary>AccordionSummary1</AccordionSummary>
-        <AccordionDetails>AccordionDetails1</AccordionDetails>
+        <AccordionHeader>AccordionSummary1</AccordionHeader>
+        <AccordionPanel>AccordionDetails1</AccordionPanel>
       </AccordionSection>
       <AccordionSection id="section-2" key="AccordionSection2">
-        <AccordionSummary>AccordionSummary2</AccordionSummary>
-        <AccordionDetails>AccordionDetails2</AccordionDetails>
+        <AccordionHeader>AccordionSummary2</AccordionHeader>
+        <AccordionPanel>AccordionDetails2</AccordionPanel>
       </AccordionSection>
     </Accordion>
   );
@@ -114,16 +114,16 @@ describe("GIVEN an Accordion", () => {
               <button onClick={toggle}>Toggle Max Expanded Items</button>
               <Accordion {...props} maxExpandedItems={isToggled ? 1 : 2}>
                 <AccordionSection id="section-0" key="AccordionSection0">
-                  <AccordionSummary>AccordionSummary0</AccordionSummary>
-                  <AccordionDetails>AccordionDetails0</AccordionDetails>
+                  <AccordionHeader>AccordionSummary0</AccordionHeader>
+                  <AccordionPanel>AccordionDetails0</AccordionPanel>
                 </AccordionSection>
                 <AccordionSection id="section-1" key="AccordionSection1">
-                  <AccordionSummary>AccordionSummary1</AccordionSummary>
-                  <AccordionDetails>AccordionDetails1</AccordionDetails>
+                  <AccordionHeader>AccordionSummary1</AccordionHeader>
+                  <AccordionPanel>AccordionDetails1</AccordionPanel>
                 </AccordionSection>
                 <AccordionSection id="section-2" key="AccordionSection2">
-                  <AccordionSummary>AccordionSummary2</AccordionSummary>
-                  <AccordionDetails>AccordionDetails2</AccordionDetails>
+                  <AccordionHeader>AccordionSummary2</AccordionHeader>
+                  <AccordionPanel>AccordionDetails2</AccordionPanel>
                 </AccordionSection>
               </Accordion>
             </>
@@ -193,16 +193,16 @@ describe("GIVEN an Accordion", () => {
       cy.mount(
         <Accordion>
           <AccordionSection id="section-0" key="AccordionSection0">
-            <AccordionSummary>AccordionSummary0</AccordionSummary>
-            <AccordionDetails>AccordionDetails0</AccordionDetails>
+            <AccordionHeader>AccordionSummary0</AccordionHeader>
+            <AccordionPanel>AccordionDetails0</AccordionPanel>
           </AccordionSection>
           <AccordionSection id="section-1" key="AccordionSection1" expanded>
-            <AccordionSummary>AccordionSummary1</AccordionSummary>
-            <AccordionDetails>AccordionDetails1</AccordionDetails>
+            <AccordionHeader>AccordionSummary1</AccordionHeader>
+            <AccordionPanel>AccordionDetails1</AccordionPanel>
           </AccordionSection>
           <AccordionSection id="section-2" key="AccordionSection2">
-            <AccordionSummary>AccordionSummary2</AccordionSummary>
-            <AccordionDetails>AccordionDetails2</AccordionDetails>
+            <AccordionHeader>AccordionSummary2</AccordionHeader>
+            <AccordionPanel>AccordionDetails2</AccordionPanel>
           </AccordionSection>
         </Accordion>
       );
@@ -214,16 +214,16 @@ describe("GIVEN an Accordion", () => {
       cy.mount(
         <Accordion expandedSectionIds={["section-0", "section-1"]}>
           <AccordionSection id="section-0" key="AccordionSection0">
-            <AccordionSummary>AccordionSummary0</AccordionSummary>
-            <AccordionDetails>AccordionDetails0</AccordionDetails>
+            <AccordionHeader>AccordionSummary0</AccordionHeader>
+            <AccordionPanel>AccordionDetails0</AccordionPanel>
           </AccordionSection>
           <AccordionSection id="section-1" key="AccordionSection1">
-            <AccordionSummary>AccordionSummary1</AccordionSummary>
-            <AccordionDetails>AccordionDetails1</AccordionDetails>
+            <AccordionHeader>AccordionSummary1</AccordionHeader>
+            <AccordionPanel>AccordionDetails1</AccordionPanel>
           </AccordionSection>
           <AccordionSection id="section-2" key="AccordionSection2" expanded>
-            <AccordionSummary>AccordionSummary2</AccordionSummary>
-            <AccordionDetails>AccordionDetails2</AccordionDetails>
+            <AccordionHeader>AccordionSummary2</AccordionHeader>
+            <AccordionPanel>AccordionDetails2</AccordionPanel>
           </AccordionSection>
         </Accordion>
       );

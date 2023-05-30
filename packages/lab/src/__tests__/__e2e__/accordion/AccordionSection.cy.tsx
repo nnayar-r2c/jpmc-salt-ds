@@ -1,10 +1,10 @@
 import {
   Accordion,
-  AccordionDetails,
+  AccordionPanel,
   AccordionDetailsProps,
   AccordionSection,
   AccordionSectionProps,
-  AccordionSummary,
+  AccordionHeader,
 } from "@salt-ds/lab";
 import { Component, ReactNode } from "react";
 
@@ -47,8 +47,8 @@ const AccordionExample = ({
   return (
     <Accordion>
       <AccordionSection onChange={onChange}>
-        <AccordionSummary>Summary Text</AccordionSummary>
-        <AccordionDetails preventUnmountOnCollapse={preventUnmountOnCollapse}>
+        <AccordionHeader>Summary Text</AccordionHeader>
+        <AccordionPanel preventUnmountOnCollapse={preventUnmountOnCollapse}>
           <DetailsSpy
             onMount={onMount}
             onUnmount={onUnmount}
@@ -56,7 +56,7 @@ const AccordionExample = ({
           >
             <div data-testid="details-content" />
           </DetailsSpy>
-        </AccordionDetails>
+        </AccordionPanel>
       </AccordionSection>
     </Accordion>
   );

@@ -1,8 +1,8 @@
 import {
   Accordion,
-  AccordionDetails,
+  AccordionPanel,
   AccordionSection,
-  AccordionSummary,
+  AccordionHeader,
 } from "@salt-ds/lab";
 
 import styles from "./Accordion.module.css";
@@ -31,10 +31,10 @@ const AccordionBase = ({
       {accordionInfo.map(({ id, summary, details }) => {
         return (
           <AccordionSection className={styles.section} key={id} id={id}>
-            <AccordionSummary className={styles.summary}>
+            <AccordionHeader className={styles.summary}>
               {summary}
-            </AccordionSummary>
-            <AccordionDetails>{details}</AccordionDetails>
+            </AccordionHeader>
+            <AccordionPanel>{details}</AccordionPanel>
           </AccordionSection>
         );
       })}

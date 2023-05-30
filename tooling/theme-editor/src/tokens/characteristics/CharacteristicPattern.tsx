@@ -3,9 +3,9 @@ import { ReactElement } from "react";
 import { useSearchParams } from "react-router-dom";
 import { capitalize, makePrefixer } from "@salt-ds/core";
 import {
-  AccordionDetails,
+  AccordionPanel,
   AccordionSection,
-  AccordionSummary,
+  AccordionHeader,
 } from "@salt-ds/lab";
 import { JSONObj } from "../../helpers/parseToJson";
 import { ChildrenValuesWithinSection } from "../ChildrenValues";
@@ -32,9 +32,10 @@ export const CharacteristicPattern = (
   return (
     <AccordionSection
       expanded={props.expandedCharacteristics.includes(props.patternName)}
-      onChange={(isExpanded) => {
+      value={props.patternName}
+      onToggle={() => {
         let characteristics;
-        if (isExpanded) {
+        if (props.expandedCharacteristics.includes(props.patternName)) {
           const openSections = searchParams.get("open");
           characteristics = props.patternName;
           if (openSections) {
@@ -53,10 +54,10 @@ export const CharacteristicPattern = (
           : setSearchParams({});
       }}
     >
-      <AccordionSummary>
+      <AccordionHeader>
         {capitalize(props.patternName) as string}
-      </AccordionSummary>
-      <AccordionDetails>
+      </AccordionHeader>
+      <AccordionPanel>
         {props.values &&
           Object.keys(props.values).map((scope) => {
             return (
@@ -95,7 +96,7 @@ export const CharacteristicPattern = (
               </div>
             );
           })}
-      </AccordionDetails>
+      </AccordionPanel>
     </AccordionSection>
   );
 };

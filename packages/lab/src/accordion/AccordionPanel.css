@@ -1,0 +1,13 @@
+.saltAccordionPanel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--salt-duration-perceptible) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.saltAccordionHeader[aria-expanded="true"] + .saltAccordionPanel {
+  grid-template-rows: 1fr;
+}
+
+.saltAccordionPanel-inner {
+  overflow: hidden;
+}

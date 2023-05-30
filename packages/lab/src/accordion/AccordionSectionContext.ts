@@ -1,26 +1,23 @@
-import { createContext, useContext } from "react";
-import { isNotProduction } from "./utils";
+import { createContext } from "@salt-ds/core";
+import { SyntheticEvent, useContext } from "react";
 
 export interface AccordionSectionContext {
-  isDisabled?: boolean;
-  isExpanded: boolean;
-  onToggle: () => void;
+  value: string;
+  expanded: boolean;
+  toggle: (event: SyntheticEvent<HTMLButtonElement>) => void;
+  disabled: boolean;
 }
 
-export const AccordionSectionContext = createContext<
-  AccordionSectionContext | undefined
->(undefined);
-
-if (isNotProduction()) {
-  AccordionSectionContext.displayName = "AccordionSectionContext";
-}
-
-export const useAccordionSectionContext = () => {
-  const context = useContext(AccordionSectionContext);
-  if (isNotProduction() && !context) {
-    console.error(
-      "useAccordionSectionContext should be used inside of AccordionSection"
-    );
+export const AccordionSectionContext = createContext<AccordionSectionContext>(
+  "AccordionSectionContext",
+  {
+    value: "",
+    expanded: false,
+    toggle: () => {},
+    disabled: false,
   }
-  return context!;
-};
+);
+
+export function useAccordionSection() {
+  return useContext(AccordionSectionContext);
+}
