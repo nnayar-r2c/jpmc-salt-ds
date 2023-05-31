@@ -50,7 +50,7 @@ describe("Tab selection, Given a Tabstrip", () => {
       describe("WHEN the selected Tab has not been specified", () => {
         it("THEN the first tab will be selected", () => {
           cy.mount(<SimpleTabstrip width={400} />);
-          cy.get(".saltTabstripNext-inner > *:first-child").should(
+          cy.get(".saltTabstripNext-inner [role='tab']:first-child").should(
             "have.ariaSelected"
           );
         });
@@ -73,7 +73,7 @@ describe("Navigation, Given a Tabstrip", () => {
           );
           cy.findByTestId("tabstop-1").focus();
           cy.realPress("Tab");
-          cy.get(".saltTabstripNext-inner > *:nth-child(1)").should(
+          cy.get(".saltTabstripNext-inner [role='tab']:nth-child(1)").should(
             "be.focused"
           );
         });
@@ -88,12 +88,12 @@ describe("Navigation, Given a Tabstrip", () => {
             );
             cy.findByTestId("tabstop-1").focus();
             cy.realPress("Tab");
-            cy.get(".saltTabstripNext-inner > *:nth-child(1)").should(
+            cy.get(".saltTabstripNext-inner [role='tab']:nth-child(1)").should(
               "be.focused"
             );
             cy.wait(50);
             cy.realPress("ArrowRight");
-            cy.get(".saltTabstripNext-inner > *:nth-child(2)").should(
+            cy.get(".saltTabstripNext-inner [role='tab']:nth-child(2)").should(
               "be.focused"
             );
           });
@@ -110,17 +110,21 @@ describe("Navigation, Given a Tabstrip", () => {
             </StackLayout>
           );
           cy.findByTestId("tabstop-1").focus();
-          cy.get(".saltTabstripNext-inner > *:first-child").realClick();
+          cy.get(
+            ".saltTabstripNext-inner [role='tab']:first-child"
+          ).realClick();
           cy.get('[role="tab"]').eq(0).should("be.focused");
         });
 
         describe("WHEN the left arrow key is pressed (from first tab)", () => {
           it("THEN no navigation will occur", () => {
             cy.mount(<SimpleTabstrip width={400} />);
-            cy.get(".saltTabstripNext-inner > *:nth-child(1)").realClick();
+            cy.get(
+              ".saltTabstripNext-inner [role='tab']:nth-child(1)"
+            ).realClick();
             cy.wait(100); // ArrowRight need some time to move focus after click
             cy.realPress("ArrowLeft");
-            cy.get(".saltTabstripNext-inner > *:nth-child(1)").should(
+            cy.get(".saltTabstripNext-inner [role='tab']:nth-child(1)").should(
               "be.focused"
             );
           });
@@ -129,10 +133,12 @@ describe("Navigation, Given a Tabstrip", () => {
         describe("WHEN the right arrow key is pressed", () => {
           it("THEN focus will be transfered to the next tab", () => {
             cy.mount(<SimpleTabstrip width={400} />);
-            cy.get(".saltTabstripNext-inner > *:first-child").realClick();
+            cy.get(
+              ".saltTabstripNext-inner [role='tab']:first-child"
+            ).realClick();
             cy.wait(100); // ArrowRight need some time to move focus after click
             cy.realPress("ArrowRight");
-            cy.get(".saltTabstripNext-inner > *:nth-child(2)").should(
+            cy.get(".saltTabstripNext-inner [role='tab']:nth-child(2)").should(
               "be.focused"
             );
           });
@@ -147,7 +153,9 @@ describe("Navigation, Given a Tabstrip", () => {
                 <button data-testid="tabstop-2" />
               </StackLayout>
             );
-            cy.get(".saltTabstripNext-inner > *:first-child").realClick();
+            cy.get(
+              ".saltTabstripNext-inner [role='tab']:first-child"
+            ).realClick();
             cy.realPress("ArrowRight");
             cy.wait(50);
             cy.realPress("Tab");
@@ -164,17 +172,19 @@ describe("Navigation, Given a Tabstrip", () => {
                 <button data-testid="tabstop-2" />
               </StackLayout>
             );
-            cy.get(".saltTabstripNext-inner > *:first-child").should(
+            cy.get(".saltTabstripNext-inner [role='tab']:first-child").should(
               "be.visible"
             );
-            cy.get(".saltTabstripNext-inner > *:first-child").realClick();
+            cy.get(
+              ".saltTabstripNext-inner [role='tab']:first-child"
+            ).realClick();
             cy.realPress("ArrowRight");
             cy.wait(50);
             cy.realPress("Tab");
             cy.wait(50);
             cy.realPress(["Shift", "Tab"]);
             cy.wait(50);
-            cy.get(".saltTabstripNext-inner > *:first-child")
+            cy.get(".saltTabstripNext-inner [role='tab']:first-child")
               .should("be.focused")
               .should("have.ariaSelected");
           });
@@ -183,7 +193,9 @@ describe("Navigation, Given a Tabstrip", () => {
         describe("WHEN the right arrow key is pressed repeatedly", () => {
           it("THEN focus will be transfered until last tab is reached", () => {
             cy.mount(<SimpleTabstrip width={400} />);
-            cy.get(".saltTabstripNext-inner > *:first-child").realClick();
+            cy.get(
+              ".saltTabstripNext-inner [role='tab']:first-child"
+            ).realClick();
             cy.realPress("ArrowRight");
             cy.wait(50);
             cy.realPress("ArrowRight");
@@ -191,11 +203,11 @@ describe("Navigation, Given a Tabstrip", () => {
             cy.realPress("ArrowRight");
             cy.wait(50);
             cy.realPress("ArrowRight");
-            cy.get(".saltTabstripNext-inner > *:nth-child(5)").should(
+            cy.get(".saltTabstripNext-inner [role='tab']:nth-child(5)").should(
               "be.focused"
             );
             cy.realPress("ArrowRight");
-            cy.get(".saltTabstripNext-inner > *:nth-child(5)").should(
+            cy.get(".saltTabstripNext-inner [role='tab']:nth-child(5)").should(
               "be.focused"
             );
           });
@@ -207,7 +219,7 @@ describe("Navigation, Given a Tabstrip", () => {
     describe("WHEN it initially renders", () => {
       it("THEN overflow indicator is included in keyboard navigation", () => {
         cy.mount(<SimpleTabstrip width={320} />);
-        cy.get(".saltTabstripNext-inner > *:first-child").realClick();
+        cy.get(".saltTabstripNext-inner [role='tab']:first-child").realClick();
         cy.wait(50);
         cy.realPress("ArrowRight");
         cy.wait(50);

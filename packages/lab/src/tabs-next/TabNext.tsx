@@ -116,6 +116,7 @@ export const TabNext = forwardRef(function Tab(
   return (
     <div
       {...props}
+      data-label={label}
       aria-controls={ariaControls}
       aria-selected={selected}
       className={clsx(withBaseName(), {

@@ -1,4 +1,4 @@
-import { isValidElement, ReactNode, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import {
   autoUpdate,
@@ -19,34 +19,56 @@ import { Button, makePrefixer, SaltProvider } from "@salt-ds/core";
 import { OverflowMenuIcon } from "@salt-ds/icons";
 import { useComponentCssInjection } from "@salt-ds/styles";
 import { useWindow } from "@salt-ds/window";
+
+import { useOverflowContext, useOverflowMenu } from "@fluentui/react-overflow";
 import { ListItem } from "../list";
 import listCss from "../list/List.css";
 import { isDesktop } from "../window";
-import { TabElement } from "../tabs/TabsTypes";
-import { TabNext } from "./TabNext";
+import { TabElement } from "./TabsNextTypes";
 
 const withBaseName = makePrefixer("saltTabstripNext");
 
-function isTab(child: ReactNode | TabElement): child is TabElement {
-  return isValidElement(child) && child.type === TabNext;
-}
-
-export function OverflowMenu({
-  tabs,
-  overflowTabsLength,
-  activeTabIndex,
-  onSelectIndex,
-  getTabId,
-  setKeyboardFocusedIndex,
-}: {
-  tabs: ReactNode[];
-  overflowTabsLength: number;
+type OverflowMenuProps = {
+  tabs: TabElement[];
   onMoveTab?: (from: number, to: number) => void;
   activeTabIndex?: number | null;
-  onSelectIndex: (index: number) => void;
-  getTabId: (index?: number) => string;
-  setKeyboardFocusedIndex: (index: number) => void;
-}) {
+  onSelectItem: (item: { label: string; id: string }) => void;
+  getTabId: (label: string) => string;
+  returnFocusToTabs: () => void;
+};
+
+export function OverflowMenu(props: OverflowMenuProps) {
+  const { isOverflowing } = useOverflowMenu<HTMLButtonElement>();
+
+  if (!isOverflowing) {
+    return null;
+  }
+
+  return <OverflowMenuImpl {...props} />;
+}
+
+function OverflowMenuImpl({
+  tabs,
+  onSelectItem,
+  getTabId,
+  returnFocusToTabs,
+}: OverflowMenuProps) {
+  const { ref, overflowCount } = useOverflowMenu<HTMLDivElement>();
+  const itemVisibility = useOverflowContext(
+    (context) => context.itemVisibility
+  );
+
+  const tabList = tabs
+    .map((tab) => {
+      const label = tab.props.label;
+
+      return {
+        label,
+        id: getTabId(label),
+      };
+    })
+    .filter((tab) => !itemVisibility[tab.id]);
+
   const targetWindow = useWindow();
   useComponentCssInjection({
     testId: "salt-tabstrip-list",
@@ -54,9 +76,6 @@ export function OverflowMenu({
     window: targetWindow,
   });
 
-  const visibleTabsLength = tabs.length - overflowTabsLength;
-  const overflowHasActiveTab =
-    activeTabIndex && activeTabIndex >= visibleTabsLength;
   const [open, setOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(0);
 
@@ -66,10 +85,6 @@ export function OverflowMenu({
   }, [open]);
 
   const [maxPopupHeight, setMaxPopupHeight] = useState<number | undefined>();
-  const indexToSelect =
-    typeof highlightedIndex !== "number"
-      ? activeTabIndex
-      : visibleTabsLength + highlightedIndex;
 
   const middleware = isDesktop
     ? []
@@ -100,9 +115,6 @@ export function OverflowMenu({
   const listNavigation = useListNavigation(context, {
     listRef,
     activeIndex: highlightedIndex,
-    selectedIndex: overflowHasActiveTab
-      ? activeTabIndex - visibleTabsLength
-      : null,
     onNavigate: setHighlightedIndex,
     virtual: true,
   });
@@ -112,25 +124,15 @@ export function OverflowMenu({
   );
 
   function select() {
-    if (!indexToSelect) return;
+    if (typeof highlightedIndex !== "number") return;
+    const selectedItem = tabList[highlightedIndex];
+    if (!selectedItem) return;
     setOpen(false);
-    onSelectIndex(indexToSelect);
-  }
-
-  function moveBackToTabs() {
-    const moveToIndex = visibleTabsLength - 1;
-    setKeyboardFocusedIndex(moveToIndex);
-    document
-      .getElementById(getTabId(moveToIndex))
-      ?.focus({ preventScroll: true });
+    onSelectItem(tabList[highlightedIndex]);
   }
 
   return (
-    <div
-      className={clsx(withBaseName("overflowMenu"), {
-        [withBaseName("overflowMenu-active")]: overflowHasActiveTab,
-      })}
-    >
+    <div className={clsx(withBaseName("overflowMenu"))} ref={ref}>
       {open ? (
         <FloatingPortal>
           <FloatingFocusManager context={context} modal={false}>
@@ -156,47 +158,38 @@ export function OverflowMenu({
                     }
 
                     if (event.key === "ArrowLeft") {
-                      moveBackToTabs();
+                      returnFocusToTabs();
                     }
                   },
                 })}
                 className={clsx(withBaseName("overflowMenu-popup"), "saltList")}
               >
-                {tabs
-                  .slice(visibleTabsLength, tabs.length)
-                  .map((tab, index) => {
-                    if (!isTab(tab)) return tab;
-                    const label =
-                      typeof tab.props.children === "string"
-                        ? tab.props.children
-                        : tab.props.label;
+                {tabList.map(({ label }, index) => {
+                  if (!label) {
+                    throw new Error("Tab needs a label");
+                  }
 
-                    if (!label) {
-                      throw new Error("Tab needs a label or a children string");
-                    }
-
-                    return (
-                      <ListItem
-                        key={label}
-                        ref={(node) => {
-                          listRef.current[index] = node;
-                        }}
-                        role="option"
-                        selected={activeTabIndex === visibleTabsLength + index}
-                        className={clsx(`saltListItem`, {
-                          saltHighlighted: highlightedIndex === index,
-                        })}
-                        label={label}
-                        tabIndex={-1}
-                        {...getItemProps({
-                          onClick: select,
-                        })}
-                        id={`${getTabId()}${label}-option`}
-                      >
-                        {tab.props.children}
-                      </ListItem>
-                    );
-                  })}
+                  return (
+                    <ListItem
+                      key={label}
+                      ref={(node) => {
+                        listRef.current[index] = node;
+                      }}
+                      role="option"
+                      className={clsx(`saltListItem`, {
+                        saltHighlighted: highlightedIndex === index,
+                      })}
+                      label={label}
+                      tabIndex={-1}
+                      {...getItemProps({
+                        onClick: select,
+                      })}
+                      id={`${getTabId(label)}-${label}-option`}
+                    >
+                      {label}
+                    </ListItem>
+                  );
+                })}
               </div>
             </SaltProvider>
           </FloatingFocusManager>
@@ -204,19 +197,18 @@ export function OverflowMenu({
       ) : null}
 
       <Button
-        tabIndex={!open && overflowHasActiveTab ? 0 : -1}
+        tabIndex={-1}
         ref={refs.setReference}
-        aria-selected={overflowHasActiveTab ? true : undefined}
         aria-autocomplete="none"
         {...getReferenceProps({
           onKeyDown: (e) => {
             if (e.key === "ArrowLeft") {
-              moveBackToTabs();
+              returnFocusToTabs();
             }
           },
         })}
-        aria-label={`Tabs overflow menu ${overflowTabsLength} item${
-          overflowTabsLength === 1 ? "" : "s"
+        aria-label={`Tabs overflow menu ${overflowCount} item${
+          overflowCount === 1 ? "" : "s"
         }`}
         variant="secondary"
       >

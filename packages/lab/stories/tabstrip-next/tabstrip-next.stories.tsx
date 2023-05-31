@@ -26,7 +26,9 @@ export const SimpleTabstrip: TabstripStory = ({
     <div style={{ width, minWidth: 0, maxWidth: "100%" }}>
       <TabstripNext defaultActiveTabIndex={0} {...tabstripProps}>
         {tabs.map((label) => (
-          <TabNext key={label}>{label}</TabNext>
+          <TabNext label={label} key={label}>
+            {label}
+          </TabNext>
         ))}
       </TabstripNext>
     </div>
@@ -53,7 +55,9 @@ export const TruncatedTabs: TabstripStory = ({
         {...tabstripProps}
       >
         {tabs.map((label) => (
-          <TabNext key={label}>{label}</TabNext>
+          <TabNext label={label} key={label}>
+            {label}
+          </TabNext>
         ))}
       </TabstripNext>
     </div>
@@ -70,7 +74,9 @@ export const CenteredTabstrip: TabstripStory = ({
     <div style={{ width, minWidth: 0, maxWidth: "100%" }}>
       <TabstripNext defaultActiveTabIndex={0} {...tabstripProps} align="center">
         {tabs.map((label) => (
-          <TabNext key={label}>{label}</TabNext>
+          <TabNext label={label} key={label}>
+            {label}
+          </TabNext>
         ))}
       </TabstripNext>
     </div>
@@ -92,7 +98,9 @@ export const ControlledTabstrip: TabstripStory = ({
         onActiveChange={setActiveTabIndex}
       >
         {tabs.map((label) => (
-          <TabNext key={label}>{label}</TabNext>
+          <TabNext label={label} key={label}>
+            {label}
+          </TabNext>
         ))}
       </TabstripNext>
     </div>
@@ -124,7 +132,9 @@ export const AddTabTabstrip: TabstripStory = ({
           onActiveChange={setActiveTabIndex}
         >
           {tabs.map((label) => (
-            <TabNext key={label}>{label}</TabNext>
+            <TabNext label={label} key={label}>
+              {label}
+            </TabNext>
           ))}
         </TabstripNext>
         <Button onClick={handleAddTab}>
@@ -167,7 +177,9 @@ export const LotsOfTabsTabstrip: TabstripStory = ({
         onActiveChange={setActiveTabIndex}
       >
         {tabs.map((label) => (
-          <TabNext key={label}>{label}</TabNext>
+          <TabNext label={label} key={label}>
+            {label}
+          </TabNext>
         ))}
       </TabstripNext>
     </div>
@@ -226,7 +238,9 @@ export const ActiveIndexNull: TabstripStory = ({
         onActiveChange={setActiveTabIndex}
       >
         {tabs.map((label) => (
-          <TabNext key={label}>{label}</TabNext>
+          <TabNext label={label} key={label}>
+            {label}
+          </TabNext>
         ))}
       </TabstripNext>
     </div>

@@ -40,13 +40,13 @@ export type TabProps = Omit<
   HTMLAttributes<HTMLElement>,
   "onClick" | "onKeyUp"
 > & {
+  label: string;
   ariaControls?: AriaAttributes["aria-controls"];
   closeable?: boolean;
   draggable?: boolean;
   dragging?: boolean;
   selected?: boolean;
   index?: number;
-  label?: string;
   onClick?: (e: MouseEvent, index: number) => void;
   onClose?: (index: number) => void;
   onKeyUp?: (e: KeyboardEvent, index: number) => void;

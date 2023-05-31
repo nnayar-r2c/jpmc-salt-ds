@@ -7,14 +7,13 @@ import {
   PropsWithChildren,
   ReactNode,
   useCallback,
-  useEffect,
   useRef,
-  useState,
 } from "react";
 import { useComponentCssInjection } from "@salt-ds/styles";
 import { useWindow } from "@salt-ds/window";
+import { Overflow, OverflowItem } from "@fluentui/react-overflow";
 import { TabNext } from "./TabNext";
-import { TabElement, TabProps } from "../tabs/TabsTypes";
+import { TabElement, TabProps } from "./TabsNextTypes";
 import { OverflowMenu } from "./OverflowMenu";
 import tabstripCss from "./TabstripNext.css";
 
@@ -35,8 +34,7 @@ export type TabstripNextProps = PropsWithChildren<{
   onMoveTab?: (from: number, to: number) => void;
   /* Set a tab max-width in order to enable tab truncation */
   tabMaxWidth?: number;
-  variant?: "primary" | "secondary";
-  getTabId?: (index?: number) => string;
+  getTabId?: (label: string) => string;
 }>;
 
 export const TabstripNext = ({
@@ -48,7 +46,6 @@ export const TabstripNext = ({
   onMoveTab,
   tabMaxWidth,
   getTabId: getTabIdProp,
-  variant = "primary",
 }: TabstripNextProps) => {
   const targetWindow = useWindow();
   useComponentCssInjection({
@@ -59,8 +56,8 @@ export const TabstripNext = ({
   const tabs = Children.toArray(children).filter(isTab);
   const uniqueId = useId();
   const _getTabId = useCallback(
-    (index?: number) => {
-      return `tab-${uniqueId ?? "unknown"}-${index ?? ""}`;
+    (label: string) => {
+      return `tab-${uniqueId ?? "unknown"}-${label}`;
     },
     [uniqueId]
   );
@@ -74,135 +71,107 @@ export const TabstripNext = ({
   });
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
-  const [hasOverflow, setHasOverflow] = useState(false);
-  const [overflowTabsLength, setOverflowTabsLength] = useState(0);
-  const [keyboardFocusedIndex, setKeyboardFocusedIndex] = useState(-1);
-
-  // figure out if overflow menu is necessary
-  useEffect(() => {
-    if (!outerRef.current || !innerRef.current) return;
-    const resize = new ResizeObserver(() => {
-      // we don't use resize observer results because they come in random order and we have refs anyways
-      if (!outerRef.current || !innerRef.current) return;
-      const hasOverflowingContent =
-        innerRef.current.clientHeight - outerRef.current.clientHeight > 0;
-      setHasOverflow(hasOverflowingContent);
-      const tabsTopOffset = innerRef.current.getBoundingClientRect().top;
-      const tabElements = [
-        ...outerRef.current.querySelectorAll(
-          `.${withBaseName("inner")} > [role="tab"]`
-        ),
-      ];
-      const overflowLength = tabElements.filter((el) => {
-        return el.getBoundingClientRect().top - tabsTopOffset > 0;
-      }).length;
-      setOverflowTabsLength(overflowLength);
-    });
-    resize.observe(outerRef.current);
-    resize.observe(innerRef.current);
-    const tabElements = outerRef.current.querySelectorAll<HTMLDivElement>(
-      `.${withBaseName("inner")} > [role="tab]`
-    );
-    const lastTab = tabElements[tabElements.length - 1];
-    if (lastTab) {
-      resize.observe(lastTab);
+  const handleOverflowMenuSelectionChange = (item: {
+    label: string;
+    id: string;
+  }) => {
+    if (item) {
+      const index = tabs.findIndex((tab) => {
+        const label =
+          typeof tab.props.children === "string"
+            ? tab.props.children
+            : tab.props.label;
+        return label === item.label;
+      });
+      setActiveTabIndex(index);
+      onActiveChange?.(index);
     }
-
-    return () => {
-      resize.disconnect();
-    };
-  }, [tabs.length]);
+  };
 
   return (
     <div
       role="tablist"
-      className={clsx(
-        withBaseName(),
-        withBaseName("horizontal"),
-        [withBaseName(`variant-${variant}`)],
-        {
-          [withBaseName("centered")]: align === "center",
-        }
-      )}
+      className={clsx(withBaseName(), withBaseName("horizontal"), {
+        [withBaseName("centered")]: align === "center",
+      })}
       ref={outerRef}
     >
-      <div className={withBaseName("inner")} ref={innerRef}>
-        {tabs.map((child, index) => {
-          const label =
-            typeof child.props.children === "string"
-              ? child.props.children
-              : child.props.label;
+      <Overflow>
+        <div className={withBaseName("inner")} ref={innerRef}>
+          {tabs.map((child, index) => {
+            const { label } = child.props;
+            const isActive = activeTabIndex === index;
+            const id = getTabId(label);
+            return (
+              <OverflowItem
+                id={id}
+                priority={isActive ? 1000 : undefined}
+                key={label}
+              >
+                <div className={withBaseName("tabWrapper")}>
+                  {cloneElement<TabProps>(child, {
+                    id,
+                    style: {
+                      maxWidth: tabMaxWidth,
+                    },
+                    label,
+                    tabIndex: isActive ? 0 : -1,
+                    selected: isActive,
+                    index,
+                    onClick: () => {
+                      setActiveTabIndex(index);
+                      onActiveChange?.(index);
+                    },
+                    onKeyUp: noop,
+                    onKeyDown: (e) => {
+                      const focusableElements = Array.from(
+                        outerRef.current?.querySelectorAll<HTMLDivElement>(
+                          `[data-overflow-item]:not([data-overflowing]) [role="tab"], [data-overflow-menu] button`
+                        ) ?? []
+                      );
+                      const focusableIndex =
+                        focusableElements.findIndex((tab) => {
+                          return label === tab.dataset.label;
+                        }) ?? focusableElements.length - 1;
+                      if (
+                        e.key === "ArrowRight" &&
+                        focusableElements[focusableIndex + 1]
+                      ) {
+                        focusableElements[focusableIndex + 1]?.focus();
+                      }
 
-          const isActive = activeTabIndex === index;
-          const id = getTabId(index);
-          const isOverflowed = index >= tabs.length - overflowTabsLength;
-          return cloneElement<TabProps>(child, {
-            id: id,
-            style: {
-              maxWidth: tabMaxWidth,
-              visibility: isOverflowed ? "hidden" : undefined,
-            },
-            label,
-            "aria-hidden": isOverflowed,
-            tabIndex: isActive && !isOverflowed ? 0 : -1,
-            selected: isActive,
-            index,
-            onClick: () => {
-              setActiveTabIndex(index);
-              onActiveChange?.(index);
-            },
-            onKeyUp: noop,
-            onKeyDown: (e) => {
-              let nextId;
-              if (e.key === "ArrowRight") {
-                const nextIsOverflowed =
-                  index + 1 >= tabs.length - overflowTabsLength;
-                if (nextIsOverflowed) {
-                  outerRef?.current
-                    ?.querySelector<HTMLDivElement>(
-                      `.${withBaseName("overflowMenu")} .saltButton`
-                    )
-                    ?.focus();
-                  return;
-                } else {
-                  nextId = getTabId(index + 1);
-                  setKeyboardFocusedIndex(index + 1);
-                }
-              }
-              if (e.key === "ArrowLeft") {
-                nextId = getTabId(index - 1);
-                setKeyboardFocusedIndex(index - 1);
-              }
-              if (nextId && innerRef.current) {
-                (document.getElementById(nextId) as HTMLDivElement)?.focus();
-              }
-              if (e.key === "Enter" || e.key === " ") {
-                const nextIndex =
-                  keyboardFocusedIndex < 0
-                    ? activeTabIndex
-                    : keyboardFocusedIndex;
-                setActiveTabIndex(nextIndex);
-                onActiveChange?.(nextIndex as number);
-              }
-            },
-          });
-        })}
-      </div>
+                      if (e.key === "ArrowLeft") {
+                        focusableElements[focusableIndex - 1]?.focus();
+                      }
 
-      {hasOverflow ? (
-        <OverflowMenu
-          tabs={tabs}
-          activeTabIndex={activeTabIndex}
-          overflowTabsLength={overflowTabsLength}
-          onMoveTab={onMoveTab}
-          onSelectIndex={(index: number) => {
-            onActiveChange?.(index);
-            setActiveTabIndex(index);
-          }}
-          getTabId={getTabId}
-          setKeyboardFocusedIndex={setKeyboardFocusedIndex}
-        />
-      ) : null}
+                      if (e.key === "Enter" || e.key === " ") {
+                        setActiveTabIndex(focusableIndex);
+                        onActiveChange?.(focusableIndex);
+                      }
+                    },
+                  })}
+                </div>
+              </OverflowItem>
+            );
+          })}
+          <OverflowItem id="menu" priority={9999}>
+            <OverflowMenu
+              tabs={tabs}
+              activeTabIndex={activeTabIndex}
+              onMoveTab={onMoveTab}
+              onSelectItem={handleOverflowMenuSelectionChange}
+              getTabId={getTabId}
+              returnFocusToTabs={() => {
+                const focusable =
+                  outerRef.current?.querySelectorAll<HTMLDivElement>(
+                    `[data-overflow-item]:not([data-overflowing]) [role="tab"]`
+                  ) ?? [];
+                focusable[focusable.length - 1]?.focus();
+              }}
+            />
+          </OverflowItem>
+        </div>
+      </Overflow>
     </div>
   );
 };
