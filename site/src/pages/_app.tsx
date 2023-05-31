@@ -30,6 +30,7 @@ import * as saltComponents from "../components";
 
 import { MyAppProps } from "../types/mosaic";
 import clsx from "clsx";
+import { WindowProvider } from "@salt-ds/window";
 
 const components = {
   ...mosaicComponents,
@@ -82,25 +83,27 @@ export default function MyApp({
   const createStore = useCreateStore(storeProps);
 
   return (
-    <SessionProvider>
-      <StoreProvider value={createStore()}>
-        <Metadata Component={Head} />
-        <ThemeProvider
-          className={clsx(themeClassName, ptMono.variable, openSans.variable)}
-        >
-          <DensityProvider>
-            <BaseUrlProvider>
-              <ImageProvider value={Image}>
-                <LinkProvider value={Link}>
-                  <LayoutProvider layoutComponents={layoutComponents}>
-                    <Component components={components} {...pageProps} />
-                  </LayoutProvider>
-                </LinkProvider>
-              </ImageProvider>
-            </BaseUrlProvider>
-          </DensityProvider>
-        </ThemeProvider>
-      </StoreProvider>
-    </SessionProvider>
+    <WindowProvider window={globalThis}>
+      <SessionProvider>
+        <StoreProvider value={createStore()}>
+          <Metadata Component={Head} />
+          <ThemeProvider
+            className={clsx(themeClassName, ptMono.variable, openSans.variable)}
+          >
+            <DensityProvider>
+              <BaseUrlProvider>
+                <ImageProvider value={Image}>
+                  <LinkProvider value={Link}>
+                    <LayoutProvider layoutComponents={layoutComponents}>
+                      <Component components={components} {...pageProps} />
+                    </LayoutProvider>
+                  </LinkProvider>
+                </ImageProvider>
+              </BaseUrlProvider>
+            </DensityProvider>
+          </ThemeProvider>
+        </StoreProvider>
+      </SessionProvider>
+    </WindowProvider>
   );
 }
