@@ -17,7 +17,10 @@ import {
 } from "@floating-ui/react";
 import { Button, makePrefixer, SaltProvider } from "@salt-ds/core";
 import { OverflowMenuIcon } from "@salt-ds/icons";
+import { useComponentCssInjection } from "@salt-ds/styles";
+import { useWindow } from "@salt-ds/window";
 import { ListItem } from "../list";
+import listCss from "../list/List.css";
 import { isDesktop } from "../window";
 import { TabElement } from "../tabs/TabsTypes";
 import { TabNext } from "./TabNext";
@@ -44,6 +47,13 @@ export function OverflowMenu({
   getTabId: (index?: number) => string;
   setKeyboardFocusedIndex: (index: number) => void;
 }) {
+  const targetWindow = useWindow();
+  useComponentCssInjection({
+    testId: "salt-tabstrip-list",
+    css: listCss,
+    window: targetWindow,
+  });
+
   const visibleTabsLength = tabs.length - overflowTabsLength;
   const overflowHasActiveTab =
     activeTabIndex && activeTabIndex >= visibleTabsLength;
