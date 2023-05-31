@@ -5,6 +5,7 @@
   --saltInput-minWidth: 4em;
 
   --tabs-tab-background: var(--salt-navigable-primary-background);
+  --tabs-tab-background-hover: rgba(0, 0, 0, 0.08);
   --tabs-tab-cursor: pointer;
   --tabs-tab-position: relative;
 }
@@ -130,7 +131,7 @@
 }
 
 .saltTabNext:focus-visible {
-  background: var(--saltTabs-tab-hover-background, var(--salt-navigable-primary-background-hover));
+  background: var(--saltTabs-tab-hover-background, var(--tabs-tab-background-hover));
 }
 
 /* Hover styling */
@@ -140,7 +141,7 @@
 }
 
 .saltTabNext:hover:not(.saltTabNext-closeHover) {
-  background: var(--saltTabs-tab-hover-background, var(--salt-navigable-primary-background-hover));
+  background: var(--saltTabs-tab-hover-background, var(--tabs-tab-background-hover));
 }
 
 /* Active styling */
