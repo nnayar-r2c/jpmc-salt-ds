@@ -1,9 +1,5 @@
 /* Class applied to root Tab element */
 .saltTabNext {
-  --saltEditableLabel-padding: 0;
-  --saltEditableLabel-height: var(--tabs-tabstrip-height);
-  --saltInput-minWidth: 4em;
-
   --tabs-tab-background: var(--salt-navigable-primary-background);
   --tabs-tab-background-hover: rgba(0, 0, 0, 0.08);
   --tabs-tab-cursor: pointer;
@@ -56,6 +52,7 @@
   border: none;
   color: inherit;
   cursor: inherit;
+  align-items: center;
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
@@ -114,20 +111,6 @@
   display: block;
   visibility: hidden;
   font-weight: var(--salt-navigable-fontWeight-active);
-}
-
-/* FIXME: these are all focusVisible styles, but with a bespoke inset */
-.saltTabNext-editing:after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 2px;
-  outline-color: var(--salt-focused-outlineColor);
-  outline-style: var(--salt-focused-outlineStyle);
-  outline-width: var(--salt-focused-outlineWidth);
-  outline-offset: -2px;
 }
 
 .saltTabNext:focus-visible {
