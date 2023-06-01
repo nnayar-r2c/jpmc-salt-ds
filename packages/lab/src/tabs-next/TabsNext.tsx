@@ -41,8 +41,8 @@ export const TabsNext = ({
 
   const uniqueId = useId();
   const getTabId = useCallback(
-    (index?: number | null) => {
-      return `tab-${uniqueId ?? "unknown"}-${index ?? ""}`;
+    (label: string) => {
+      return `tab-${uniqueId ?? "unknown"}-${label}`;
     },
     [uniqueId]
   );
@@ -76,7 +76,7 @@ export const TabsNext = ({
       {typeof activeTabIndex === "number"
         ? cloneElement(tabs[activeTabIndex], {
             id: getTabpanelId(activeTabIndex),
-            "aria-labelledby": getTabId(activeTabIndex),
+            "aria-labelledby": getTabId(tabs[activeTabIndex].props.label),
           })
         : null}
     </StackLayout>
