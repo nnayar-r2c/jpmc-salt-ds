@@ -16,6 +16,22 @@ type TabstripStory = Story<
   }
 >;
 
+export const Default: TabstripStory = ({ width = 600, ...tabstripProps }) => {
+  const tabs = ["Home", "Transactions", "Loans", "Checks", "Liquidity"];
+
+  return (
+    <div style={{ width, minWidth: 0, maxWidth: "100%" }}>
+      <TabstripNext {...tabstripProps}>
+        {tabs.map((label) => (
+          <TabNext label={label} key={label}>
+            {label}
+          </TabNext>
+        ))}
+      </TabstripNext>
+    </div>
+  );
+};
+
 export const SimpleTabstrip: TabstripStory = ({
   width = 600,
   ...tabstripProps

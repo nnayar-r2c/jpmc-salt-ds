@@ -26,12 +26,19 @@ function isTab(child: ReactNode | TabElement): child is TabElement {
 }
 
 export type TabstripNextProps = PropsWithChildren<{
+  /* Value for the uncontrolled version. Set to null in order to have no tabs be selected. */
   activeTabIndex?: number | null;
+  /* Callback for the controlled version. */
   onActiveChange?: (index?: number) => void;
+  /* Initial value for the uncontrolled version. Set to null in order to have no tabs be selected by default. */
   defaultActiveTabIndex?: number;
+  /* Align the tabs to the center. Left aligned by default. */
   align?: "center";
   /* Set a tab max-width in order to enable tab truncation */
   tabMaxWidth?: number;
+  /* 
+  Function to generate a unique id for each tab. Necessary for overflow to work. 
+  By default it uses the label, therefore the Tab label has to be unique. */
   getTabId?: (label: string) => string;
 }>;
 
@@ -50,7 +57,6 @@ export const TabstripNext = ({
     css: tabstripCss,
     window: targetWindow,
   });
-  const tabs = Children.toArray(children).filter(isTab);
   const uniqueId = useId();
   const _getTabId = useCallback(
     (label: string) => {
@@ -59,30 +65,35 @@ export const TabstripNext = ({
     [uniqueId]
   );
   const getTabId = getTabIdProp || _getTabId;
+  const tabs = Children.toArray(children)
+    .filter(isTab)
+    .map((tab) => {
+      const { label } = tab.props;
+      const id = tab.props.id || getTabId(label);
+      return { tab, id };
+    });
 
   const [activeTabIndex, setActiveTabIndex] = useControlled({
     controlled: activeTabIndexProp,
-    default: defaultActiveTabIndex,
+    // we want to make it possible for no tabs to be selected
+    // but it has to be set explicitly by the user by setting default or controlled value to null
+    default:
+      defaultActiveTabIndex === null ? undefined : defaultActiveTabIndex ?? 0,
     name: "useTabs",
     state: "activeTabIndex",
   });
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
-  const handleOverflowMenuSelectionChange = (item: {
-    label: string;
-    id: string;
-  }) => {
-    if (item) {
-      const index = tabs.findIndex((tab) => {
-        const label =
-          typeof tab.props.children === "string"
-            ? tab.props.children
-            : tab.props.label;
-        return label === item.label;
-      });
-      setActiveTabIndex(index);
-      onActiveChange?.(index);
-    }
+  const handleOverflowMenuSelectionChange = (selectedId: string) => {
+    const index = tabs.findIndex(({ id: tabId }) => {
+      return tabId === selectedId;
+    });
+    setActiveTabIndex(index);
+    onActiveChange?.(index);
+    // We are using setTimeout here because the overflow menu has its own focus management.
+    setTimeout(() => {
+      document.getElementById(selectedId)?.focus();
+    }, 10);
   };
 
   return (
@@ -95,10 +106,9 @@ export const TabstripNext = ({
     >
       <Overflow>
         <div className={withBaseName("inner")} ref={innerRef}>
-          {tabs.map((child, index) => {
-            const { label } = child.props;
+          {tabs.map(({ tab, id }, index) => {
+            const { label } = tab.props;
             const isActive = activeTabIndex === index;
-            const id = getTabId(label);
             return (
               <OverflowItem
                 id={id}
@@ -106,7 +116,7 @@ export const TabstripNext = ({
                 key={label}
               >
                 <div className={withBaseName("tabWrapper")}>
-                  {cloneElement<TabProps>(child, {
+                  {cloneElement<TabProps>(tab, {
                     id,
                     style: {
                       maxWidth: tabMaxWidth,
@@ -156,7 +166,6 @@ export const TabstripNext = ({
               tabs={tabs}
               activeTabIndex={activeTabIndex}
               onSelectItem={handleOverflowMenuSelectionChange}
-              getTabId={getTabId}
               returnFocusToTabs={() => {
                 const focusable =
                   outerRef.current?.querySelectorAll<HTMLDivElement>(

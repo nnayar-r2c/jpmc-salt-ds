@@ -29,10 +29,9 @@ import { TabElement } from "./TabsNextTypes";
 const withBaseName = makePrefixer("saltTabstripNext");
 
 type OverflowMenuProps = {
-  tabs: TabElement[];
+  tabs: Array<{ tab: TabElement; id: string }>;
   activeTabIndex?: number | null;
-  onSelectItem: (item: { label: string; id: string }) => void;
-  getTabId: (label: string) => string;
+  onSelectItem: (selectedId: string) => void;
   returnFocusToTabs: () => void;
 };
 
@@ -49,7 +48,6 @@ export function OverflowMenu(props: OverflowMenuProps) {
 function OverflowMenuImpl({
   tabs,
   onSelectItem,
-  getTabId,
   returnFocusToTabs,
 }: OverflowMenuProps) {
   const { ref, overflowCount } = useOverflowMenu<HTMLDivElement>();
@@ -57,16 +55,7 @@ function OverflowMenuImpl({
     (context) => context.itemVisibility
   );
 
-  const tabList = tabs
-    .map((tab) => {
-      const label = tab.props.label;
-
-      return {
-        label,
-        id: getTabId(label),
-      };
-    })
-    .filter((tab) => !itemVisibility[tab.id]);
+  const tabList = tabs.filter(({ id }) => !itemVisibility[id]);
 
   const targetWindow = useWindow();
   useComponentCssInjection({
@@ -127,7 +116,7 @@ function OverflowMenuImpl({
     const selectedItem = tabList[highlightedIndex];
     if (!selectedItem) return;
     setOpen(false);
-    onSelectItem(tabList[highlightedIndex]);
+    onSelectItem(tabList[highlightedIndex].id);
   }
 
   return (
@@ -155,19 +144,15 @@ function OverflowMenuImpl({
                       event.preventDefault();
                       select();
                     }
-
-                    if (event.key === "ArrowLeft") {
-                      returnFocusToTabs();
-                    }
                   },
                 })}
                 className={clsx(withBaseName("overflowMenu-popup"), "saltList")}
               >
-                {tabList.map(({ label }, index) => {
+                {tabList.map(({ tab, id }, index) => {
+                  const { label } = tab.props;
                   if (!label) {
                     throw new Error("Tab needs a label");
                   }
-
                   return (
                     <ListItem
                       key={label}
@@ -183,7 +168,7 @@ function OverflowMenuImpl({
                       {...getItemProps({
                         onClick: select,
                       })}
-                      id={`${getTabId(label)}-${label}-option`}
+                      id={`${id}-option`}
                     >
                       {label}
                     </ListItem>

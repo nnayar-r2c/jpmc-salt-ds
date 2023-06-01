@@ -1,10 +1,124 @@
 import { composeStories } from "@storybook/testing-react";
+import * as tabsStories from "@stories/tabs-next/tabs-next.stories";
 import * as tabstripStories from "@stories/tabstrip-next/tabstrip-next.stories";
 import { StackLayout } from "@salt-ds/core";
 
-const { SimpleTabstrip, AutoReorderTabstrip } = composeStories(tabstripStories);
+const { Default: DefaultTabs } = composeStories(tabsStories);
+const { Default: DefaultTabstrip, SimpleTabstrip } =
+  composeStories(tabstripStories);
 
-describe("Responsive rendering, Given a Tabstrip", () => {
+describe("Given a Tabs", () => {
+  describe("WHEN uncontrolled", () => {
+    describe("WHEN no defaultActiveTabIndex is provided", () => {
+      it("THEN first tab is selected", () => {
+        cy.mount(<DefaultTabs width={400} />);
+        cy.findAllByRole("tab")
+          .eq(0)
+          .should("have.attr", "aria-selected", "true");
+        cy.findByText("Content for Home tab");
+      });
+    });
+    describe("WHEN a defaultActiveTabIndex is provided", () => {
+      it("THEN the defaultActiveTabIndex is selected", () => {
+        cy.mount(<DefaultTabs defaultActiveTabIndex={1} width={400} />);
+        cy.findAllByRole("tab")
+          .eq(1)
+          .should("have.attr", "aria-selected", "true");
+        cy.findByText("Content for Transactions tab");
+      });
+    });
+  });
+  describe("WHEN controlled", () => {
+    describe("WHEN a activeTabIndex is provided", () => {
+      it("THEN the activeTabIndex is selected", () => {
+        cy.mount(<DefaultTabs activeTabIndex={1} width={400} />);
+        cy.findAllByRole("tab")
+          .eq(1)
+          .should("have.attr", "aria-selected", "true");
+        cy.findByText("Content for Transactions tab");
+      });
+    });
+    describe("WHEN a onActiveChange is provided", () => {
+      it("THEN the activeTabIndex is selected", () => {
+        cy.mount(
+          <DefaultTabs
+            onActiveChange={cy.spy().as("onActiveChange")}
+            activeTabIndex={1}
+            width={400}
+          />
+        );
+        cy.findAllByRole("tab")
+          .eq(1)
+          .should("have.attr", "aria-selected", "true");
+        cy.findByText("Content for Transactions tab");
+        cy.findAllByRole("tab").eq(0).click();
+
+        cy.get("@onActiveChange")
+          .should("have.been.calledOnce")
+          .should("have.been.calledWith", 0);
+      });
+    });
+  });
+});
+
+describe("Given a Tabstrip", () => {
+  describe("WHEN uncontrolled", () => {
+    describe("WHEN no defaultActiveTabIndex is provided", () => {
+      it("THEN first tab is selected", () => {
+        cy.mount(<DefaultTabstrip width={400} />);
+        cy.findAllByRole("tab")
+          .eq(0)
+          .should("have.attr", "aria-selected", "true");
+      });
+    });
+    describe("WHEN a defaultActiveTabIndex is provided", () => {
+      it("THEN the defaultActiveTabIndex is selected", () => {
+        cy.mount(<DefaultTabstrip defaultActiveTabIndex={1} width={400} />);
+        cy.findAllByRole("tab")
+          .eq(1)
+          .should("have.attr", "aria-selected", "true");
+      });
+    });
+    describe("WHEN a defaultActiveTabIndex is null", () => {
+      it("THEN no tab is selected", () => {
+        cy.mount(<DefaultTabstrip defaultActiveTabIndex={null} width={400} />);
+        cy.findAllByRole("tab")
+          .eq(0)
+          .should("have.attr", "aria-selected", "false");
+      });
+    });
+  });
+  describe("WHEN controlled", () => {
+    describe("WHEN a activeTabIndex is provided", () => {
+      it("THEN the activeTabIndex is selected", () => {
+        cy.mount(<DefaultTabstrip activeTabIndex={1} width={400} />);
+        cy.findAllByRole("tab")
+          .eq(1)
+          .should("have.attr", "aria-selected", "true");
+      });
+    });
+    describe("WHEN a onActiveChange is provided", () => {
+      it("THEN the activeTabIndex is selected", () => {
+        cy.mount(
+          <DefaultTabstrip
+            onActiveChange={cy.spy().as("onActiveChange")}
+            activeTabIndex={1}
+            width={400}
+          />
+        );
+        cy.findAllByRole("tab")
+          .eq(1)
+          .should("have.attr", "aria-selected", "true");
+
+        cy.findAllByRole("tab").eq(0).click();
+
+        cy.get("@onActiveChange")
+          .should("have.been.calledOnce")
+          .should("have.been.calledWith", 0);
+      });
+    });
+  });
+
   describe("WHEN initial size is sufficient to display all contents", () => {
     describe("WHEN it initially renders", () => {
       it("THEN all the content items will be visible", () => {
@@ -18,7 +132,7 @@ describe("Responsive rendering, Given a Tabstrip", () => {
       });
       it("THEN no overflow indicator will be present", () => {
         cy.mount(<SimpleTabstrip width={400} />);
-        cy.findByRole("tablist").findByRole("button").should("not.exist");
+        cy.findByRole("tablist").findByRole("combobox").should("not.exist");
       });
     });
 
@@ -274,20 +388,14 @@ describe("Navigation, Given a Tabstrip", () => {
       cy.focused().realPress("Escape");
       cy.findByRole("listbox").should("not.exist");
     });
-    it("THEN overflow menu can be closed with ArrowLeft and focus is returned to last visible tab", () => {
-      cy.mount(<SimpleTabstrip width={120} />);
-      cy.findByRole("combobox").click();
-      cy.findByRole("listbox").should("exist");
-      cy.focused().realPress("ArrowLeft");
-      cy.findByRole("listbox").should("not.exist");
-      cy.focused().should("have.attr", "role", "tab");
-    });
-    it("THEN overflow menu item can be selected with Enter and focus is returned to the overflow button", () => {
+    it("THEN overflow menu item can be selected with Enter and focus is moved to the active tab", () => {
       cy.mount(<SimpleTabstrip width={120} />);
       cy.findByRole("combobox").click();
       cy.findByRole("listbox").should("exist");
       cy.focused().realPress("ArrowDown").realPress("Enter");
-      cy.focused().should("have.attr", "role", "combobox");
+      cy.focused()
+        .should("have.ariaSelected")
+        .should("have.attr", "role", "tab");
     });
   });
 });

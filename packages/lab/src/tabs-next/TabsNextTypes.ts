@@ -40,6 +40,10 @@ export type TabProps = Omit<
   HTMLAttributes<HTMLElement>,
   "onClick" | "onKeyUp"
 > & {
+  /* 
+  Label is mandatory for accessibility and must be unique in order for overflow to work. 
+  If you cannot provide a unique label, you must provide a unique id to each tab.
+  */
   label: string;
   ariaControls?: AriaAttributes["aria-controls"];
   closeable?: boolean;

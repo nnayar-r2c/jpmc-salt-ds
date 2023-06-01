@@ -1,15 +1,22 @@
-import { TabPanelNext, TabsNext } from "@salt-ds/lab";
+import { TabPanelNext, TabsNext, TabsNextProps } from "@salt-ds/lab";
 import { Text } from "@salt-ds/core";
+import { Story } from "@storybook/react";
 
 export default {
   title: "Lab/TabsNext/TabsNext",
   component: TabsNext,
 };
 
-export const Default = () => {
+type TabsStory = Story<
+  TabsNextProps & {
+    width?: number;
+  }
+>;
+
+export const Default: TabsStory = ({ width = 600, ...props }) => {
   return (
-    <div style={{ width: 600, maxWidth: "100%", height: 300 }}>
-      <TabsNext>
+    <div style={{ width, maxWidth: "100%", height: 300 }}>
+      <TabsNext {...props}>
         <TabPanelNext label="Home">
           <Text>Content for Home tab</Text>
         </TabPanelNext>
