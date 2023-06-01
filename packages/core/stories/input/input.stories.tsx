@@ -1,5 +1,5 @@
-import { Input, FlowLayout, Text } from "@salt-ds/core";
-import { CallIcon, CreditCardIcon, FilterClearIcon, FilterIcon, FlagIcon } from "@salt-ds/icons";
+import { Input, FlowLayout, Text, AdornmentButton } from "@salt-ds/core";
+import { CallIcon, CloseIcon, CreditCardIcon, FilterClearIcon, FilterIcon, FlagIcon, MenuIcon, NoteIcon, PotFoodIcon, RefreshIcon, SendIcon } from "@salt-ds/icons";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { ChangeEvent, useState } from "react";
 
@@ -127,7 +127,6 @@ export const Validation: ComponentStory<typeof Input> = (args) => {
   );
 };
 
-
 export const StaticAdornments: ComponentStory<typeof Input> = (args) => {
   return (
     <FlowLayout style={{ width: "266px" }}>
@@ -162,6 +161,40 @@ export const StaticAdornments: ComponentStory<typeof Input> = (args) => {
           </>
         }
         defaultValue={args.defaultValue ?? "Value 2"}
+        {...args}
+      />
+    </FlowLayout>
+  );
+};
+
+export const ButtonAdornment: ComponentStory<typeof Input> = (args) => {
+  return (
+    <FlowLayout style={{ width: "266px" }}>
+      <Input
+        startAdornment={<AdornmentButton><NoteIcon /></AdornmentButton>}
+        defaultValue={args.defaultValue ?? "Value"}
+        {...args}
+      />
+      <Input
+        variant="secondary"
+        startAdornment={<AdornmentButton variant="cta"><RefreshIcon /></AdornmentButton>}
+        defaultValue={args.defaultValue ?? "Value"}
+        {...args}
+      />
+      <Input
+        endAdornment={<AdornmentButton><SendIcon /></AdornmentButton>}
+        defaultValue={args.defaultValue ?? "Value"}
+        {...args}
+      />
+      <Input
+        variant="secondary"
+        endAdornment={
+          <>
+            <AdornmentButton variant="secondary"><CloseIcon /></AdornmentButton>
+            <AdornmentButton variant="cta"><FlagIcon /></AdornmentButton>
+          </>
+        }
+        defaultValue={args.defaultValue ?? "Value"}
         {...args}
       />
     </FlowLayout>
