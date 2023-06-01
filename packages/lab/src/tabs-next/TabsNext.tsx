@@ -27,11 +27,9 @@ export const TabsNext = ({
   activeTabIndex: activeTabIndexProp,
   defaultActiveTabIndex,
   onActiveChange,
-  onMoveTab,
   ...props
 }: TabsNextProps) => {
   const tabs = Children.toArray(children).filter(isTabPanel);
-
   const [activeTabIndex, setActiveTabIndex] = useControlled({
     controlled: activeTabIndexProp,
     default: defaultActiveTabIndex ?? 0,
