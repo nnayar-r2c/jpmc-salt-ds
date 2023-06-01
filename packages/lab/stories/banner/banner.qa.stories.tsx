@@ -1,7 +1,13 @@
 import { FC } from "react";
-import { Link, StackLayout, SaltProvider } from "@salt-ds/core";
-import { Banner, BannerProps } from "@salt-ds/lab";
+import { Button, Link, StackLayout, SaltProvider } from "@salt-ds/core";
+import {
+  Banner,
+  BannerProps,
+  BannerContent,
+  BannerActions,
+} from "@salt-ds/lab";
 import { ComponentMeta, Story } from "@storybook/react";
+import { CloseIcon } from "@salt-ds/icons";
 
 export default {
   title: "Lab/Banner/QA",
@@ -10,23 +16,16 @@ export default {
 
 const BasicBannerExample: FC<BannerProps> = ({ status }) => {
   return (
-    <div style={{ width: "95%", minWidth: "60vw" }}>
-      {
-        <Banner
-          onClose={() => console.log("close")}
-          render={({ Icon, getIconProps, getLabelProps, getLinkProps }) => (
-            <>
-              <Icon {...getIconProps()} aria-label={"Success"} />
-              <span {...getLabelProps()}>
-                Example custom renderer
-                <Link {...getLinkProps()}>link</Link>
-              </span>
-            </>
-          )}
-          status={status}
-        />
-      }
-    </div>
+    <Banner status={status}>
+      <BannerContent>
+        Example custom renderer <Link href={"#"}>link</Link>
+      </BannerContent>
+      <BannerActions>
+        <Button aria-label="refresh" variant="secondary">
+          <CloseIcon />
+        </Button>
+      </BannerActions>
+    </Banner>
   );
 };
 
@@ -38,22 +37,22 @@ const SuccessBanner = () => <BasicBannerExample status={"success"} />;
 export const ExamplesGrid: Story = () => (
   <StackLayout gap={2}>
     <SaltProvider applyClassesTo={"child"} density={"high"} mode={"light"}>
-      <div className="saltBannerContainerExample">
+      <div style={{ width: "60vw" }}>
         <InfoBanner />
       </div>
     </SaltProvider>
     <SaltProvider applyClassesTo={"child"} density={"medium"} mode={"dark"}>
-      <div className="saltBannerContainerExample">
+      <div style={{ width: "60vw" }}>
         <ErrorBanner />
       </div>
     </SaltProvider>
     <SaltProvider applyClassesTo={"child"} density={"low"} mode={"light"}>
-      <div className="saltBannerContainerExample">
+      <div style={{ width: "60vw" }}>
         <WarningBanner />
       </div>
     </SaltProvider>
     <SaltProvider applyClassesTo={"child"} density={"touch"} mode={"dark"}>
-      <div className="saltBannerContainerExample">
+      <div style={{ width: "60vw" }}>
         <SuccessBanner />
       </div>
     </SaltProvider>

@@ -9,7 +9,10 @@ import {
 import { makePrefixer, useControlled } from "@salt-ds/core";
 import { CheckedIcon } from "./assets/CheckedIcon";
 
-import "./Switch.css";
+import { useWindow } from "@salt-ds/window";
+import { useComponentCssInjection } from "@salt-ds/styles";
+
+import switchCss from "./Switch.css";
 
 export interface SwitchProps {
   checked?: boolean;
@@ -43,6 +46,13 @@ export const Switch = forwardRef<HTMLLabelElement, SwitchProps>(function Switch(
     onFocus,
     ...rest
   } = props;
+
+  const targetWindow = useWindow();
+  useComponentCssInjection({
+    testId: "salt-switch",
+    css: switchCss,
+    window: targetWindow,
+  });
 
   const [checked, setChecked] = useControlled({
     controlled: checkedProp,

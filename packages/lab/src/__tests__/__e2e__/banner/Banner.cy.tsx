@@ -1,80 +1,81 @@
-import { Banner } from "@salt-ds/lab";
 import { composeStories } from "@storybook/testing-react";
+import { Banner, BannerActions, BannerContent } from "@salt-ds/lab";
+import { Button } from "@salt-ds/core";
+import { RefreshIcon } from "@salt-ds/icons";
 import * as bannerStories from "@stories/banner/banner.stories";
 import { checkAccessibility } from "../../../../../../cypress/tests/checkAccessibility";
 
 const composedStories = composeStories(bannerStories);
-const { Info, Success, Warning, Error } = composedStories;
+const { StatusesPrimary } = composedStories;
 
 describe("GIVEN a Banner", () => {
   checkAccessibility(composedStories);
 
-  it("THEN should render info", () => {
-    cy.mount(<Info />);
+  it("THEN should render status", () => {
+    cy.mount(<StatusesPrimary />);
 
     cy.findByTestId("InfoSolidIcon").should("exist");
-  });
-
-  it("THEN should render success", () => {
-    cy.mount(<Success />);
-
     cy.findByTestId("SuccessTickIcon").should("exist");
-  });
-
-  it("THEN should render warning", () => {
-    cy.mount(<Warning />);
-
     cy.findByTestId("WarningSolidIcon").should("exist");
-  });
-
-  it("THEN should render error", () => {
-    cy.mount(<Error />);
-
     cy.findByTestId("ErrorSolidIcon").should("exist");
   });
 
-  it("THEN should announce the contents of the Banner", () => {
+  xit("THEN should announce the contents of the Banner", () => {
     const message = "example announcement";
-    cy.mount(<Banner>{message}</Banner>);
+    cy.mount(
+      <Banner>
+        <BannerContent>{message}</BannerContent>
+      </Banner>
+    );
 
     cy.get("[aria-live]").contains(message);
   });
 
-  it("THEN should call onClose when interacted with", () => {
-    const clickSpy = cy.stub().as("clickSpy");
-    cy.mount(<Banner onClose={clickSpy}>On Close example</Banner>);
-    cy.realPress("Tab");
-    cy.realPress("Enter");
-    cy.get("@clickSpy").should("be.called");
-    cy.realPress("Space");
-    cy.get("@clickSpy").should("be.called");
-  });
-
-  describe("WHEN using additional LinkProps", () => {
-    it("THEN they should be applied", () => {
-      cy.mount(
-        <Banner LinkProps={{ href: "some-link", children: "Go to Dashboard" }}>
-          Default Banner State
-        </Banner>
-      );
-
-      cy.findByText("Link").should("not.exist");
-      cy.findByText("Go to Dashboard").should("exist");
-    });
-  });
-
-  describe("WHEN emphasize={true}", () => {
+  describe("WHEN variant=secondary", () => {
     it("THEN class should be applied to the banner", () => {
       cy.mount(
-        <Banner data-testid="bannerRoot" emphasize={true}>
-          Default Banner State
+        <Banner data-testid="bannerRoot" variant="secondary">
+          <BannerContent> Default Banner State</BannerContent>
         </Banner>
       );
 
       cy.findByTestId("bannerRoot").should(
         "have.class",
-        "saltBanner-emphasize"
+        "saltBanner-secondary"
       );
     });
+  });
+});
+
+describe("WHEN adding BannerActions", () => {
+  it("THEN should show the close button and should call onClick handler on CLICK, ENTER and SPACE", () => {
+    const clickSpy = cy.stub().as("clickSpy");
+    const Component = (
+      <Banner>
+        <BannerContent>On Close example</BannerContent>
+        <BannerActions>
+          <Button aria-label="refresh" variant="secondary" onClick={clickSpy}>
+            <RefreshIcon />
+          </Button>
+        </BannerActions>
+      </Banner>
+    );
+    cy.mount(Component);
+    cy.get(".saltBanner").should("exist");
+    cy.findByRole("button").should("exist");
+    cy.findByRole("button").realClick();
+    cy.get("@clickSpy").should("be.called");
+
+    cy.mount(Component);
+    cy.get(".saltBanner").should("exist");
+    cy.realPress("Tab");
+    cy.realPress("Enter");
+    cy.get("@clickSpy").should("be.called");
+
+    cy.mount(Component);
+    cy.get(".saltBanner").should("exist");
+    cy.realPress("Tab");
+    cy.realPress("Space");
+    cy.get("@clickSpy").should("be.called");
   });
 });

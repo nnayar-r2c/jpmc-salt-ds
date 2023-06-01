@@ -3,27 +3,31 @@ import {
   cloneElement,
   forwardRef,
   HTMLAttributes,
-  ReactNode,
   isValidElement,
+  ReactNode,
   Ref,
 } from "react";
 import { FloatingArrow, FloatingPortal } from "@floating-ui/react";
+import { useWindow } from "@salt-ds/window";
+import { useComponentCssInjection } from "@salt-ds/styles";
+
 import { StatusIndicator, ValidationStatus } from "../status-indicator";
 import {
-  UseFloatingUIProps,
   makePrefixer,
   mergeProps,
+  UseFloatingUIProps,
   useForkRef,
 } from "../utils";
-import { useTooltip, UseTooltipProps } from "./useTooltip";
-import "./Tooltip.css";
 import { SaltProvider } from "../salt-provider";
+
+import { useTooltip, UseTooltipProps } from "./useTooltip";
+import tooltipCss from "./Tooltip.css";
 
 const withBaseName = makePrefixer("saltTooltip");
 
 export interface TooltipProps
-  extends HTMLAttributes<HTMLDivElement>,
-    Pick<UseFloatingUIProps, "open" | "onOpenChange" | "placement"> {
+  extends Pick<UseFloatingUIProps, "open" | "onOpenChange" | "placement">,
+    Omit<HTMLAttributes<HTMLDivElement>, "content"> {
   /**
    * The children will be the Tooltip's trigger.
    */
@@ -82,6 +86,13 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
       leaveDelay = 0,
       ...rest
     } = props;
+
+    const targetWindow = useWindow();
+    useComponentCssInjection({
+      testId: "salt-tooltip",
+      css: tooltipCss,
+      window: targetWindow,
+    });
 
     const hookProps: UseTooltipProps = {
       open: openProp,
