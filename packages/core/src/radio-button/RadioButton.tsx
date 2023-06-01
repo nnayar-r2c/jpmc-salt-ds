@@ -14,6 +14,7 @@ import { RadioButtonIcon } from "./RadioButtonIcon";
 import radioButtonCss from "./RadioButton.css";
 import { useWindow } from "@salt-ds/window";
 import { useComponentCssInjection } from "@salt-ds/styles";
+import { useFormFieldProps } from "../form-field-context";
 
 const withBaseName = makePrefixer("saltRadioButton");
 
@@ -69,8 +70,8 @@ export const RadioButton = forwardRef<HTMLLabelElement, RadioButtonProps>(
     const {
       checked: checkedProp,
       className,
-      disabled,
-      error,
+      disabled: disabledProp,
+      error: errorProp,
       inputProps,
       label,
       name: nameProp,
@@ -89,6 +90,17 @@ export const RadioButton = forwardRef<HTMLLabelElement, RadioButtonProps>(
     });
 
     const radioGroup = useRadioGroup();
+
+    const {
+      a11yProps: {
+        "aria-labelledby": formFieldLabelledBy
+      } = {},
+      disabled: formFieldDisabled,
+      validationStatus: formFieldValidationStatus,
+    } = useFormFieldProps();
+    
+    const disabled = formFieldDisabled ?? disabledProp;
+    const error = formFieldValidationStatus === "error" ?? errorProp;
 
     const radioGroupChecked =
       radioGroup.value != null && value != null
@@ -124,6 +136,7 @@ export const RadioButton = forwardRef<HTMLLabelElement, RadioButtonProps>(
         {...rest}
       >
         <input
+          aria-labelledby={formFieldLabelledBy}
           className={withBaseName("input")}
           {...inputProps}
           checked={checked}

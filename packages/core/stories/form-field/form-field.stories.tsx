@@ -205,6 +205,16 @@ export const WithValidation: ComponentStory<typeof FormField> = (props) => {
         <Input defaultValue="Input value" />
         <FormHelperText>Helper text</FormHelperText>
       </FormField>
+      <FormField validationStatus="error" {...props}>
+        <FormLabel>Error Form Field</FormLabel>
+        <Checkbox label="Option 1" />
+        <FormHelperText>Helper text</FormHelperText>
+      </FormField>
+      <FormField validationStatus="error" {...props}>
+        <FormLabel>Error Form Field</FormLabel>
+        <RadioButton label="Option 1" />
+        <FormHelperText>Helper text</FormHelperText>
+      </FormField>
       {/* TODO: Guidance to explain that the following would produce broken design/behaviour
       
       
