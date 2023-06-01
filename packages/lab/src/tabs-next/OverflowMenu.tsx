@@ -30,7 +30,6 @@ const withBaseName = makePrefixer("saltTabstripNext");
 
 type OverflowMenuProps = {
   tabs: TabElement[];
-  onMoveTab?: (from: number, to: number) => void;
   activeTabIndex?: number | null;
   onSelectItem: (item: { label: string; id: string }) => void;
   getTabId: (label: string) => string;

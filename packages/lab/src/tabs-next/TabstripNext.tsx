@@ -30,8 +30,6 @@ export type TabstripNextProps = PropsWithChildren<{
   onActiveChange?: (index?: number) => void;
   defaultActiveTabIndex?: number;
   align?: "center";
-  /* Triggered when tabs should be reordered to make the overflowed tab visible. This prop can only be used with controlled tabstrip. */
-  onMoveTab?: (from: number, to: number) => void;
   /* Set a tab max-width in order to enable tab truncation */
   tabMaxWidth?: number;
   getTabId?: (label: string) => string;
@@ -43,7 +41,6 @@ export const TabstripNext = ({
   defaultActiveTabIndex,
   onActiveChange,
   align,
-  onMoveTab,
   tabMaxWidth,
   getTabId: getTabIdProp,
 }: TabstripNextProps) => {
@@ -158,7 +155,6 @@ export const TabstripNext = ({
             <OverflowMenu
               tabs={tabs}
               activeTabIndex={activeTabIndex}
-              onMoveTab={onMoveTab}
               onSelectItem={handleOverflowMenuSelectionChange}
               getTabId={getTabId}
               returnFocusToTabs={() => {
