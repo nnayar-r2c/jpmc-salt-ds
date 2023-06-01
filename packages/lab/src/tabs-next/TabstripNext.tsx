@@ -137,8 +137,8 @@ export const TabstripNext = ({
                         ) ?? []
                       );
                       const focusableIndex =
-                        focusableElements.findIndex((tab) => {
-                          return label === tab.dataset.label;
+                        focusableElements.findIndex((tabElement) => {
+                          return id === tabElement.id;
                         }) ?? focusableElements.length - 1;
                       if (
                         e.key === "ArrowRight" &&
