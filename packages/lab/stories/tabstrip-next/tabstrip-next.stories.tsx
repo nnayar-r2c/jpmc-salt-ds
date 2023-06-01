@@ -207,6 +207,7 @@ export const CloseTabTabstrip: TabstripStory = ({
       >
         {tabs.map((label) => (
           <TabNext
+            label={label}
             key={label}
             closeable
             onClose={(tabIndex) => {
