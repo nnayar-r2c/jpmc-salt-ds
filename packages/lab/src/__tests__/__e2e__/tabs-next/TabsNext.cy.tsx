@@ -56,7 +56,7 @@ describe("Tab selection, Given a Tabstrip", () => {
     });
   });
 
-  describe.only("WHEN initial size is NOT sufficient to display all contents", () => {
+  describe("WHEN initial size is NOT sufficient to display all contents", () => {
     describe("WHEN the selected Tab is in the overflow menu", () => {
       it("THEN the active tab will be moved from the overflow menu to the end of visible tabs", () => {
         cy.mount(<SimpleTabstrip width={220} />);
