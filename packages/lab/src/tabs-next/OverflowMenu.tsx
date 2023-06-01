@@ -15,7 +15,7 @@ import {
   useListNavigation,
   useRole,
 } from "@floating-ui/react";
-import { Button, makePrefixer, SaltProvider } from "@salt-ds/core";
+import { Button, makePrefixer, SaltProvider, Tooltip } from "@salt-ds/core";
 import { OverflowMenuIcon } from "@salt-ds/icons";
 import { useComponentCssInjection } from "@salt-ds/styles";
 import { useWindow } from "@salt-ds/window";
@@ -195,24 +195,26 @@ function OverflowMenuImpl({
         </FloatingPortal>
       ) : null}
 
-      <Button
-        tabIndex={-1}
-        ref={refs.setReference}
-        aria-autocomplete="none"
-        {...getReferenceProps({
-          onKeyDown: (e) => {
-            if (e.key === "ArrowLeft") {
-              returnFocusToTabs();
-            }
-          },
-        })}
-        aria-label={`Tabs overflow menu ${overflowCount} item${
-          overflowCount === 1 ? "" : "s"
-        }`}
-        variant="secondary"
-      >
-        <OverflowMenuIcon style={{ margin: 0 }} />
-      </Button>
+      <Tooltip content="Overflow Menu">
+        <Button
+          tabIndex={-1}
+          ref={refs.setReference}
+          aria-autocomplete="none"
+          {...getReferenceProps({
+            onKeyDown: (e) => {
+              if (e.key === "ArrowLeft") {
+                returnFocusToTabs();
+              }
+            },
+          })}
+          aria-label={`Tabs overflow menu ${overflowCount} item${
+            overflowCount === 1 ? "" : "s"
+          }`}
+          variant="secondary"
+        >
+          <OverflowMenuIcon style={{ margin: 0 }} />
+        </Button>
+      </Tooltip>
     </div>
   );
 }
