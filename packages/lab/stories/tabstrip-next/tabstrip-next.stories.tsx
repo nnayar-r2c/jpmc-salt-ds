@@ -125,7 +125,7 @@ export const AddTabTabstrip: TabstripStory = ({
 
   return (
     <div style={{ width, minWidth: 0, maxWidth: "100%" }}>
-      <FlexLayout align="center">
+      <FlexLayout align="center" gap={1}>
         <TabstripNext
           {...tabstripProps}
           activeTabIndex={activeTabIndex}

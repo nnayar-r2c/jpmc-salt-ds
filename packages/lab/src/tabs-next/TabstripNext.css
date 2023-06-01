@@ -4,9 +4,9 @@
   --tabs-tabstrip-display: var(--saltTabs-tabstrip-display, inline-flex);
   --tabs-tabstrip-background: var(--saltTabs-tabstrip-background, transparent);
 
-  --tabs-activationIndicator-height: var(--salt-size-border);
-  --tabs-activationIndicator-background: var(--salt-container-primary-borderColor);
-  --tabs-activationIndicator-thumb-height: var(--salt-editable-borderWidth-active);
+  --tabs-activationIndicator-thumb-height: var(--saltTabs-activationIndicator-thumb-height, var(--salt-size-bar));
+  --tabs-activationIndicator-height: var(--saltTabs-activationIndicator-height, calc(var(--tabs-activationIndicator-thumb-height) / 2));
+  --tabs-activationIndicator-background: var(--saltTabs-activationIndicator-background, var(--salt-container-primary-borderColor));
   --tabs-tab-spacing: var(--salt-spacing-100);
 
   align-items: flex-start;
@@ -29,10 +29,6 @@
   display: flex;
   align-items: center;
   border-bottom: var(--tabs-activationIndicator-thumb-height) solid transparent;
-}
-
-.saltTabstripNext-overflowMenu-active {
-  border-bottom-color: var(--salt-navigable-indicator-active);
 }
 
 .saltTabstripNext-overflowMenu-popup {

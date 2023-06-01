@@ -115,7 +115,7 @@
 }
 
 .saltTabNext:focus-visible {
-  background: var(--saltTabs-tab-hover-background, var(--tabs-tab-background-hover));
+  background: var(--saltTabs-tab-background-hover, var(--tabs-tab-background-hover));
 }
 
 /* Hover styling */
@@ -125,7 +125,7 @@
 }
 
 .saltTabNext:hover:not(.saltTabNext-closeHover) {
-  background: var(--saltTabs-tab-hover-background, var(--tabs-tab-background-hover));
+  background: var(--saltTabs-tab-background-hover, var(--tabs-tab-background-hover));
 }
 
 /* Active styling */
