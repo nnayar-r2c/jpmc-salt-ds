@@ -1,11 +1,10 @@
 /* Component class applied to the root element */
 .saltTabstripNext {
   --tabs-tabstrip-height: var(--saltTabs-tabstrip-height, var(--salt-size-stackable));
-  --tabs-tabstrip-dragging-display: none;
-  --tabs-tabstrip-display: inline-flex;
-  --tabs-tabstrip-background: transparent;
+  --tabs-tabstrip-display: var(--saltTabs-tabstrip-display, inline-flex);
+  --tabs-tabstrip-background: var(--saltTabs-tabstrip-background, transparent);
 
-  --saltTabs-activationIndicator-height: var(--salt-size-border);
+  --tabs-activationIndicator-height: var(--salt-size-border);
   --tabs-activationIndicator-background: var(--salt-container-primary-borderColor);
   --tabs-activationIndicator-thumb-height: var(--salt-editable-borderWidth-active);
   --tabs-tab-spacing: var(--salt-spacing-100);
@@ -15,18 +14,12 @@
   font-size: var(--salt-text-fontSize);
   font-weight: var(--salt-text-fontWeight);
   position: relative;
-  display: flex;
+  background: var(--tabs-tabstrip-background);
+  display: var(--tabs-tabstrip-display);
   min-width: 28px;
   width: 100%;
   height: var(--tabs-tabstrip-height);
-}
-
-.saltTabstripNext::before {
-  content: "";
-  position: absolute;
-  inset: auto 0 0 0;
-  height: var(--saltTabs-activationIndicator-height);
-  background: var(--tabs-activationIndicator-background);
+  border-bottom: solid var(--tabs-activationIndicator-height) var(--tabs-activationIndicator-background);
 }
 
 .saltTabstripNext-overflowMenu {
@@ -49,19 +42,6 @@
   margin-top: 5px;
 }
 
-.saltTabstripNext-scrollable {
-  overflow-x: auto;
-}
-
-.saltTabstripNext-scrollable .saltTabstripNext-inner {
-  flex-wrap: nowrap;
-  width: auto;
-}
-
-.saltTabstripNext-scrollable::-webkit-scrollbar {
-  display: none;
-}
-
 .saltTabstripNext-inner {
   width: 100%;
   align-items: center;
@@ -69,7 +49,6 @@
   min-width: 0;
   flex-wrap: nowrap;
   justify-content: flex-start;
-  line-height: var(--tabs-tabstrip-height);
   overflow: hidden;
 }
 

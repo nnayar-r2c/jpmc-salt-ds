@@ -56,7 +56,8 @@
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
-  height: var(--saltTabs-tabstrip-height, var(--salt-size-stackable));
+  /* visually center the text */
+  line-height: calc(var(--tabs-tabstrip-height) - var(--tabs-activationIndicator-thumb-height));
   outline: none;
   padding: 0 var(--tabs-tab-spacing);
   position: relative;
