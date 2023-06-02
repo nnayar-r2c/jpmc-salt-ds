@@ -72,7 +72,7 @@ export const TabNext = forwardRef(function Tab(
   });
   if (index === undefined || onClick === undefined || onKeyDown === undefined) {
     throw Error(
-      "index, onClick, onKeyUp, onKeyDown are required props, they would nornally be injected by Tabstrip, are you creating a Tab outside of a Tabstrip"
+      "index, onClick, onKeyDown are required props, they would normally be injected by Tabstrip, are you creating a Tab outside of a Tabstrip"
     );
   }
   const root = useRef<HTMLDivElement>(null);

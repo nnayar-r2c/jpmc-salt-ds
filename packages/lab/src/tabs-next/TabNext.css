@@ -75,17 +75,17 @@
 }
 
 /* the close Button on a closeable Tab*/
-.saltTabNext-close-icon {
+.saltTabNext-closeButton .saltTabNext-close-icon {
   display: none;
 }
 
-.salt-density-touch .saltTabNext-close-icon,
-.salt-density-low .saltTabNext-close-icon {
+.salt-density-touch .saltTabNext-closeButton .saltTabNext-close-icon,
+.salt-density-low .saltTabNext-closeButton .saltTabNext-close-icon {
   display: block;
 }
 
-.salt-density-touch .saltTabNext-close-icon-small,
-.salt-density-low .saltTabNext-close-icon-small {
+.salt-density-touch .saltTabNext-closeButton .saltTabNext-close-icon-small,
+.salt-density-low .saltTabNext-closeButton .saltTabNext-close-icon-small {
   display: none;
 }
 
