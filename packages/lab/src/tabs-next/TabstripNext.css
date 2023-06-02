@@ -1,6 +1,5 @@
 /* Component class applied to the root element */
 .saltTabstripNext {
-  --tabs-tabstrip-height: var(--saltTabs-tabstrip-height, var(--salt-size-stackable));
   --tabs-tabstrip-display: var(--saltTabs-tabstrip-display, inline-flex);
   --tabs-tabstrip-background: var(--saltTabs-tabstrip-background, transparent);
 
@@ -18,8 +17,14 @@
   display: var(--tabs-tabstrip-display);
   min-width: 28px;
   width: 100%;
-  height: var(--tabs-tabstrip-height);
-  border-bottom: solid var(--tabs-activationIndicator-height) var(--tabs-activationIndicator-background);
+}
+
+.saltTabstripNext::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: var(--tabs-activationIndicator-height);
+  background: var(--tabs-activationIndicator-background);
 }
 
 .saltTabstripNext-overflowMenu {

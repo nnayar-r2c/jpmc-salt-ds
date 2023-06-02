@@ -17,7 +17,6 @@
   color: var(--salt-text-primary-foreground);
   cursor: var(--saltTabs-tab-cursor, var(--tabs-tab-cursor));
   display: var(--tabs-tabstrip-display);
-  height: var(--saltTabs-tab-height, var(--tabs-tabstrip-height));
   letter-spacing: var(--saltTabs-tab-letterSpacing, var(--tabs-tab-letterSpacing, 0));
   min-width: var(--saltTabs-tab-minWidth, 40px);
   outline: none;
@@ -56,8 +55,8 @@
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
-  /* visually center the text */
-  line-height: calc(var(--tabs-tabstrip-height) - var(--tabs-activationIndicator-thumb-height));
+  height: var(--salt-size-base);
+  margin-top: var(--salt-spacing-50);
   outline: none;
   padding: 0 var(--tabs-tab-spacing);
   position: relative;
