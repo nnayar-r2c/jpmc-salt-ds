@@ -1,15 +1,19 @@
 import { FC } from "react";
-import { Link, StackLayout, SaltProvider } from "@salt-ds/core";
 import {
   Banner,
   BannerProps,
   BannerContent,
-  BannerCloseButton,
-} from "@salt-ds/lab";
+  BannerActions,
+  Button,
+  Link,
+  StackLayout,
+  SaltProvider,
+} from "@salt-ds/core";
 import { ComponentMeta, Story } from "@storybook/react";
+import { CloseIcon } from "@salt-ds/icons";
 
 export default {
-  title: "Lab/Banner/QA",
+  title: "Core/Banner/QA",
   component: Banner,
 } as ComponentMeta<typeof Banner>;
 
@@ -19,7 +23,11 @@ const BasicBannerExample: FC<BannerProps> = ({ status }) => {
       <BannerContent>
         Example custom renderer <Link href={"#"}>link</Link>
       </BannerContent>
-      <BannerCloseButton onClick={() => console.log("close")} />
+      <BannerActions>
+        <Button aria-label="refresh" variant="secondary">
+          <CloseIcon />
+        </Button>
+      </BannerActions>
     </Banner>
   );
 };

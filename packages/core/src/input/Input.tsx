@@ -5,19 +5,18 @@ import {
   FocusEvent,
   forwardRef,
   InputHTMLAttributes,
-  ReactNode,
   Ref,
   useState,
 } from "react";
-import { makePrefixer, useControlled, useFormFieldProps } from "@salt-ds/core";
+import { useComponentCssInjection } from "@salt-ds/styles";
+import { useWindow } from "@salt-ds/window";
+import { useFormFieldProps } from "../form-field-context";
+import { makePrefixer, useControlled } from "../utils";
 import { StatusAdornment } from "../status-adornment";
 
-import { useWindow } from "@salt-ds/window";
-import { useComponentCssInjection } from "@salt-ds/styles";
+import inputCss from "./Input.css";
 
-import inputNextCss from "./InputNext.css";
-
-const withBaseName = makePrefixer("saltInputNext");
+const withBaseName = makePrefixer("saltInput");
 
 export interface InputProps
   extends Omit<ComponentPropsWithoutRef<"div">, "defaultValue">,
@@ -31,10 +30,6 @@ export interface InputProps
    */
   emptyReadOnlyMarker?: string;
   /**
-   * End adornment component
-   */
-  endAdornment?: ReactNode;
-  /**
    * [Attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#Attributes) applied to the `input` element.
    */
   inputProps?: InputHTMLAttributes<HTMLInputElement>;
@@ -46,10 +41,6 @@ export interface InputProps
    * If `true`, the component is read only.
    */
   readOnly?: boolean;
-  /**
-   * Start adornment component
-   */
-  startAdornment?: ReactNode;
   /**
    * Alignment of text within container. Defaults to "left"
    */
@@ -72,13 +63,11 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(function Input(
     className: classNameProp,
     disabled,
     emptyReadOnlyMarker = "—",
-    endAdornment,
     id,
     inputProps = {},
     inputRef,
     readOnly: readOnlyProp,
     role,
-    startAdornment,
     style,
     textAlign = "left",
     value: valueProp,
@@ -91,15 +80,15 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(function Input(
 ) {
   const targetWindow = useWindow();
   useComponentCssInjection({
-    testId: "salt-input-next",
-    css: inputNextCss,
+    testId: "salt-input",
+    css: inputCss,
     window: targetWindow,
   });
 
   const {
     a11yProps: {
+      "aria-describedby": formFieldDescribedBy,
       "aria-labelledby": formFieldLabelledBy,
-      ...restFormFieldA11yProps
     } = {},
     disabled: formFieldDisabled,
     readOnly: formFieldReadOnly,
@@ -110,7 +99,6 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(function Input(
     ariaActiveDescendant,
     ariaExpanded,
     ariaOwns,
-    ...restFormFieldA11yProps,
   };
 
   const isDisabled = disabled || formFieldDisabled;
@@ -124,6 +112,7 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(function Input(
   const defaultValue = isEmptyReadOnly ? emptyReadOnlyMarker : defaultValueProp;
 
   const {
+    "aria-describedby": inputDescribedBy,
     "aria-labelledby": inputLabelledBy,
     onBlur,
     onChange,
@@ -155,7 +144,7 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(function Input(
   };
 
   const inputStyle = {
-    "--inputNext-textAlign": textAlign,
+    "--input-textAlign": textAlign,
     ...style,
   };
 
@@ -177,6 +166,7 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(function Input(
       {...other}
     >
       <input
+        aria-describedby={clsx(formFieldDescribedBy, inputDescribedBy)}
         aria-labelledby={clsx(formFieldLabelledBy, inputLabelledBy)}
         className={clsx(withBaseName("input"), inputProps?.className)}
         disabled={isDisabled}
