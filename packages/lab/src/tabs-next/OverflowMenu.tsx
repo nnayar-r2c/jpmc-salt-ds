@@ -50,6 +50,8 @@ function OverflowMenuImpl({
   onSelectItem,
   returnFocusToTabs,
 }: OverflowMenuProps) {
+  const [returnedFocusAfterSelection, setReturnedFocusAfterSelection] =
+    useState(true);
   const { ref, overflowCount } = useOverflowMenu<HTMLDivElement>();
   const itemVisibility = useOverflowContext(
     (context) => context.itemVisibility
@@ -115,6 +117,7 @@ function OverflowMenuImpl({
     if (typeof highlightedIndex !== "number") return;
     const selectedItem = tabList[highlightedIndex];
     if (!selectedItem) return;
+    setReturnedFocusAfterSelection(false);
     setOpen(false);
     onSelectItem(tabList[highlightedIndex].id);
   }
@@ -188,6 +191,13 @@ function OverflowMenuImpl({
           {...getReferenceProps({
             onKeyDown: (e) => {
               if (e.key === "ArrowLeft") {
+                returnFocusToTabs();
+              }
+            },
+            onFocus: (e) => {
+              if (!returnedFocusAfterSelection) {
+                e.preventDefault();
+                setReturnedFocusAfterSelection(true);
                 returnFocusToTabs();
               }
             },

@@ -90,10 +90,6 @@ export const TabstripNext = ({
     });
     setActiveTabIndex(index);
     onActiveChange?.(index);
-    // We are using setTimeout here because the overflow menu has its own focus management.
-    setTimeout(() => {
-      document.getElementById(selectedId)?.focus();
-    }, 10);
   };
 
   return (
