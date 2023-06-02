@@ -1,4 +1,4 @@
-export * from "./Accordion";
+export * from "./AccordionGroup";
 export * from "./AccordionPanel";
-export * from "./AccordionSection";
+export * from "./Accordion";
 export * from "./AccordionHeader";

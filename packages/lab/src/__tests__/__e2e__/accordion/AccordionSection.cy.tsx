@@ -1,9 +1,9 @@
 import {
-  Accordion,
+  AccordionGroup,
   AccordionPanel,
   AccordionDetailsProps,
-  AccordionSection,
-  AccordionSectionProps,
+  Accordion,
+  AccordionProps,
   AccordionHeader,
 } from "@salt-ds/lab";
 import { Component, ReactNode } from "react";
@@ -33,7 +33,7 @@ class DetailsSpy extends Component<DetailsSpyProps> {
   }
 }
 
-type AccordionExampleProps = Pick<AccordionSectionProps, "onChange"> &
+type AccordionExampleProps = Pick<AccordionProps, "onChange"> &
   Pick<AccordionDetailsProps, "preventUnmountOnCollapse"> &
   DetailsSpyProps;
 
@@ -45,8 +45,8 @@ const AccordionExample = ({
   onUpdated,
 }: AccordionExampleProps) => {
   return (
-    <Accordion>
-      <AccordionSection onChange={onChange}>
+    <AccordionGroup>
+      <Accordion onChange={onChange}>
         <AccordionHeader>Summary Text</AccordionHeader>
         <AccordionPanel preventUnmountOnCollapse={preventUnmountOnCollapse}>
           <DetailsSpy
@@ -57,12 +57,12 @@ const AccordionExample = ({
             <div data-testid="details-content" />
           </DetailsSpy>
         </AccordionPanel>
-      </AccordionSection>
-    </Accordion>
+      </Accordion>
+    </AccordionGroup>
   );
 };
 
-describe("GIVEN an AccordionSection", () => {
+describe("GIVEN an Accordion", () => {
   describe("WHEN preventUnmountOnCollapse is false", () => {
     it("THEN it should render in collapsed state", () => {
       cy.mount(<AccordionExample />);

@@ -1,10 +1,6 @@
 import { ReactElement } from "react";
 import { clsx } from "clsx";
-import {
-  AccordionSection,
-  AccordionHeader,
-  AccordionPanel,
-} from "@salt-ds/lab";
+import { Accordion, AccordionHeader, AccordionPanel } from "@salt-ds/lab";
 import { makePrefixer } from "@salt-ds/core";
 import { ChildrenValues } from "../../ChildrenValues";
 import { JSONObj } from "../../../helpers/parseToJson";
@@ -47,7 +43,7 @@ export const FoundationPatternByDensity = (
   props: FoundationPatternByDensityProps
 ): ReactElement => {
   return (
-    <AccordionSection
+    <Accordion
       value={props.patternName}
       key={`${props.themeName}-${props.patternName}-accordion`}
     >
@@ -76,6 +72,6 @@ export const FoundationPatternByDensity = (
             })}
         </div>
       </AccordionPanel>
-    </AccordionSection>
+    </Accordion>
   );
 };

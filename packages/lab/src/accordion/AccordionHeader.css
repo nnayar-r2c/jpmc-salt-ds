@@ -12,6 +12,7 @@
   font-size: var(--salt-text-fontSize);
   line-height: var(--salt-text-lineHeight);
   font-family: var(--salt-text-fontFamily);
+  color: var(--salt-text-primary-foreground);
 }
 
 .saltAccordionHeader:focus-visible {

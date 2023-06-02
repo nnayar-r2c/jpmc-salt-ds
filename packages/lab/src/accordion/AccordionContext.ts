@@ -1,15 +1,15 @@
 import { createContext } from "@salt-ds/core";
 import { SyntheticEvent, useContext } from "react";
 
-export interface AccordionSectionContext {
+export interface AccordionContextValue {
   value: string;
   expanded: boolean;
   toggle: (event: SyntheticEvent<HTMLButtonElement>) => void;
   disabled: boolean;
 }
 
-export const AccordionSectionContext = createContext<AccordionSectionContext>(
-  "AccordionSectionContext",
+export const AccordionContext = createContext<AccordionContextValue>(
+  "AccordionContext",
   {
     value: "",
     expanded: false,
@@ -18,6 +18,6 @@ export const AccordionSectionContext = createContext<AccordionSectionContext>(
   }
 );
 
-export function useAccordionSection() {
-  return useContext(AccordionSectionContext);
+export function useAccordion() {
+  return useContext(AccordionContext);
 }

@@ -1,16 +1,63 @@
-import { ComponentPropsWithoutRef, forwardRef } from "react";
-import { makePrefixer } from "@salt-ds/core";
+import { ComponentPropsWithoutRef, forwardRef, SyntheticEvent } from "react";
+import { makePrefixer, useControlled } from "@salt-ds/core";
 import { clsx } from "clsx";
-export interface AccordionProps extends ComponentPropsWithoutRef<"div"> {}
+import { AccordionContext } from "./AccordionContext";
+export interface AccordionProps extends ComponentPropsWithoutRef<"div"> {
+  /**
+   * AccordionGroup value.
+   */
+  value: string;
+  /**
+   * Whether the accordion is expanded.
+   */
+  expanded?: boolean;
+  /**
+   * Whether the accordion is expanded by default.
+   */
+  defaultExpanded?: boolean;
+  /**
+   * Callback fired when the accordion is toggled.
+   * @param event
+   */
+  onToggle?: (event: SyntheticEvent<HTMLButtonElement>) => void;
+  /**
+   * Whether the accordion is disabled.
+   */
+  disabled?: boolean;
+}
 
 const withBaseName = makePrefixer("saltAccordion");
 
 export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
   function Accordion(props, ref) {
-    const { className, ...rest } = props;
+    const {
+      className,
+      defaultExpanded,
+      expanded: expandedProp,
+      disabled,
+      onToggle,
+      value,
+      ...rest
+    } = props;
+
+    const [expanded, setExpanded] = useControlled({
+      controlled: expandedProp,
+      default: Boolean(defaultExpanded),
+      name: "Accordion",
+      state: "expanded",
+    });
+
+    const toggle = (event: SyntheticEvent<HTMLButtonElement>) => {
+      setExpanded((prev) => !prev);
+      onToggle?.(event);
+    };
 
     return (
-      <div className={clsx(withBaseName(), className)} ref={ref} {...rest} />
+      <AccordionContext.Provider
+        value={{ value, toggle, expanded, disabled: Boolean(disabled) }}
+      >
+        <div ref={ref} className={clsx(withBaseName(), className)} {...rest} />
+      </AccordionContext.Provider>
     );
   }
 );

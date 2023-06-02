@@ -1,32 +1,32 @@
 import {
-  Accordion,
+  AccordionGroup,
   AccordionPanel,
-  AccordionProps,
-  AccordionSection,
+  AccordionGroupProps,
+  Accordion,
   AccordionHeader,
 } from "@salt-ds/lab";
 import { useReducer, useState } from "react";
 
-const AccordionExample = (props: AccordionProps) => {
+const AccordionExample = (props: AccordionGroupProps) => {
   return (
-    <Accordion {...props}>
-      <AccordionSection id="section-0" key="AccordionSection0">
+    <AccordionGroup {...props}>
+      <Accordion id="section-0" key="AccordionSection0">
         <AccordionHeader>AccordionSummary0</AccordionHeader>
         <AccordionPanel>AccordionDetails0</AccordionPanel>
-      </AccordionSection>
-      <AccordionSection id="section-1" key="AccordionSection1">
+      </Accordion>
+      <Accordion id="section-1" key="AccordionSection1">
         <AccordionHeader>AccordionSummary1</AccordionHeader>
         <AccordionPanel>AccordionDetails1</AccordionPanel>
-      </AccordionSection>
-      <AccordionSection id="section-2" key="AccordionSection2">
+      </Accordion>
+      <Accordion id="section-2" key="AccordionSection2">
         <AccordionHeader>AccordionSummary2</AccordionHeader>
         <AccordionPanel>AccordionDetails2</AccordionPanel>
-      </AccordionSection>
-    </Accordion>
+      </Accordion>
+    </AccordionGroup>
   );
 };
 
-const ControlledAccordionExample = (props: AccordionProps) => {
+const ControlledAccordionExample = (props: AccordionGroupProps) => {
   const { expandedSectionIds, onChange, ...rest } = props;
   const [expanded, setExpanded] = useState(expandedSectionIds);
 
@@ -36,20 +36,24 @@ const ControlledAccordionExample = (props: AccordionProps) => {
   };
 
   return (
-    <Accordion expandedSectionIds={expanded} onChange={handleChange} {...rest}>
-      <AccordionSection id="section-0" key="AccordionSection0">
+    <AccordionGroup
+      expandedSectionIds={expanded}
+      onChange={handleChange}
+      {...rest}
+    >
+      <Accordion id="section-0" key="AccordionSection0">
         <AccordionHeader>AccordionSummary0</AccordionHeader>
         <AccordionPanel>AccordionDetails0</AccordionPanel>
-      </AccordionSection>
-      <AccordionSection id="section-1" key="AccordionSection1">
+      </Accordion>
+      <Accordion id="section-1" key="AccordionSection1">
         <AccordionHeader>AccordionSummary1</AccordionHeader>
         <AccordionPanel>AccordionDetails1</AccordionPanel>
-      </AccordionSection>
-      <AccordionSection id="section-2" key="AccordionSection2">
+      </Accordion>
+      <Accordion id="section-2" key="AccordionSection2">
         <AccordionHeader>AccordionSummary2</AccordionHeader>
         <AccordionPanel>AccordionDetails2</AccordionPanel>
-      </AccordionSection>
-    </Accordion>
+      </Accordion>
+    </AccordionGroup>
   );
 };
 
@@ -71,7 +75,7 @@ const expectOnChangeLastCalled = (expected: number[]) => {
   );
 };
 
-describe("GIVEN an Accordion", () => {
+describe("GIVEN an AccordionGroup", () => {
   describe("WHEN it is used in uncontrolled mode", () => {
     describe("WHEN user expands up to maxExpandedItems sections", () => {
       it("THEN sections should expand", () => {
@@ -105,27 +109,27 @@ describe("GIVEN an Accordion", () => {
       });
 
       describe("AND WHEN user changes maxExpandedItems to a lower number", () => {
-        function DynamicMaxExpandedItemsExample(props: AccordionProps) {
+        function DynamicMaxExpandedItemsExample(props: AccordionGroupProps) {
           const [isToggled, toggle] = useReducer((state) => {
             return !state;
           }, false);
           return (
             <>
               <button onClick={toggle}>Toggle Max Expanded Items</button>
-              <Accordion {...props} maxExpandedItems={isToggled ? 1 : 2}>
-                <AccordionSection id="section-0" key="AccordionSection0">
+              <AccordionGroup {...props} maxExpandedItems={isToggled ? 1 : 2}>
+                <Accordion id="section-0" key="AccordionSection0">
                   <AccordionHeader>AccordionSummary0</AccordionHeader>
                   <AccordionPanel>AccordionDetails0</AccordionPanel>
-                </AccordionSection>
-                <AccordionSection id="section-1" key="AccordionSection1">
+                </Accordion>
+                <Accordion id="section-1" key="AccordionSection1">
                   <AccordionHeader>AccordionSummary1</AccordionHeader>
                   <AccordionPanel>AccordionDetails1</AccordionPanel>
-                </AccordionSection>
-                <AccordionSection id="section-2" key="AccordionSection2">
+                </Accordion>
+                <Accordion id="section-2" key="AccordionSection2">
                   <AccordionHeader>AccordionSummary2</AccordionHeader>
                   <AccordionPanel>AccordionDetails2</AccordionPanel>
-                </AccordionSection>
-              </Accordion>
+                </Accordion>
+              </AccordionGroup>
             </>
           );
         }
@@ -191,20 +195,20 @@ describe("GIVEN an Accordion", () => {
   describe("WHEN expanded prop is set directly on accordion sections", () => {
     it("THEN sections with expanded property set to true should be expanded", () => {
       cy.mount(
-        <Accordion>
-          <AccordionSection id="section-0" key="AccordionSection0">
+        <AccordionGroup>
+          <Accordion id="section-0" key="AccordionSection0">
             <AccordionHeader>AccordionSummary0</AccordionHeader>
             <AccordionPanel>AccordionDetails0</AccordionPanel>
-          </AccordionSection>
-          <AccordionSection id="section-1" key="AccordionSection1" expanded>
+          </Accordion>
+          <Accordion id="section-1" key="AccordionSection1" expanded>
             <AccordionHeader>AccordionSummary1</AccordionHeader>
             <AccordionPanel>AccordionDetails1</AccordionPanel>
-          </AccordionSection>
-          <AccordionSection id="section-2" key="AccordionSection2">
+          </Accordion>
+          <Accordion id="section-2" key="AccordionSection2">
             <AccordionHeader>AccordionSummary2</AccordionHeader>
             <AccordionPanel>AccordionDetails2</AccordionPanel>
-          </AccordionSection>
-        </Accordion>
+          </Accordion>
+        </AccordionGroup>
       );
       expectExpandedSections([1]);
     });
@@ -212,20 +216,20 @@ describe("GIVEN an Accordion", () => {
     // TODO Should this work?
     it.skip("THEN expanded property set on sections should have priority over accordion's properties", () => {
       cy.mount(
-        <Accordion expandedSectionIds={["section-0", "section-1"]}>
-          <AccordionSection id="section-0" key="AccordionSection0">
+        <AccordionGroup expandedSectionIds={["section-0", "section-1"]}>
+          <Accordion id="section-0" key="AccordionSection0">
             <AccordionHeader>AccordionSummary0</AccordionHeader>
             <AccordionPanel>AccordionDetails0</AccordionPanel>
-          </AccordionSection>
-          <AccordionSection id="section-1" key="AccordionSection1">
+          </Accordion>
+          <Accordion id="section-1" key="AccordionSection1">
             <AccordionHeader>AccordionSummary1</AccordionHeader>
             <AccordionPanel>AccordionDetails1</AccordionPanel>
-          </AccordionSection>
-          <AccordionSection id="section-2" key="AccordionSection2" expanded>
+          </Accordion>
+          <Accordion id="section-2" key="AccordionSection2" expanded>
             <AccordionHeader>AccordionSummary2</AccordionHeader>
             <AccordionPanel>AccordionDetails2</AccordionPanel>
-          </AccordionSection>
-        </Accordion>
+          </Accordion>
+        </AccordionGroup>
       );
 
       expectExpandedSections([2]);

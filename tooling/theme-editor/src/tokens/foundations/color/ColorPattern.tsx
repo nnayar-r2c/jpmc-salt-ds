@@ -1,11 +1,7 @@
 import { ReactElement } from "react";
 import { useSearchParams } from "react-router-dom";
 import { capitalize } from "@salt-ds/core";
-import {
-  AccordionSection,
-  AccordionPanel,
-  AccordionHeader,
-} from "@salt-ds/lab";
+import { Accordion, AccordionPanel, AccordionHeader } from "@salt-ds/lab";
 import { JSONObj } from "../../../helpers/parseToJson";
 import { ChildrenValues } from "../../ChildrenValues";
 export interface ColorPatternProps {
@@ -26,7 +22,7 @@ export const ColorPattern = (props: ColorPatternProps): ReactElement => {
     <>
       {Object.keys(props.values).map(function (color) {
         return (
-          <AccordionSection
+          <Accordion
             expanded={expandedSections.includes(color)}
             value={color}
             key={`${props.themeName}-${props.patternName}-${color}-accordion`}
@@ -71,7 +67,7 @@ export const ColorPattern = (props: ColorPatternProps): ReactElement => {
                 );
               })}
             </AccordionPanel>
-          </AccordionSection>
+          </Accordion>
         );
       })}
     </>

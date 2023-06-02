@@ -5,7 +5,7 @@ import { ChevronRightIcon } from "@salt-ds/icons";
 import { useWindow } from "@salt-ds/window";
 import { useComponentCssInjection } from "@salt-ds/styles";
 
-import { useAccordionSection } from "./AccordionSectionContext";
+import { useAccordion } from "./AccordionContext";
 import accordionHeaderCss from "./AccordionHeader.css";
 
 export interface AccordionHeaderProps
@@ -18,7 +18,7 @@ export const AccordionHeader = forwardRef<
   AccordionHeaderProps
 >(function AccordionHeader(props, ref) {
   const { children, className, onClick, ...rest } = props;
-  const { value, expanded, toggle, disabled } = useAccordionSection();
+  const { value, expanded, toggle, disabled } = useAccordion();
 
   const targetWindow = useWindow();
   useComponentCssInjection({

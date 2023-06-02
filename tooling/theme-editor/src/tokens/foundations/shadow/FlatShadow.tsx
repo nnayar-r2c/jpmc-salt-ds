@@ -1,11 +1,7 @@
 import { ReactElement } from "react";
 import { clsx } from "clsx";
 import { capitalize, makePrefixer } from "@salt-ds/core";
-import {
-  AccordionSection,
-  AccordionPanel,
-  AccordionHeader,
-} from "@salt-ds/lab";
+import { Accordion, AccordionPanel, AccordionHeader } from "@salt-ds/lab";
 import { JSONObj } from "../../../helpers/parseToJson";
 import { getShadowParts } from "./getShadowParts";
 import { ShadowPatternProps } from "./ShadowPatternProps";
@@ -29,7 +25,7 @@ export const FlatShadow = (props: FlatShadowProps): ReactElement => {
   const patternParts = getShadowParts(props.shadowPattern);
 
   return (
-    <AccordionSection
+    <Accordion
       key={`${props.themeName}-${props.innerPattern}-accordion`}
       value={props.innerPattern}
       expanded={props.expandedSections.includes(props.innerPattern)}
@@ -98,6 +94,6 @@ export const FlatShadow = (props: FlatShadowProps): ReactElement => {
           })}
         </div>
       </AccordionPanel>
-    </AccordionSection>
+    </Accordion>
   );
 };

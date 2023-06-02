@@ -1,18 +1,18 @@
 import { useState, ReactNode, SyntheticEvent, ComponentType } from "react";
 import {
-  Accordion,
+  AccordionGroup,
   AccordionPanel,
-  AccordionProps,
-  AccordionSection,
+  AccordionGroupProps,
+  Accordion,
   AccordionHeader,
 } from "@salt-ds/lab";
 import { ComponentMeta, Story } from "@storybook/react";
 import "./accordion.stories.css";
 
 export default {
-  title: "Lab/Accordion",
-  component: Accordion,
-} as ComponentMeta<typeof Accordion>;
+  title: "Lab/AccordionGroup",
+  component: AccordionGroup,
+} as ComponentMeta<typeof AccordionGroup>;
 
 const PanelContent = ({ children }: { children?: ReactNode }) => {
   return <div className="panel-content">{children}</div>;
@@ -60,19 +60,19 @@ const contentMap: Record<string, ComponentType> = {
 
 const AccordionTemplate: Story<AccordionStoryProps> = (props) => (
   <div className="story-root">
-    <Accordion>
+    <AccordionGroup>
       {accordions.map((accordion) => {
         const Content = contentMap[accordion];
         return (
-          <AccordionSection value={accordion} disabled={props.disabled}>
+          <Accordion value={accordion} disabled={props.disabled}>
             <AccordionHeader>{accordion}</AccordionHeader>
             <AccordionPanel>
               <Content />
             </AccordionPanel>
-          </AccordionSection>
+          </Accordion>
         );
       })}
-    </Accordion>
+    </AccordionGroup>
   </div>
 );
 
@@ -86,11 +86,11 @@ const ControlledAccordionTemplate: Story<AccordionStoryProps> = (props) => {
 
   return (
     <div className="story-root">
-      <Accordion>
+      <AccordionGroup>
         {accordions.map((accordion) => {
           const Content = contentMap[accordion];
           return (
-            <AccordionSection
+            <Accordion
               expanded={expanded === accordion}
               onToggle={onChange}
               value={accordion}
@@ -100,15 +100,15 @@ const ControlledAccordionTemplate: Story<AccordionStoryProps> = (props) => {
               <AccordionPanel>
                 <Content />
               </AccordionPanel>
-            </AccordionSection>
+            </Accordion>
           );
         })}
-      </Accordion>
+      </AccordionGroup>
     </div>
   );
 };
 
-const MultiAccordionTemplate: Story<AccordionProps> = () => {
+const MultiAccordionTemplate: Story<AccordionGroupProps> = () => {
   const [expanded, setExpanded] = useState<string[]>([]);
 
   const onChange = (event: SyntheticEvent<HTMLButtonElement>) => {
@@ -120,11 +120,11 @@ const MultiAccordionTemplate: Story<AccordionProps> = () => {
 
   return (
     <div className="story-root">
-      <Accordion>
+      <AccordionGroup>
         {accordions.map((accordion) => {
           const Content = contentMap[accordion];
           return (
-            <AccordionSection
+            <Accordion
               expanded={expanded.includes(accordion)}
               onToggle={onChange}
               value={accordion}
@@ -133,37 +133,37 @@ const MultiAccordionTemplate: Story<AccordionProps> = () => {
               <AccordionPanel>
                 <Content />
               </AccordionPanel>
-            </AccordionSection>
+            </Accordion>
           );
         })}
-      </Accordion>
+      </AccordionGroup>
     </div>
   );
 };
 
-const AccordionInAccordionTemplate: Story<AccordionProps> = () => {
+const AccordionInAccordionTemplate: Story<AccordionGroupProps> = () => {
   return (
     <div className="story-root">
-      <Accordion>
-        <AccordionSection key={"Geography"} value="Geography">
+      <AccordionGroup>
+        <Accordion key={"Geography"} value="Geography">
           <AccordionHeader>Geography</AccordionHeader>
           <AccordionPanel>
             <PanelContent>
               {accordions.map((accordion) => {
                 const Content = contentMap[accordion];
                 return (
-                  <AccordionSection value={accordion}>
+                  <Accordion value={accordion}>
                     <AccordionHeader>{accordion}</AccordionHeader>
                     <AccordionPanel>
                       <Content />
                     </AccordionPanel>
-                  </AccordionSection>
+                  </Accordion>
                 );
               })}
             </PanelContent>
           </AccordionPanel>
-        </AccordionSection>
-        <AccordionSection key={"Climate"} value="Climate">
+        </Accordion>
+        <Accordion key={"Climate"} value="Climate">
           <AccordionHeader>Climate</AccordionHeader>
           <AccordionPanel>
             <p>
@@ -171,8 +171,8 @@ const AccordionInAccordionTemplate: Story<AccordionProps> = () => {
               cool temperatures and plentiful rainfall all year round.
             </p>
           </AccordionPanel>
-        </AccordionSection>
-      </Accordion>
+        </Accordion>
+      </AccordionGroup>
     </div>
   );
 };
